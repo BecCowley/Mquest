@@ -1,0 +1,8 @@
+%  s_raw, t_raw and p_raw are the raw values received for the profile
+%  p_callibrate is the adjusted pressure after removing the surface pressure offset
+%  s_calibrate is the adjusted salinity after pressure has been corrected.
+
+cndr  = sw_cndr(s_raw,t_raw,p_raw);    
+s_calibrate = sw_salt(cndr,t_raw,p_calibrate);
+
+  

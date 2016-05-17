@@ -1,0 +1,13 @@
+
+
+ T-4   d1new: 6.6910  d2new: 0.00225
+ T-5   d1new: 6.8280  d2new: 0.00182
+ T-6   d1new: 6.6910  d2new: 0.00225
+ T-7
+DB     d1new: 6.6910  d2new: 0.00225
+ T-FD - fast deep   d1new: 6.3910  d2new: 0.00182
+ T-DB - deep blue   d1new: 6.6910  d2new: 0.00225
+ T-10   d1new: 6.3010  d2new: 0.00216
+ T-11   d1new: 1.7779  d2new: 0.0002557
+ Spartan probe - T-7 equiv   d1new: 6.6910  d2new: 0.00225
+ 

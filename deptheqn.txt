@@ -1,0 +1,3 @@
+         do 25 i=1,np
+            D(i)=(a - (b * tinc * i)) * tinc * i
+ 25      continue

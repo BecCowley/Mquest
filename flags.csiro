@@ -1,0 +1,89 @@
+csiro mnemonic, severity code,integer code,depth source [0:not applicable
+ or depth known; 1 depth from menu; 2 depth from cursor line]; depth used}
+CSA  0 1   0 0.0   {Surface data removed to 3.7m, replaced with 99.99}
+QCA  1 36  0 0.
+DUA  0 35  0 0.
+DAA  0 35  0 0.
+REA  0 24  0 0.
+PEA  2 33  0 0.    {Position error flag!}
+PEH  2 33  0 0.    {Position error flag! to autocorrect hemisphere}
+TEA  2 34  0 0.    {Time error flag!}
+DPA  0 39  0 0.    {Depth corrected (new equation)}
+MOA  2 2   1 0.    {Spike replaced with linearly interpolated values}
+IVA  1 6   2 0.    
+NUA  1 7   2 0.    
+SAA  2 16  0 0.    {FROM SURFACE}
+STA  1 8   0 0.        
+EFA  1 32  0 0.    { EDDY FRONT } 
+OPA  2 28  0 0.
+TDA  2 17  2 0.
+FSA  2 29  0 0.
+PSA  2 37  0 0.    
+PIA  2 31  2 0.    
+WSA  2 9   2 0.   
+LEA  2 10  0 0.  
+IDA  2 10  0 0.  {id number has changed - this stores the old one..}  
+IPA  2 13  1 0.    
+SPA  2 14  1 0.    
+HFA  2 12  1 0.    
+HBA  2 4   2 0.    
+CTA  1 18  0 0.  { CLASS 1 TO 10m, CLASS 3 BELOW }
+CUA  2 11  2 0.    
+ERA  2 47  0 0.  {early recording error - probe not in water}
+BOA  2 15  0 0.    {FROM SURFACE}
+DEA  2 45  0 0.    {multiply depth by 10m for JDRD}
+PFA  2 5   2 0.    
+SBA  2 27  0 0.    { CLASS 2 FROM SURFACE (19 POINT FILTER WITH COEFF 0.0526}
+DRA  2 30  0 0.
+GSA  2 46  2 0.   {bad short gradient flag from auto qc program}
+GLA  2 48  2 0.   {bad long gradient flag from auto qc program}
+BDA  1 23  0 0.
+BBA  1 40  0 0.   {bad bottle data - insert missing value at cursor}
+EEA  2 38  0 0.    
+MSA  2 99  0 0.
+TAA  2 44  2 0.   {Temperature anomaly - could be bad but accept for now...}
+URA  2 42  0 0.   {under resolved profile - surface interps prob. garbagel}
+DTA  2 43  0 0.   {bad data type - correct it!}
+SFA  1 50  0 0.   {The beginning of the woce specific codes...}
+MLA  1 51  0 0.
+TIA  2 52  0 0.
+TGA  2 53  0 0.
+QUR  3 -79 2 0.   {Questionable! allows retrieval for later exam.}
+RER  3 -24 0 0.   {repeat drop to be rejected for other reasons}
+DDR  3 -80 0 0.
+WSR  3 -9  2 0.    
+LER  3 -10 2 0.    
+HFR  3 -12 1 0.    
+IPR  3 -13 1 0.    
+SPR  4 -14 1 0.    
+TOR  3 -17 2 0.   {from surface!!  Change this back to 2!!}   
+CTR  3 -18 1 0.   {FROM menu - but from 10m if CTA}
+OPR  3 -28 2 0.   {FROM cursor}
+DRR  3 -30 0 0.   {FROM SURFACE}
+CSR  3 -1  0 0.
+MOR  3 -2  0 0.
+CUR  3 -11 2 0.    
+BOR  3 -15 0 0.    {FROM SURFACE}
+SAR  3 -16 0 0.    {FROM SURFACE}
+SBR  3 -27 0 0.
+PER  3 -33 0 0.
+TER  3 -34 0 0.
+DUR  3 -35 0 0.   {true duplicate drop to be deleted from file}
+CLR  3 -38 1 0.   {contact lost (with probe) - reject}
+NTR  4 -19 0 0.   {FROM SURFACE}
+NGR  4 -20 1 0.   {FROM DEPTH OF PROBLEM}
+WBR  4 -3  1 0.    
+HBR  3 -4  1 0.    
+PFR  3 -5  2 0. 
+BDR  3 -23 0 0. 
+MBR  3 -41 2 0.   
+TPR  4 -21 0 0.
+URR  3 -42 0 0.
+GRR  3 -46 2 0.
+SFR  3 -50 0 0.   {The beginning fothe woce specific codes...}
+FSR  3 -29 0 0.
+MLR  3 -51 0 0.
+TIR  3 -52 0 0.
+TGR  3 -53 0 0.
+nss  4 -99 0 0.   {nonsense to get TPR to work!!!}
+
