@@ -11,6 +11,7 @@ currentp=i
 
 col=['gbyrg'];
 readnetcdf;
+pd = handles.pd;
 handles.changed='N';
             
 %plot climatology...
@@ -18,18 +19,18 @@ plot_clim;
 handles.displaybuddy='N';
 
 xlimit=[-5 35];
-if(profiledata.ndep>0)
-    handles.menudepth=min(handles.menudepth,profiledata.depth(profiledata.ndep(1)));
+if(pd.ndep>0)
+    handles.menudepth=min(handles.menudepth,pd.depth(pd.ndep(1)));
 else
     handles.menudepth=0;
 end
 
 %plot grey line at cursor point
 ylimit=[-30 1000];
-if(profiledata.ndep>0)
-    if(profiledata.depth(profiledata.ndep(1))>1000.)
-        gg=find(profiledata.depth>1000);
-        if(profiledata.temp(gg(1))<30.)
+if(pd.ndep>0)
+    if(pd.depth(pd.ndep(1))>1000.)
+        gg=find(pd.depth>1000);
+        if(pd.temp(gg(1))<30.)
             ylimit=[-30 2000];
         end
     end
@@ -43,20 +44,20 @@ set(g,'LineWidth',2);
 
 
 %plot profile data
-isn=find(~isnan(profiledata.temp) & profiledata.temp<99.);
+isn=find(~isnan(pd.temp) & pd.temp<99.);
 if(~isempty(isn))
     if length(isn)==1
-    hg=plot(profiledata.temp(isn),profiledata.depth(isn),'wx');
+    hg=plot(pd.temp(isn),pd.depth(isn),'wx');
     else
-    hg=plot(profiledata.temp(isn),profiledata.depth(isn),'w-');
+    hg=plot(pd.temp(isn),pd.depth(isn),'w-');
     end
     set(hg,'ButtonDownFcn','recenterprofileplotfcn');
 end
-if(isfield(profiledata,'sal'));
-    isn=find(~isnan(profiledata.sal) & profiledata.sal<99.);
+if(isfield(pd,'sal'));
+    isn=find(~isnan(pd.sal) & pd.sal<99.);
     if(~isempty(isn))
-        shiftsal=profiledata.sal-20.;
-        hs=plot(shiftsal(isn),profiledata.depth(isn),'c');
+        shiftsal=pd.sal-20.;
+        hs=plot(shiftsal(isn),pd.depth(isn),'c');
     end
 end
 hold on
@@ -68,7 +69,7 @@ set(gca,'Xcolor',grey);
 set(gca,'YColor',grey);
 %axis([-2 35 -1000 0])
 xlimit=[-5 35];
-%handles.menudepth=min(handles.menudepth,profiledata.depth(profiledata.ndep(1)));
+%handles.menudepth=min(handles.menudepth,pd.depth(pd.ndep(1)));
             
 %add QC flags to plot and plot colored line of profile quality:
 

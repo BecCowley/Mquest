@@ -12,8 +12,6 @@
 %          NOTE: use -doy if want just seasonal component; ie mean=0.
 %  fname   CARS version name:  eg 'cars2006a' or 'coast8_06' [def cars2006]
 %  woa     1=WOA05  2=WOA98   used outside of CARS region  [def 0]
-%  fll     1=values at all depths outside of land areas (with selected
-%          files only) [default 0]
 %  vart    1=seasonal or mean  9=SD  10=RMSMR  11=RMSR  [def 1]
 %          (var>=2 disables seasonal evaluation)
 %
@@ -24,14 +22,14 @@
 % AUTHOR: Jeff Dunn  CSIRO DMR  May 1998
 % $Id: get_clim_casts.m,v 1.6 2001/06/07 00:00:59 dun216 Exp dun216 $
 %
-% CALLS:  clname  inpolygon  coord2grd  getchunk  get_woa_profiles
+% CALLS:  clname  inpolygon  coord2grd  getchunk2  get_woa_profiles
 % RELATED:  'get_clim' - is slower but can get data from multiple climatologies
 %           in one go (eg use low res only where no high res), and also can
 %           return variables other than the mean or seasonal property fields.
 %
-% USAGE: [vv,out] = get_clim_casts(prop,lon,lat,deps,doy,fname,woa,fll,vart);
+% USAGE: [vv,out] = get_clim_casts(prop,lon,lat,deps,doy,fname,woa,vart);
 
-function [vv,out] = get_clim_casts(prop,lon,lat,deps,doy,fname,woa,fll,vart);
+function [vv,out] = get_clim_casts(prop,lon,lat,deps,doy,fname,woa,vart);
 
 % MODS  30/5/08  Add access to WOD05
 
@@ -48,8 +46,6 @@ end
 [vv,out] = deal([]);
 
 
-ncquiet;
-
 if ~isa(lon,'double')
     lon = double(lon);
     lat = double(lat);
@@ -58,8 +54,7 @@ end
 if nargin<5; doy = []; end
 if nargin<6; fname = []; end
 if nargin<7 | isempty(woa); woa = 0; end
-if nargin<8 | isempty(fll); fll = 0; end
-if nargin<9 | isempty(vart)
+if nargin<8 | isempty(vart)
     vart = 1;
     doy = [];
 end
@@ -140,7 +135,7 @@ if ~isempty(ic)
     [X,Y] = coord2grd(lon(ic),lat(ic),gor(2),gor(1),gsp(2),gsp(1),rot);
     
     if isempty(doy)
-        [mn,t2,t3,t4,t5,ix,iy] = getchunk(prop,deps,rng,cpath,fname,-2,fll,vart);
+        [mn,t2,t3,t4,t5,ix,iy] = getchunk22(prop,deps,rng,cpath,fname,-2,vart);
         if isempty(mn)
             return
         end
@@ -160,7 +155,7 @@ if ~isempty(ic)
         % 	vv(2:ndep,ic) = interp3(mn,X,Y,Z,'*linear');
         %      end
     else
-        [mn,an,sa,t4,t5,ix,iy] = getchunk(prop,deps,rng,cpath,fname,2,fll,vart);
+        [mn,an,sa,t4,t5,ix,iy] = getchunk2(prop,deps,rng,cpath,fname,2,vart);
         if isempty(mn)
             return
         end

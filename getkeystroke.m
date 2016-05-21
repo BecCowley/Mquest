@@ -1,4 +1,4 @@
-function ch = getkey(m) ;
+function ch = getkeystroke(m) ;
 
 % GETKEY - get a key 
 %   CH = GETKEY waits for a keypress, returns the ASCII code. Accepts
@@ -25,7 +25,7 @@ set(gcbo,'Userdata',get(handles.QuotaQuest,'Currentkey'));
 
     ch = get(gcbo,'Userdata');
 
-    profiledata=handles.profile_data;
+    pd=handles.pd;
 
 qualf='   ';
 
@@ -84,18 +84,18 @@ switch ch;
 %        close(hw2);
         return
     case 'f2'   %show QC (in list box)
-        numh=profiledata.numhists;
-        kk=1:numh;   %strmatch(DATA_QC_SOURCE,profiledata.Ident_Code);
-qcstring= [profiledata.QC_code(kk,:) num2str(profiledata.QC_depth(kk),' \t%9.2f')];
+        numh=pd.numhists;
+        kk=1:numh;   %strmatch(DATA_QC_SOURCE,pd.Ident_Code);
+qcstring= [pd.QC_code(kk,:) num2str(pd.QC_depth(kk),' \t%9.2f')];
         centering=1;
         deletionpoint= deleteQC('UserData',{centering qcstring 1});
         %close(hw2);
                 return;
     case 'f3'   %delete QC (from list)
-        numh=profiledata.numhists;
-        kk= 1:numh;    %strmatch(DATA_QC_SOURCE,profiledata.Ident_Code);
+        numh=pd.numhists;
+        kk= 1:numh;    %strmatch(DATA_QC_SOURCE,pd.Ident_Code);
         kkhist=kk;
-qcstring= [profiledata.QC_code(kk,:) num2str(profiledata.QC_depth(kk),' \t%9.2f')];
+qcstring= [pd.QC_code(kk,:) num2str(pd.QC_depth(kk),' \t%9.2f')];
         centering=1;
         deletionpoint= deleteQC('UserData',{centering qcstring 0});
             if(deletionpoint==-1);
@@ -112,8 +112,8 @@ qcstring= [profiledata.QC_code(kk,:) num2str(profiledata.QC_depth(kk),' \t%9.2f'
     case 'f4'   %kill drop (replace with raw data)  ! must rewrite keys if date or position has changed...
         %check to see if date/time or lat/long has changed:
         rewritekeys=0;
-        for jj=1:profiledata.numhists
-            if(strcmp(profiledata.QC_code(jj,:),'TE') | strcmp(profiledata.QC_code(jj,:),'PE'))
+        for jj=1:pd.numhists
+            if(strcmp(pd.QC_code(jj,:),'TE') | strcmp(pd.QC_code(jj,:),'PE'))
                 rewritekeys=1;
             end
         end
@@ -129,49 +129,49 @@ qcstring= [profiledata.QC_code(kk,:) num2str(profiledata.QC_depth(kk),' \t%9.2f'
 
         i=handles.currentprofile;
         readnetcdf
-        profiledata=handles.profile_data;
+        pd=handles.profile_data;
         
         %now rewrite the keys elements that might have changed - do all just
         %to be sure.
                  
-        t=profiledata.time;
+        t=pd.time;
         sh=strfind(t,':');
         if(~isempty(sh))
             t(sh)=[];
         end
 
         updatekeys('obs_y',keysdata.masterrecno(handles.currentprofile),...
-                profiledata.year,keysdata.prefix);
+                pd.year,keysdata.prefix);
         updatekeys('obs_m',keysdata.masterrecno(handles.currentprofile),...
-                profiledata.month,keysdata.prefix);
+                pd.month,keysdata.prefix);
         updatekeys('obs_d',keysdata.masterrecno(handles.currentprofile),...
-                profiledata.date,keysdata.prefix);
+                pd.date,keysdata.prefix);
         updatekeys('obs_t',keysdata.masterrecno(handles.currentprofile),...
                 t,keysdata.prefix);
         updatekeys('obslat',keysdata.masterrecno(handles.currentprofile),...
-                profiledata.latitude,keysdata.prefix);
+                pd.latitude,keysdata.prefix);
        
            
  % no!       ????????????????????
 
-%     c= mod(720-profiledata.longitude,360);
-    c=profiledata.longitude;
+%     c= mod(720-pd.longitude,360);
+    c=pd.longitude;
     
        updatekeys('c360long',keysdata.masterrecno(handles.currentprofile),...
                c,keysdata.prefix);
        updatekeys('obslng',keysdata.masterrecno(handles.currentprofile),...
                c,keysdata.prefix);
   
-        keysdata.year(handles.currentprofile)=str2num(profiledata.year);
-        keysdata.month(handles.currentprofile)=str2num(profiledata.month);
-        keysdata.day(handles.currentprofile)=str2num(profiledata.date);
+        keysdata.year(handles.currentprofile)=str2num(pd.year);
+        keysdata.month(handles.currentprofile)=str2num(pd.month);
+        keysdata.day(handles.currentprofile)=str2num(pd.date);
         keysdata.time(handles.currentprofile)=str2num(t);
         keysdata.obslon(handles.currentprofile)=c;
-        keysdata.obslat(handles.currentprofile)=profiledata.latitude;
+        keysdata.obslat(handles.currentprofile)=pd.latitude;
         
         handles.keys=keysdata;
        
-        handles.profile_data=profiledata;
+        handles.profile_data=pd;
         
         axes(handles.profile);
         cla
@@ -350,13 +350,13 @@ qcstring= [profiledata.QC_code(kk,:) num2str(profiledata.QC_depth(kk),' \t%9.2f'
         
 
     case '5'    %get rid of duplicate history records...
-        kkhist=1:profiledata.numhists;
-        for i=1:profiledata.numhists
-            if(strmatch('PE',profiledata.QC_code(i,:)) |...
-                    strmatch('TE',profiledata.QC_code(i,:)));
+        kkhist=1:pd.numhists;
+        for i=1:pd.numhists
+            if(strmatch('PE',pd.QC_code(i,:)) |...
+                    strmatch('TE',pd.QC_code(i,:)));
             else
-          j=strmatch(profiledata.QC_code(i,:),profiledata.QC_code);
-          gg=find(j~=i & profiledata.QC_depth(i)==profiledata.QC_depth(j));
+          j=strmatch(pd.QC_code(i,:),pd.QC_code);
+          gg=find(j~=i & pd.QC_depth(i)==pd.QC_depth(j));
             if(~isempty(gg))
                 axes(handles.profile)
                 deletionpoint=j(gg);
@@ -464,7 +464,7 @@ qcstring= [profiledata.QC_code(kk,:) num2str(profiledata.QC_depth(kk),' \t%9.2f'
         end
 
         try
-            wlim=(ceil(profiledata.depth(profiledata.ndep)/100)*100)+100;
+            wlim=(ceil(pd.depth(pd.ndep)/100)*100)+100;
             set(handles.waterfall,'Ylim',[0 wlim(1)]);
         catch
             set(handles.waterfall,'Ylim',[1 1000]);
@@ -562,8 +562,8 @@ qcstring= [profiledata.QC_code(kk,:) num2str(profiledata.QC_depth(kk),' \t%9.2f'
         hold on
         
         %now plot the edited profile:
-        isn=find(~isnan(profiledata.temp) & profiledata.temp<99.);
-        plot(profiledata.temp(isn),profiledata.depth(isn),'w-');
+        isn=find(~isnan(pd.temp) & pd.temp<99.);
+        plot(pd.temp(isn),pd.depth(isn),'w-');
 
         drawnow
         %close(hw2);
@@ -678,18 +678,18 @@ end
         %first, remove any HBR or NGR already present:
         axes(handles.profile);
         qualf='HBR';
-        numh=profiledata.numhists;
-        qcstring= [profiledata.QC_code(1:numh,:)];
+        numh=pd.numhists;
+        qcstring= [pd.QC_code(1:numh,:)];
         deletionpoint= strmatch(qualf(1:2),qcstring,'exact');
             if(~isempty(deletionpoint));
-                kkhist=1:profiledata.numhists;
+                kkhist=1:pd.numhists;
                 deleteqcflag;
             end
         qualf='NGR';
-        qcstring= [profiledata.QC_code(1:numh,:)];
+        qcstring= [pd.QC_code(1:numh,:)];
         deletionpoint= strmatch(qualf(1:2),qcstring,'exact');
             if(~isempty(deletionpoint));
-                kkhist=1:profiledata.numhists;
+                kkhist=1:pd.numhists;
                 deleteqcflag;
             end
 
@@ -869,7 +869,7 @@ end
 %    case 'add'
         
     case 'multiply'     %set temp scale to show surface values that are offscale
-        r1=profiledata.temp(find(profiledata.temp<99));
+        r1=pd.temp(find(pd.temp<99));
         r=range(r1);
         set(handles.profile,'Xlim',[r(1)-5. r(2)+5.])
         %saveguidata
@@ -878,11 +878,11 @@ end
         %               used to see bottom of deep traces
         axes(handles.profile);
         cla;
-        focusdepth=(profiledata.depth(1)-profiledata.depth(profiledata.ndep))/2;
-        handles.profilefocus=profiledata.depth(profiledata.ndep)/2;
-        set(handles.profile,'YLim',[-10 profiledata.depth(profiledata.ndep)+100]);
+        focusdepth=(pd.depth(1)-pd.depth(pd.ndep))/2;
+        handles.profilefocus=pd.depth(pd.ndep)/2;
+        set(handles.profile,'YLim',[-10 pd.depth(pd.ndep)+100]);
         yy=get(handles.depthdisplay,'Value');
-        r=range(profiledata.temp);
+        r=range(pd.temp);
         set(handles.profile,'Xlim',[r(1)-5. r(2)+5.])
         %saveguidata
         zoomprofile;
@@ -1067,7 +1067,7 @@ usebuddylimits=get(handles.buddyselection,'Value');
         handles.profilefocus=100.;
         set(handles.profile,'YLim',[focusdepth-100 focusdepth+100]);
         yy=get(handles.depthdisplay,'Value');
-        set(handles.profile,'Xlim',[profiledata.temp(yy)-10. profiledata.temp(yy)+10.])
+        set(handles.profile,'Xlim',[pd.temp(yy)-10. pd.temp(yy)+10.])
         %saveguidata
         
         if(handles.displaybuddy=='Y')

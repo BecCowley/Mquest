@@ -1,65 +1,47 @@
-function quest(username,month,databaseprefix,questversion)
+function Mquest(username)
 
-% usage: quest('username')
-%        quest('username','mmm','databaseprefix','questversion') is optional in
-%        thi5s order
-%  This function is used to launch quest and initialize variables.
+% usage: Mquest('username')
+%  This function is used to launch Mquest and initialize variables.
 %  it sets up the preferences for the user (which can be iota or
-%  ann or lisa or mership or argo or ....) and then asks you if 
+%  ann or lisa or mership or argo or ....) and then asks you if
 %  you wish to change any parameters.
 
 CONFIG
 
-if(nargin<1)
-    username='newuser'
-%username='ann';
-end
-username=username;
+user = readUserInfotxt;
 
 % if(~ispc)
 %     pathelements
 % end
-
 newuser=0;
-[user,prefix,mm,yy,qc,auto,timewindow,sstyle]=textread('usersettings.txt','%s%s%s%s%s%s%s%s');
-
-getuser=strmatch(username,user,'exact');
+%user has entered a username
+getuser=find(strcmp(username,user.user));
 
 if(isempty(getuser))
-    newuser=length(user)+1;
+    newuser = 1;
+    if nargin < 1
+        %this is a new user
+        username=input('Please enter a new username [default: ''newuser'']: ','s');
+        if isempty(username)
+            username = 'newuser';
+        end
+    end
+    getuser = length(user.user) + 1;
 end
 
-if(newuser==length(user)+1)
-    
-    user{newuser}=username;
-    prefix{newuser}='unknown';
-    mm{newuser}='All';
-    yy{newuser}='All';
-    qc{newuser}='1';
-    auto{newuser}='1';
-    timewindow{newuser}='1';
-    sstyle{newuser}='unknown';
-end    
-
-getuser=strmatch(username,user,'exact');
-
-% if(nargin>1)
-%    mm{getuser}=month;
-% end
-% if(nargin>2)
-%    prefix{getuser}=databaseprefix;
-% end
-% if(nargin>3)
-%     sstyle{getuser}=questversion;
-% end
-
-%saveuserinfo
-if(nargin==2)
-    h=selectuser('usernumber',getuser,'users',user,'prefix',prefix,'month',mm,...
-    'year',yy,'qcrequired',qc,'autoonly',auto,'timewindow',timewindow,'sortstyle',sstyle,...
-    'showauto',1);
-else
-    h=selectuser('usernumber',getuser,'users',user,'prefix',prefix,'month',mm,...
-    'year',yy,'qcrequired',qc,'autoonly',auto,'timewindow',timewindow,'sortstyle',sstyle,...
-    'showauto',0);
+%add the new user information to the structure
+user.usernumber = getuser;
+user.showauto = 0;
+if newuser==1
+    user.user{end+1}=username;
+    user.prefix{end+1}='unknown';
+    user.mm{end+1}='All';
+    user.yy{end+1}='All';
+    user.qc{end+1}='1';
+    user.auto{end+1}='1';
+    user.timewindow{end+1}='1';
+    user.sstyle{end+1}='unknown';
+    saveuserinfo(user);
 end
+%call to gui 'selectuser'
+selectuser(user);

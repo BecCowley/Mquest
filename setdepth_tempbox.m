@@ -2,28 +2,28 @@ clear depthtemp
 
 %retrieveguidata
 
-profiledata=handles.profile_data;
+pd=handles.pd;
 depthtemp=[];
 
-for j=1:length(profiledata.depth) 
+for j=1:length(pd.depth) 
 %    p1=profiledata.temp(j);
 %    p2=profiledata.depth(j);
-if(isnan(profiledata.depth(j)))
+if(isnan(pd.depth(j)))
 
 else
-   depthtemp{j}=sprintf('%7.2f ', profiledata.depth(j), profiledata.temp(j));
+   depthtemp{j}=sprintf('%7.2f ', pd.depth(j), pd.temp(j));
 end
 end
 if(~isempty(depthtemp))
     set (handles.depthdisplay,'String',depthtemp);
-    findmd=find(profiledata.depth>=handles.menudepth);
+    findmd=find(pd.depth>=handles.menudepth);
     if(isempty(findmd))
-        if(~isnan(profiledata.depth(profiledata.ndep)))
-            set(handles.depthdisplay,'Value',profiledata.ndep);
-            findmd=profiledata.ndep;
+        if(~isnan(pd.depth(pd.ndep)))
+            set(handles.depthdisplay,'Value',pd.ndep);
+            findmd=pd.ndep;
         else
-            set(handles.depthdisplay,'Value',profiledata.ndep-1);
-            findmd=profiledata.ndep-1;
+            set(handles.depthdisplay,'Value',pd.ndep-1);
+            findmd=pd.ndep-1;
         end
     else
         set(handles.depthdisplay,'Value',findmd(1));

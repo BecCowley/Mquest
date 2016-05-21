@@ -36,11 +36,9 @@ else
 end
 
 format short g
-bfile=netcdf(filenam);
 
-
-nprof=bfile{'No_Prof'}(:);
-ptype=getnc(filenam,'Prof_Type');
+nprof=ncread(filenam,'No_Prof');
+ptype=ncread(filenam,'Prof_Type');
 
 if(nprof==1);ptype=ptype';end
 
@@ -48,22 +46,18 @@ if(nprof==1);ptype=ptype';end
 
 pt=strmatch('TEMP',ptype);
 
-h=squeeze(bfile{'Profparm'}(:,:,:,:,:));
+h=squeeze(ncread(filenam,'Profparm'));
 
-dpcode=getnc(filenam,'D_P_Code');
-de=bfile{'Depthpress'}(:,:);
+dpcode=ncread(filenam,'D_P_Code');
+de=ncread(filenam,'Depthpress');
 if dpcode=='P' %convert to depth if necessary
     %change to teos-10 on 17 Sept 2014
 %     de=sw_dpth(de,profiledata.latitude(1));
     de=-gsw_z_from_p(de,profiledata.latitude(1));
 end
 
-if(nprof==1)
-    de=de';
-end
-tempqc=squeeze(bfile{'ProfQP'}(:,:,:,:,:,:));
+tempqc=squeeze(ncread(filenam,'ProfQP'));
 
-close(bfile);
 dnan=find(~isnan(de));
 %de=de(dnan);
 %h=h(dnan);

@@ -12,7 +12,7 @@ try
     profiledata=handles.profile_data;
 end
 keysdata=handles.keys;
-ss=keysdata.stnnum(handles.currentprofile); %keysdata.stnnum(i);   %
+handles.ss=keysdata.stnnum(handles.currentprofile); %keysdata.stnnum(i);   %
 set(handles.profilenumber,'String',num2str(handles.currentprofile));
 handles.menudepth=500.;
 

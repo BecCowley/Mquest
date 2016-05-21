@@ -18,22 +18,22 @@ if(~exist('clim'))
         200 210 220 225 230 240 250 260 270 275 280 290 300 325 350 375 400 425 450 475 500 ...
         550 600 650 700 750 800 850 900 950 1000 1100];
     
-    profiledata=handles.profile_data;
+    pd=handles.pd;
     
     [laty,lonx]=meshgrid(la,lo);
     [m,n]=size(laty);
     
     lat=reshape(laty,[m*n,1]);
     lon=reshape(lonx,[m*n,1]);
-%     [aa,days,midd]=names_of_months(str2num(profiledata.month));
+%     [aa,days,midd]=names_of_months(str2num(pd.month));
     
     %c360lon=rem(720-lon,360.);
     %get every month
     [meant,std] = deal(NaN*ones(length(deps),length(lon),12));
     for jj = 1:12
         [aa,days,midd]=names_of_months(jj);
-        meant(:,:,jj)=quest_get_clim_casts('t',lon,lat,deps,midd,'cars2009a',1,0,1);
-        std(:,:,jj)=quest_get_clim_casts('t',lon,lat,deps,midd,'cars2009a',1,0,9);
+        meant(:,:,jj)=quest_get_clim_casts('t',lon,lat,deps,midd,'cars2009a',1,1);
+        std(:,:,jj)=quest_get_clim_casts('t',lon,lat,deps,midd,'cars2009a',1,9);
     end
     
     clim.mean=meant;
@@ -55,10 +55,10 @@ clim=handles.clim;
 clear lat
 clear lon
 deps=clim.deps;
-lat=profiledata.latitude;
-lon=profiledata.longitude;
-if(profiledata.longitude<0)
-    lon=rem(720-profiledata.longitude,360);
+lat=pd.latitude;
+lon=pd.longitude;
+if(pd.longitude<0)
+    lon=rem(720-pd.longitude,360);
 end
 %dd=clim.lat-lat;
 dd=clim.lat-floor(lat);
@@ -71,10 +71,10 @@ lonindex=find(dd==min(abs(dd)));
 meanprofile=intersect(latindex,lonindex);
 
 %which month?
-timeindex = str2num(profiledata.month);
+timeindex = str2num(pd.month);
 
 if(~isempty(meanprofile))
-    %    mn=atday(profiledata.month)
+    %    mn=atday(pd.month)
     %    [mo,days,midday]=names_of_months(mn);
     %    meant=atday(midday,clim.temp(1:56,latindex,lonindex),clim.anominput(1:56,latindex,lonindex);
     

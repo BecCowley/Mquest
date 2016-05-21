@@ -7,9 +7,9 @@ i=handles.currentprofile;
 
 col=['gbyrg'];
 plot_clim;
-isn=find(~isnan(profiledata.temp) & profiledata.temp<99.);
+isn=find(~isnan(pd.temp) & pd.temp<99.);
 
-hg=plot(profiledata.temp(isn),profiledata.depth(isn),'w-');
+hg=plot(pd.temp(isn),pd.depth(isn),'w-');
 set(hg,'ButtonDownFcn','recenterprofileplotfcn');
 
 hold on

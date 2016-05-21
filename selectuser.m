@@ -74,37 +74,28 @@ twstring{3}='month +/1 15 days';
 
 set(handles.timewindow,'String',twstring);
 
-ms='JanFebMarAprMayJunJulAugSepOctNovDecAll';
-j=1;
-for i=1:13
-    month{i}=ms(j:j+2);
-    j=j+3;
-end
+month={'Jan';'Feb';'Mar';'Apr';'May';'Jun';'Jul';'Aug';'Sep';'Oct';'Nov';'Dec';'All'};
 set(handles.Month,'String',month);   
 
-if nargin<6
+if nargin<4
     errordlg('too few input arguments - rerun');
     quit;
 else
-    userno=varargin{2};
-    users=varargin{4};
-    users;
-    a=varargin{14};
-    b=varargin{16};
-    c=varargin{6};
+    userno=varargin{1}.usernumber;
+    users=varargin{1}.user;
     set(handles.user_name,'String',users);
     set(handles.user_name,'Value',userno);
-    set(handles.database_prefix,'String',c{userno});
-    set(handles.Month,'Value',strmatch(varargin{8}{userno},month,'exact'));
-    set(handles.Year,'String',varargin{10}{userno});
-    set(handles.subsetbyQC,'Value',str2num(varargin{12}{userno}));
-    set(handles.AutoQConly,'Value',str2num(a{userno}));
-    set(handles.timewindow,'Value',str2num(b{userno}));
-    sstyle=varargin{18};
-    showauto=varargin{20};
-    if(strmatch(sstyle{userno},'lat','exact'));
+    set(handles.database_prefix,'String',varargin{1}.prefix{userno});
+    set(handles.Month,'Value',find(strcmp(varargin{1}.mm(userno),month)));
+    set(handles.Year,'String',varargin{1}.yy{userno});
+    set(handles.subsetbyQC,'Value',str2num(varargin{1}.qc{userno}));
+    set(handles.AutoQConly,'Value',str2num(varargin{1}.auto{userno}));
+    set(handles.timewindow,'Value',str2num(varargin{1}.timewindow{userno}));
+    sstyle=varargin{1}.sstyle(userno);
+    showauto=varargin{1}.showauto;
+    if strcmp(sstyle,'lat')
         set(handles.sortstylelatitude,'Value',1);
-    elseif(strmatch(sstyle{userno},'ship','exact'));
+    elseif strcmp(sstyle,'ship')
         set(handles.sortstyleship,'Value',1);
     end
     if(showauto)
@@ -115,15 +106,14 @@ else
     end
 end
 
-clear u
-    userno=get(handles.user_name,'Value');
-    user=get(handles.user_name,'String');
-    u=user(userno);
-buddydata=[u{1} 'buddies.txt'];
+%populate the buddy data list
+user=users{userno};
+buddydata=[user 'buddies.txt'];
 
-clear buddyd
 try
-    [buddydatalist]=textread(buddydata,'%s');
+    fid = fopen(buddydata);
+    [buddydatalist]=textscan(fid,'%s');
+    fclose(fid);
 catch
     buddydatalist=[];
 end
@@ -131,10 +121,8 @@ end
 for i=1:length(buddydatalist)
     buddyd{i+2}=buddydatalist{i};
 end
-%:length(buddydata)+2}=buddydatalist
 buddyd{1}=get(handles.buddydata,'String');
 bp=get(handles.database_prefix,'String');
-%whos b*;
 buddyd{2}=bp;
 set (handles.buddydata,'String',buddyd);
 
@@ -396,44 +384,45 @@ function launch_quest_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+%get existing information
+user_all = readUserInfotxt;
 
-[user,prefix,mm,yy,qc,auto,timewindow,sortstyle]=textread('usersettings.txt','%s%s%s%s%s%s%s%s');
-
-    userno=get(handles.user_name,'Value');
-    user=get(handles.user_name,'String');
-    prefix{userno}=get(handles.database_prefix,'String');
-    if(strmatch(prefix{userno},'unknown'))
-        errordlg('please specify database')
-        return
-    end
-    mmm=get(handles.Month,'String');
-    m1=get(handles.Month,'Value');
-    mm{userno}=mmm{m1};
-    yy{userno}=get(handles.Year,'String');
-    qc{userno}=num2str(get(handles.subsetbyQC,'Value'));
-    auto{userno}=num2str(get(handles.AutoQConly,'Value'));
+%now get any user changes:
+userno=get(handles.user_name,'Value');
+user=get(handles.user_name,'String');
+user_all.prefix{userno}=get(handles.database_prefix,'String');
+if strcmp(user_all.prefix{userno},'unknown')
+    errordlg('please specify database')
+    return
+end
+mmm=get(handles.Month,'String');
+m1=get(handles.Month,'Value');
+user_all.mm{userno}=mmm{m1};
+user_all.yy{userno}=get(handles.Year,'String');
+user_all.qc{userno}=num2str(get(handles.subsetbyQC,'Value'));
+user_all.auto{userno}=num2str(get(handles.AutoQConly,'Value'));
 %    t=get(handles.timewindow,'String');
-    timewindow{userno}=num2str(get(handles.timewindow,'Value'));
-    if(get(handles.sortstylelatitude,'Value'));
-        sortstyle{userno}='lat';
-    elseif(get(handles.sortstyleship,'Value'));
-        sortstyle{userno}='ship';
-    else
-        sortstyle{userno}='none';
-    end
+user_all.timewindow{userno}=num2str(get(handles.timewindow,'Value'));
+if(get(handles.sortstylelatitude,'Value'));
+    user_all.sortstyle{userno}='lat';
+elseif(get(handles.sortstyleship,'Value'));
+    user_all.sortstyle{userno}='ship';
+else
+    user_all.sortstyle{userno}='none';
+end
 %getkeys and then call QuotaQuest...
 
-u=user(userno);
-p=prefix(userno);
-m=mm(userno);
-y=yy(userno);
-q=qc(userno);
-a=auto(userno);
-tw=timewindow(userno);
-sstyle=sortstyle(userno);
+u=user;
+p=user_all.prefix(userno);
+m=user_all.mm(userno);
+y=user_all.yy(userno);
+q=user_all.qc(userno);
+a=user_all.auto(userno);
+tw=user_all.timewindow(userno);
+sstyle=user_all.sortstyle(userno);
 save selectuser.mat userno u p m y q a tw sstyle;
 
-saveuserinfo;
+saveuserinfo(user_all);
 
 delete(handles.selectuser);
 

@@ -10,7 +10,7 @@
 
 %retrieveguidata
 
-profiledata=handles.profile_data;
+pd=handles.pd;
 i=handles.currentprofile;
 
 ylimit=get(handles.profile,'Ylim');
@@ -28,15 +28,15 @@ col=['gbyrg'];
 cla
 plot_clim;
 %end
-isn=find(~isnan(profiledata.temp) & profiledata.temp<99.);
+isn=find(~isnan(pd.temp) & pd.temp<99.);
 
-plot(profiledata.temp(isn),profiledata.depth(isn),'w-');
+plot(pd.temp(isn),pd.depth(isn),'w-');
 
-if(isfield(profiledata,'sal'));
-    isn=find(~isnan(profiledata.sal) & profiledata.sal<99.);
+if(isfield(pd,'sal'));
+    isn=find(~isnan(pd.sal) & pd.sal<99.);
     if(~isempty(isn))
-        shiftsal=profiledata.sal-20.;
-        hs=plot(shiftsal(isn),profiledata.depth(isn),'c');
+        shiftsal=pd.sal-20.;
+        hs=plot(shiftsal(isn),pd.depth(isn),'c');
     end
 end
 
@@ -49,10 +49,10 @@ set(gca,'Xcolor',grey);
 set(gca,'YColor',grey);
 %axis([-2 35 -1000 0]);
 %xlimit=[-5 35];
-if(profiledata.ndep==0)
+if(pd.ndep==0)
     handles.menudepth=0;
 else
-    handles.menudepth=min(handles.menudepth,profiledata.depth(profiledata.ndep(1)));
+    handles.menudepth=min(handles.menudepth,pd.depth(pd.ndep(1)));
 end
 %saveguidata
 

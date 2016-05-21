@@ -25,7 +25,7 @@ end
 
 fid = fopen(fnm,'r');
 j=0;
-    tmpdb = textscan(fid,'%s','delimiter',',','bufsize',10000);
+    tmpdb = textscan(fid,'%s','delimiter',',');
     tmpdb = tmpdb{1};
 for i=1:2:length(tmpdb)
     j=j+1;

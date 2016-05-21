@@ -3,6 +3,8 @@ function [keysdata]=getkeys(prefix,mmm,yy,qc,auto,timewindow,sstyle)
 %   extracts the data required to find individual profiles within 
 %   the database and returns it in "keysdata" 
 %
+%   Updated May, 2016 to use Matlab netcdf tools. Bec Cowley.
+%
 %   required inputs are:
 %       prefix = the prefix of the database - generally the directory name
 %       mmm = the month required as a numeric in character*2 with "all" or
@@ -79,7 +81,7 @@ end
           
     end
     
-    stationnumber=getnc(keysfile,'stn_num');
+    stationnumber=ncread(keysfile,'stn_num');
 
     if(isempty(stationnumber))
     %    errordlg('this appears to be a new file - returning')
@@ -89,17 +91,17 @@ end
 % and you must fill the file before you can use it!!!
 %        waiting=1;
 %        importdata('UserData',{prefix(1),dir2});
-%        stationnumber=getnc(keysfile,'stn_num');
+%        stationnumber=ncread(keysfile,'stn_num');
 %        if(isempty(stationnumber))
 %             errordlg('this is an empty file - returning and will crash')
 %             return
 %        end
 return
     end
-month=getnc(keysfile,'obs_m');
-year=getnc(keysfile,'obs_y');
-day=getnc(keysfile,'obs_d');
-time=getnc(keysfile,'obs_t');
+month=ncread(keysfile,'obs_m')';
+year=ncread(keysfile,'obs_y')';
+day=ncread(keysfile,'obs_d')';
+time=ncread(keysfile,'obs_t')';
 for iii=1:size(time,1)
     tt = time(iii,:);
     kkk=strfind(tt,' ');
@@ -119,14 +121,14 @@ for iii=1:length(kkk)
     day(kkk(iii),:)='00';
 end
 
-latitude=getnc(keysfile,'obslat');
-longitude=getnc(keysfile,'c360long',-1,-1,-1,-1,1);
-autoqc=getnc(keysfile,'autoqc');
-callsign=getnc(keysfile,'callsign');
-dsource=getnc(keysfile,'data_source');
-datat=getnc(keysfile,'data_t');
-priority=getnc(keysfile,'priority');
-stnnum=getnc(keysfile,'stn_num');
+latitude=ncread(keysfile,'obslat');
+longitude=ncread(keysfile,'c360long');
+autoqc=ncread(keysfile,'autoqc');
+callsign=ncread(keysfile,'callsign')';
+dsource=ncread(keysfile,'data_source')';
+datat=ncread(keysfile,'data_t')';
+priority=ncread(keysfile,'priority');
+stnnum=ncread(keysfile,'stn_num')';
 
 if(~isempty(strmatch('all',mmm{1})) | ~isempty(strmatch('All',mmm{1})))
  kk=1:length(latitude);   
@@ -258,7 +260,7 @@ number_of_master_profiles=length(g)
 
 if(needqc)
 
-    masterstn=getnc([prefix{1} '_keys.nc'],'stn_num');
+    masterstn=ncread([prefix{1} '_keys.nc'],'stn_num');
     masterstn=str2num(masterstn);
     [icomm,ia,ib]=intersect(keysdata.stnnum,masterstn,'rows');
     keysdata.masterrecno(ia)=ib;
