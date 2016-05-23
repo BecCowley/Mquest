@@ -169,7 +169,7 @@ profiledata.Nparms=0;
 profiledata.Num_Hists=0;
 
 % profiledata.nosseg=1;
-profiledata.Prof_Type='TEMP            ';
+profiledata.Prof_Type(:,1)='TEMP            ';
 profiledata.Dup_Flag='N';
 profiledata.Digit_Code='7';
 profiledata.Standard='2';
@@ -382,7 +382,6 @@ profiledata.SRFC_Parm=surfparm;
 profiledata.SRFC_Q_Parm=surfqparm;
 
 profiledata.D_P_Code='D';
-profiledata.Prof_Type='TEMP            ';
  
 % Parameter data and QC flags
 depths = rawdata.depth;
@@ -437,4 +436,5 @@ ju=julian([pd.year pd.month pd.day ...
 profiledata.time = ju;
 profiledata.woce_time = int32(profiledata.woce_time);
 profiledata.woce_date = int32(str2double(profiledata.woce_date));
+
 return

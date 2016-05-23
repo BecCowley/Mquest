@@ -2,10 +2,26 @@ function nc = getMQschema(profiledata,filn)
 % create the netcdf schema for MQuest files.
 % Bec Cowley, May 2016
 
-no_depths=profiledata.No_Depths;
+% load up the blank netcdf schema from mat file:
 
-% % convert no_depths to the closest 100
-% int_depth=((fix(no_depths/100))+1)*100;
+if exist('blank_nc.mat','file')
+    load blank_nc.mat
+    nc = ncblank;
+    %fill in the max/min data information from the profiledata structure
+    nc.Variables(1).Attributes(3).Value = profiledata.woce_date;
+    nc.Variables(1).Attributes(4).Value = profiledata.woce_date;
+    nc.Variables(2).Attributes(3).Value = profiledata.woce_time;
+    nc.Variables(2).Attributes(4).Value = profiledata.woce_time;
+    nc.Variables(3).Attributes(3).Value = profiledata.time;
+    nc.Variables(3).Attributes(4).Value = profiledata.time;
+    return
+else
+    disp('Unable to make the netcdf file from scratch, need to do more coding here')
+    return
+end
+    %make it from scratch
+    
+no_depths = profiledata.No_Depths;
 
 %Dimensions
 dimnames = {'N_Prof','Nparms','Nsurfc','Num_Hists','time','latitude',...
@@ -16,7 +32,19 @@ dimlen = [0,30,30,100,1,1,1,no_depths,1,2,4,5,6,8,10,12,16,250];
 
 dimunlim = logical([1,zeros(1,length(dimnames) - 1)]);
 
+for a = 1:length(dimnames)
+    dims(:,:,a) = {dimnames{a};dimlen(a);dimunlim(a)};
+end
+
+flds = {'Name'
+    'Length'
+    'Unlimited'};
+
+nc.Dimensions = cell2struct(dims,flds);
+
+%%% OK UP TO HERE. NEEDS WORK.
 %Variables
+
 varnames = { 'woce_date'    'woce_time'    'time'    'latitude'    'longitude' ...
     'Num_Hists'    'No_Prof'    'Nparms' ...
     'Nsurfc'    'Mky'    'One_Deg_Sq'    'Cruise_ID'    'Data_Type'   ...
@@ -85,6 +113,19 @@ varattval = {'date'    'yyyymmdd UTC'    profiledata.woce_date    profiledata.wo
     '%8.4f'    'F8.4'    -60    -60    'longitude'    '360degrees_E'  ...
     0    360    '%9.4f'    'F9.4' ...
     190    190    -99.99    -99.99};
+
+flds = { 'Name'
+    'Dimensions'
+    'Size'
+    'Datatype'
+    'Attributes'
+    'ChunkSize'
+    'FillValue'
+    'DeflateLevel'
+    'Shuffle'};
+for a = 1:length(varnames)
+    dims(:,:,a) = {dimnames{a};dimlen(a);dimunlim(a)};
+end
 
 clear nc
 nc.Filename = filn;
