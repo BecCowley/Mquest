@@ -89,11 +89,11 @@ for i = 1:length(drop)
     %get information from previous profile:
     if exist('profiledata','var')
         %keep the callsign, line and voyage information:
-        icalls = strmatch('GCLL',profiledata.surfpcode);
-        calls = profiledata.surfparm(icalls,:);
-        iline = strmatch('TWI#',profiledata.surfpcode);
-        line = profiledata.surfparm(iline,:);
-        crid = profiledata.cruiseID;
+        icalls = strmatch('GCLL',profiledata.SRFC_Code);
+        calls = profiledata.SRFC_Parm(icalls,:);
+        iline = strmatch('TWI#',profiledata.SRFC_Code);
+        line = profiledata.SRFC_Parm(iline,:);
+        crid = profiledata.Cruise_ID;
     else
         calls = 'empty';
         line = 'empty';
@@ -101,15 +101,15 @@ for i = 1:length(drop)
     end
     
     %CS: Create structure
-    profiledata=readDEVIL([inputdir drop{i}],uniqueid);
+    [profiledata,pd]=readDEVIL([inputdir drop{i}],uniqueid);
     
     %check the callsign, line and voyage information is OK, RC, March 2014
-    icalls = strmatch('GCLL',profiledata.surfpcode);
-    if isempty(strmatch(calls,profiledata.surfparm(icalls,:))) & ~exist('call_voy','var')
-        disp(['Callsign = ' profiledata.surfparm(icalls,:)])
+    icalls = strmatch('GCLL',pd.surfcode);
+    if isempty(strmatch(calls,pd.surfparm(icalls,:))) & ~exist('call_voy','var')
+        disp(['Callsign = ' pd.surfparm(icalls,:)])
         calls = input('Enter correct callsign for this voyage, or return to accept: ','s');
         if isempty(calls)
-            call_voy = profiledata.surfparm(icalls,:);
+            call_voy = pd.surfparm(icalls,:);
         else
             call_voy = calls;
         end
@@ -117,17 +117,17 @@ for i = 1:length(drop)
     
     %assign the voyage callsign if required
     if exist('call_voy')
-        profiledata.surfparm(icalls,:) = '          ';
-        profiledata.surfparm(icalls,1:length(call_voy)) = call_voy;
+        pd.surfparm(icalls,:) = '          ';
+        pd.surfparm(icalls,1:length(call_voy)) = call_voy;
     end
     
     %LINE
-    iline = strmatch('TWI#',profiledata.surfpcode);
-    if isempty(strmatch(line,profiledata.surfparm(iline,:))) & ~exist('line_voy','var')
-        disp(['Line = ' profiledata.surfparm(iline,:)])
+    iline = strmatch('TWI#',pd.surfcode);
+    if isempty(strmatch(line,pd.surfparm(iline,:))) & ~exist('line_voy','var')
+        disp(['Line = ' pd.surfparm(iline,:)])
         line = input('Enter correct line for this voyage, or return to accept: ','s');
         if isempty(line)
-            line_voy = profiledata.surfparm(iline,:);
+            line_voy = pd.surfparm(iline,:);
         else
             line_voy = line;
         end
@@ -135,16 +135,16 @@ for i = 1:length(drop)
     
     %assign the voyage line if required
     if exist('line_voy')
-        profiledata.surfparm(iline,:) = '          ';
-        profiledata.surfparm(iline,1:length(line_voy)) = line_voy;
+        pd.surfparm(iline,:) = '          ';
+        pd.surfparm(iline,1:length(line_voy)) = line_voy;
     end
     
     %cruiseID
-    if isempty(strmatch(crid,profiledata.cruiseID)) & ~exist('crid_voy','var')
-        disp(['CruiseID = ' profiledata.cruiseID])
+    if isempty(strmatch(crid,profiledata.Cruise_ID)) & ~exist('crid_voy','var')
+        disp(['CruiseID = ' profiledata.Cruise_ID])
         crid = input('Enter correct cruiseID for this voyage, or return to accept: ','s');
         if isempty(crid)
-            crid_voy = profiledata.cruiseID;
+            crid_voy = profiledata.Cruise_ID;
         else
             crid_voy = crid;
         end
@@ -152,36 +152,36 @@ for i = 1:length(drop)
     
     %assign the voyage line if required
     if exist('crid_voy')
-        profiledata.cruiseID = '          ';
-        profiledata.cruiseID(1:length(crid_voy)) = crid_voy;
+        profiledata.Cruise_ID = '          ';
+        profiledata.Cruise_ID(1:length(crid_voy)) = crid_voy;
     end
     
-    
-    profiledata.source='          ';
-    profiledata.outputfile=prefix;
-    profiledata.source(1:length(source))=source;
-    profiledata.priority=p;
-%     profiledata.surfqparm(1)=num2str(p);
-%     ss='          ';
-%     ss(1:length(source))=source; 
-%     profiledata.surfparm(1,:)=ss;
+%     
+     pd.source='          ';
+     pd.outputfile=prefix;
+     pd.source(1:length(source))=source;
+     pd.priority=p;
+     pd.surfqparm(1)=num2str(p);
+     ss='          ';
+     ss(1:length(source))=source; 
+     pd.surfparm(1,:)=ss;
     
 
     % if the lat and long are out of range, give error message and SKIP...
     
-  if(profiledata.latitude>90 | profiledata.latitude <-90 | ...
-            profiledata.longitude<-360 | profiledata.longitude>360)
+  if(pd.latitude>90 | pd.latitude <-90 | ...
+            pd.longitude<-360 | pd.longitude>360)
 %        errordlg('error - latitude or longitude out of range')
-        profiledata.datafile=drop{i};
-        [profiledatan]=bad_lat_long('UserData',{[profiledata]});
+        pd.datafile=drop{i};
+        [profiledatan]=bad_lat_long('UserData',{[pd]});
       
         if(~isempty(profiledatan))
             profiledata=profiledatan;
         end
   end
   
-  if(profiledata.latitude>90 | profiledata.latitude <-90 | ...
-            profiledata.longitude<-360 | profiledata.longitude>360)
+  if(pd.latitude>90 | pd.latitude <-90 | ...
+            pd.longitude<-360 | pd.longitude>360)
         disp('error - latitude or longitude out of range')
         pause
   else
@@ -191,8 +191,8 @@ for i = 1:length(drop)
         checkforduplicates
     end
     %CS: To use as a function, use line below
-    %[profiledata,uniqueid]=checkforduplicates_function(keysdata,...
-    %profiledata,uniqueid,whattodo,alreadychecked)
+    %[pd,uniqueid]=checkforduplicates_function(keysdata,...
+    %pd,uniqueid,whattodo,alreadychecked)
 
     writekeys=1;
 
@@ -200,15 +200,15 @@ for i = 1:length(drop)
         if(whattodo~='s' | isempty(kk))
             if(whattodo=='r')
                   ss='          ';
-                  s=num2str(profiledata.nss); 
+                  s=num2str(pd.nss); 
                   ss(1:length(s))=s
-                  kcsid=strmatch('CSID',profiledata.surfpcode);
-                  profiledata.surfparm(kcsid,:)=ss;
+                  kcsid=strmatch('CSID',pd.surfcode);
+                  pd.surfparm(kcsid,:)=ss;
                   writekeys=0;
             else
                 writekeys=1;
             end
-            writeMQNCfiles(profiledata,writekeys);
+            writeMQNCfiles(profiledata,pd,writekeys);
         end
   end
 end 

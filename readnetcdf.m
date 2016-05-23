@@ -54,7 +54,7 @@ pd.latitude = profiledata.latitude;
 pd.longitude = profiledata.longitude;
 pd.year=wd(1:4);
 pd.month=wd(5:6);
-pd.date=wd(7:8);
+pd.day=wd(7:8);
 pd.ndep = profiledata.No_Depths;
 
 wt=profiledata.woce_time;

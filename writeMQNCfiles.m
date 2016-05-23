@@ -1,4 +1,4 @@
-function writeMQNCfiles(profiledata,writekeys)
+function writeMQNCfiles(profiledata,pd,writekeys)
 %
 %writeMQNCfiles - writes the full file for a single profile, creating the
 %file if required. Used in the import function.
@@ -105,37 +105,34 @@ function writeMQNCfiles(profiledata,writekeys)
 %         nossegs: 0
 
 
-    if(profiledata.ndep==0)
-        return
-    end
-clear filenam
-    filenam=profiledata.outputfile{1};
-    n=str2num(profiledata.nss);
-    nss=num2str(n);
-    
-for j=1:2:length(nss);
+if(pd.ndep==0)
+    return
+end
+filenam=pd.outputfile{1};
+n=str2num(pd.nss);
+nss=num2str(n);
 
-	if(j+1>length(nss))
+for j=1:2:length(nss);
+    
+    if(j+1>length(nss))
         if(ispc)
-filenam=[filenam '\' nss(j)];
+            filenam=[filenam '\' nss(j)];
         else
-filenam=[filenam '/' nss(j)]; 
+            filenam=[filenam '/' nss(j)];
         end
-    else	
+    else
         if(ispc)
-filenam=[filenam '\' nss(j:j+1)];
+            filenam=[filenam '\' nss(j:j+1)];
         else
-filenam=[filenam '/' nss(j:j+1)];
+            filenam=[filenam '/' nss(j:j+1)];
         end
-	end
+    end
 end
 
 filenam1=[filenam 'ed.nc'];
 filenam2=[filenam 'raw.nc'];
 
-%note : before you can do this, you need to know how many depths you are
-%working with!!!  So you must already have a profiledata structure with the
-%relevant information in the right form.
+%Now start writing:
 
 filenamnew=filenam1
 createMQNCfiles(profiledata,filenamnew)
@@ -144,23 +141,30 @@ createMQNCfiles(profiledata,filenamnew)
 
 % check that the csid is set properly...
 
-filenam=filenam1;
-ss=nss
 %checkcsid
-
-editedncfile=netcdf(filenam1,'write');
-rawncfile=netcdf(filenam2,'write');
-
-%sort out the parameter segments into one string for storage:
-
-    clear dep
-    clear prof
-    clear profQ
-    clear depQ
-
+%flip some fields around:
+profiledata.SRFC_Code=profiledata.SRFC_Code';
+profiledata.SRFC_Parm=profiledata.SRFC_Parm';
+profiledata.SRFC_Q_Parm=profiledata.SRFC_Q_Parm';
 
 % Extract data from the profiledata structure created with the input
 % function
+
+flds = fieldnames(profiledata);
+for a = 1:length(flds)
+    try
+    if ~isempty(profiledata.(flds{a}))
+        %     write edited file
+        ncwrite(filenam1,flds{a},profiledata.(flds{a}));
+        %write raw file
+        ncwrite(filenam2,flds{a},profiledata.(flds{a}));
+    end
+    catch
+        disp([num2str(a) ' ' flds{a}])
+        continue
+    end
+end
+
 prof=profiledata.profparm;
 profQ=profiledata.profQparm;
 dep=profiledata.depth(:,:);

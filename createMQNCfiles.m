@@ -9,9 +9,18 @@ function createMQNCfiles(profiledata,filenamnew)
 %           file are sufficient to hold the entire profile
 %         filenamnew contains the complete filename of the file to be created.
 %Updated to use Matlab netcdf library, May, 2016. Bec Cowley
+%
 
+if ~exist(filenamnew,'file')
+    nc = getMQschema(profiledata,filenamnew);
+    
+    ncwriteschema(filenamnew,nc);
+else
+    return
+end
 
-no_depths=profiledata.ndep;
+return
+no_depths=profiledata.No_Depths;
 
 % convert no_depths to the closest 100
 int_depth=((fix(no_depths/100))+1)*100;
@@ -60,29 +69,26 @@ ds16 = netcdf.defDim(newdatabasefile,'String_16',16);
 ds250= netcdf.defDim(newdatabasefile,'String_250',250);
 
 % create the variables & their attributes
-varid = netcdf.defVar(newdatabasefile,'woce_date','NC_FLOAT',dsingle);
+varid = netcdf.defVar(newdatabasefile,'woce_date','NC_INT',dsingle);
 netcdf.putAtt(newdatabasefile,varid,'standard_name','Date');
 netcdf.putAtt(newdatabasefile,varid,'long_name','WOCE date');
 netcdf.putAtt(newdatabasefile,varid,'units','yyyymmdd UTC');
-date1=profiledata.year*10000+profiledata.month*100+profiledata.day;
-netcdf.putAtt(newdatabasefile,varid,'data_min',date1);
-netcdf.putAtt(newdatabasefile,varid,'data_max',date1);
+netcdf.putAtt(newdatabasefile,varid,'data_min',profiledata.woce_date);
+netcdf.putAtt(newdatabasefile,varid,'data_max',profiledata.woce_date);
 
 varid = netcdf.defVar(newdatabasefile,'woce_time','NC_INT',dtime);
 netcdf.putAtt(newdatabasefile,varid,'standard_name','Time of day');
 netcdf.putAtt(newdatabasefile,varid,'long_name','WOCE time of day');
 netcdf.putAtt(newdatabasefile,varid,'units','hhmmss');
-netcdf.putAtt(newdatabasefile,varid,'data_min',profiledata.time);
-netcdf.putAtt(newdatabasefile,varid,'data_max',profiledata.time);
+netcdf.putAtt(newdatabasefile,varid,'data_min',profiledata.woce_time);
+netcdf.putAtt(newdatabasefile,varid,'data_max',profiledata.woce_time);
 
 varid = netcdf.defVar(newdatabasefile,'time','NC_FLOAT',dtime);
-ju=julian([profiledata.year profiledata.month profiledata.day ...
-    floor(profiledata.time/100) rem(profiledata.time,100) 0])-2415020.5;
 netcdf.putAtt(newdatabasefile,varid,'standard_name','time');
 netcdf.putAtt(newdatabasefile,varid,'long_name','time');
 netcdf.putAtt(newdatabasefile,varid,'units','days since 1900-01-01 00:00:00');
-netcdf.putAtt(newdatabasefile,varid,'data_min',ju);
-netcdf.putAtt(newdatabasefile,varid,'data_max',ju);
+netcdf.putAtt(newdatabasefile,varid,'data_min',profiledata.time);
+netcdf.putAtt(newdatabasefile,varid,'data_max',profiledata.time);
 
 varid = netcdf.defVar(newdatabasefile,'latitude','NC_FLOAT',dlat);
 netcdf.putAtt(newdatabasefile,varid,'standard_name','latitude');
@@ -123,7 +129,7 @@ netcdf.defVar(newdatabasefile,'MEDS_Sta','NC_CHAR',ds8);
 netcdf.defVar(newdatabasefile,'Q_Pos','NC_CHAR',ds1);
 netcdf.defVar(newdatabasefile,'Q_Date_Time','NC_CHAR',ds1);
 netcdf.defVar(newdatabasefile,'Q_Record','NC_CHAR',ds1);
-netcdf.defVar(newdatabasefile,'Up_date','NC_CHAR',ds1);
+netcdf.defVar(newdatabasefile,'Up_date','NC_CHAR',ds8);
 netcdf.defVar(newdatabasefile,'Bul_Time','NC_CHAR',ds12);
 netcdf.defVar(newdatabasefile,'Bul_Header','NC_CHAR',ds8);
 netcdf.defVar(newdatabasefile,'Source_ID','NC_CHAR',ds4);
@@ -143,6 +149,7 @@ if isfield(profiledata,'comments_post')
     netcdf.defVar(newdatabasefile,'PostDropComments','NC_CHAR',ds250);
 end
 
+netcdf.defVar(newdatabasefile,'Uflag','NC_CHAR',ds1);
 netcdf.defVar(newdatabasefile,'Pcode','NC_CHAR',[dnparms,ds4]);
 netcdf.defVar(newdatabasefile,'Parm','NC_CHAR',[dnparms,ds10]);
 netcdf.defVar(newdatabasefile,'Q_Parm','NC_CHAR',[dnparms,ds1]);
@@ -152,7 +159,7 @@ netcdf.defVar(newdatabasefile,'SRFC_Q_Parm','NC_CHAR',[dnsurfc,ds1]);
 netcdf.defVar(newdatabasefile,'Ident_Code','NC_CHAR',[dnhists,ds2]);
 netcdf.defVar(newdatabasefile,'PRC_Code','NC_CHAR',[dnhists,ds4]);
 netcdf.defVar(newdatabasefile,'Version','NC_CHAR',[dnhists,ds4]);
-netcdf.defVar(newdatabasefile,'PRC_Date','NC_CHAR',[dnhists,ds4]);
+netcdf.defVar(newdatabasefile,'PRC_Date','NC_CHAR',[dnhists,ds8]);
 netcdf.defVar(newdatabasefile,'Act_Code','NC_CHAR',[dnhists,ds2]);
 netcdf.defVar(newdatabasefile,'Act_Parm','NC_CHAR',[dnhists,ds4]);
 netcdf.defVar(newdatabasefile,'Aux_ID','NC_FLOAT',dnhists);

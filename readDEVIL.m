@@ -1,4 +1,4 @@
-function profiledata=readDEVIL(fname,uniqueid)
+function [profiledata,pd]=readDEVIL(fname,uniqueid)
 
 global SHIP_NAMES
 global CALLS
@@ -8,6 +8,92 @@ global launchheight
 %this function reads a single profile from a DEVIL drop file and creates the
 %structure "profiledata" containing all the variables necessary to either
 %plot or write the data into another format.
+% profiledata = 
+% 
+%         woce_date: 20160426
+%         woce_time: 142500
+%              time: 42485
+%          latitude: -25.35
+%         longitude: 131.03
+%         Num_Hists: 1
+%           No_Prof: 1
+%            Nparms: 0
+%            Nsurfc: 13
+%               Mky: [8x1 char]
+%        One_Deg_Sq: [8x1 char]
+%         Cruise_ID: [10x1 char]
+%         Data_Type: [2x1 char]
+%           Iumsgno: [12x1 char]
+%     Stream_Source: ' '
+%             Uflag: 'U'
+%          MEDS_Sta: [8x1 char]
+%             Q_Pos: '1'
+%       Q_Date_Time: '1'
+%          Q_Record: '1'
+%           Up_date: [8x1 char]
+%          Bul_Time: [12x1 char]
+%        Bul_Header: [6x1 char]
+%         Source_ID: [4x1 char]
+%      Stream_Ident: [4x1 char]
+%        QC_Version: [4x1 char]
+%        Data_Avail: 'A'
+%         Prof_Type: [16x1 char]
+%          Dup_Flag: 'N'
+%        Digit_Code: '7'
+%          Standard: '2'
+%        Deep_Depth: 198.7
+%             Pcode: [30x4 char]
+%              Parm: [30x10 char]
+%            Q_Parm: [30x1 char]
+%         SRFC_Code: [30x4 char]
+%         SRFC_Parm: [30x10 char]
+%       SRFC_Q_Parm: [30x1 char]
+%        Ident_Code: [100x2 char]
+%          PRC_Code: [100x4 char]
+%           Version: [100x4 char]
+%          PRC_Date: [100x8 char]
+%          Act_Code: [100x2 char]
+%          Act_Parm: [100x4 char]
+%            Aux_ID: [100x1 single]
+%      Previous_Val: [100x10 char]
+%     Flag_severity: [100x1 int32]
+%          D_P_Code: 'D'
+%         No_Depths: 300
+%        Depthpress: [400x1 double]
+%          Profparm: [400x1 double]
+%           DepresQ: [400x1 char]
+%            ProfQP: [400x1 char]
+
+%And a holding structure (pd) for QCd data, plotting. Returned to main
+%structure at write time.
+% pd = 
+% 
+%          latitude: -25.35
+%         longitude: 131.03
+%              year: '2016'
+%             month: '04'
+%              day: '26'
+%              ndep: 300
+%              time: '14:25'
+%             depth: [400x1 double]
+%                qc: [400x1 char]
+%          depth_qc: [400x1 char]
+%              temp: [400x1 double]
+%     Flag_severity: [100x1 int32]
+%          numhists: 1
+%            nparms: 0
+%           QC_code: [100x2 char]
+%          QC_depth: [100x1 double]
+%          PRC_Date: [100x8 char]
+%          PRC_Code: [100x4 char]
+%           Version: [100x4 char]
+%          Act_Parm: [100x4 char]
+%      Previous_Val: [100x10 char]
+%        Ident_Code: [100x2 char]
+%          surfcode: [30x4 char]
+%          surfparm: [30x10 char]
+%         surfqparm: [30x1 char]
+%            nsurfc: 13
 
 % get the ship name database:
 
@@ -17,10 +103,11 @@ else
     S = SHIP_NAMES;
 end
 %setup output files:
-profiledata.nss=num2str(uniqueid);
+pd.nss=num2str(uniqueid);
 
 % initialise strings
 str1 = ' ';
+str2 = '  ';
 str4 = '    ';
 str6 = '      ';
 str8 = '        ';
@@ -28,63 +115,68 @@ str10 = '          ';
 str12 = '            ';
 
 %Get data and place in structures:
+rawdata = nc2struct(fname);
+
 %CS: profile date
-woce_date = num2str(ncread(fname,'woce_date'));
-profiledata.year=str2num(woce_date(1:4));
-profiledata.month=str2num(woce_date(5:6));
-profiledata.day=str2num(woce_date(7:8));
+profiledata.woce_date = num2str(rawdata.woce_date);
 %CS: profile time - get rid of milliseconds
-time = ncread(fname,'woce_time');
-profiledata.time = floor(time/100)*100;
-profiledata.latitude = ncread(fname,'latitude');
+time = rawdata.woce_time;
+profiledata.woce_time = floor(time/100)*100;
+profiledata.latitude = rawdata.latitude;
 %CS: need to multiply lon by -1 so same convention as MA
-profiledata.longitude = ncread(fname,'longitude');
+profiledata.longitude = rawdata.longitude;
 if profiledata.longitude < 0
     profiledata.longitude = profiledata.longitude +360;
 end
-profiledata.lon=profiledata.longitude;
-profiledata.lat=profiledata.latitude;
 
 %CS: Fill these extra fields:
-profiledata.mky=str8;
-profiledata.onedegsq=str8;
-profiledata.cruiseID=str10; %fill in below
-profiledata.datat='XB';
-profiledata.iumsgno=str12;
-profiledata.streamsource=str1;
-profiledata.uflag='U'; %required for NOAA. 'U' = update, 'S' = skip. Bec Cowley, August 2014.
-profiledata.medssta=str8;
-profiledata.qpos='1';
-profiledata.qdatetime='1';
-profiledata.qrec='1';
-profiledata.bultime=str12;
-profiledata.bulheader=str6;
+profiledata.Mky=str8;
+profiledata.One_Deg_Sq=str8;
+profiledata.Cruise_ID=str10; %fill in below
+profiledata.Data_Type='XB';
+profiledata.Iumsgno=str12;
+profiledata.Stream_Source=str1;
+profiledata.Uflag='U'; %required for NOAA. 'U' = update, 'S' = skip. Bec Cowley, August 2014.
+profiledata.MEDS_Sta=str8;
+profiledata.Q_Pos='1';
+profiledata.Q_Date_Time='1';
+profiledata.Q_Record='1';
+profiledata.Bul_Time=str12;
+profiledata.Bul_Header=str6;
+profiledata.Ident_Code=str2;
+profiledata.PRC_Code=repmat(str1,4,100);
+profiledata.Version=repmat(str1,4,100);
+profiledata.PRC_Date=repmat(str1,8,100);
+profiledata.Act_Code=repmat(str1,2,100);
+profiledata.Act_Parm=repmat(str1,4,100);
+profiledata.Aux_ID=double.empty(100,0);
+profiledata.Previous_Val=repmat(str1,4,100);
+profiledata.Flag_severity=double.empty(100,0);%zeros here
 %     clo=datestr(clock,24);
 %     update=[clo(1:2) clo(4:5) clo(7:10)];
 %As of August, 2014, the format has been changed to yyyymmdd to agree with
 %NOAA formats. Bec Cowley
 update = datestr(now,'yyyymmdd');
-profiledata.update=update;
-profiledata.sourceID=str4;
-profiledata.streamident=[DATA_QC_SOURCE 'XB'];
-profiledata.QCversion=str4;
-profiledata.dataavail='A';
+profiledata.Up_date=update;
+profiledata.Source_ID=str4;
+profiledata.Stream_Ident=[DATA_QC_SOURCE 'XB'];
+profiledata.QC_Version=str4;
+profiledata.Data_Avail='A';
 
 %CS: Only 1 profile per file
-profiledata.nprof=1;
-profiledata.nparms=0;
-profiledata.nhists=0;
+profiledata.No_Prof=1;
+profiledata.Nparms=0;
+profiledata.Num_Hists=0;
 
-profiledata.nosseg=1;
-profiledata.prof_type='TEMP            ';
-profiledata.dup_flag='N';
-profiledata.digit_code='7';
-profiledata.standard='2';
-profiledata.deep_depth=0; %deepest depth - fill below
+% profiledata.nosseg=1;
+profiledata.Prof_Type='TEMP            ';
+profiledata.Dup_Flag='N';
+profiledata.Digit_Code='7';
+profiledata.Standard='2';
 
-profiledata.profiledata.pcode=str4;
-profiledata.profiledata.parm=str10;
-profiledata.profiledata.qparm=str1;
+profiledata.Pcode=str4;
+profiledata.Parm=str10;
+profiledata.Q_Parm=str1;
 
 %RC: Get global attributes
 namesList = {'CallSign','Code','Voyage','InterfaceType','InterfaceCode', ...
@@ -131,7 +223,7 @@ if ~isempty(ij) && ~isempty(ik)
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if(~isempty(shipname))
-    kk=strmatch(upper(shipname),upper(S.fullname),'exact');
+    kk=strcmpi(shipname,S.fullname);
     if(~isempty(kk))
         shortname=S.shortname(kk);
         s=shortname;
@@ -148,7 +240,7 @@ if(~isempty(shipname))
                 fnm=[ MQUEST_DIRECTORY_UNIX '/calls.txt'];
             end
             fid = fopen(fnm,'r');
-            tmpdb = textscan(fid,'%s%s%s','delimiter',',','bufsize',10000);
+            tmpdb = textscan(fid,'%s%s%s','delimiter',',');
             fclose(fid);
             ij = strfind(fname,'.');
             ii = strmatch(fname(ij(1)+1:ij(1)+2),tmpdb{:,3});
@@ -173,17 +265,17 @@ if(~isempty(shipname))
 
             fid = fopen(fnm,'r');
             j=0;
-            tmpdb = textscan(fid,'%s','delimiter',',','bufsize',10000);
-            fclose(fid)
+            tmpdb = textscan(fid,'%s','delimiter',',');
+            fclose(fid);
             tmpdb = tmpdb{1};
             for i=1:2:length(tmpdb)
                 j=j+1;
                 disp(['   ' S.fullname{j} ',' S.shortname{j}])
             end
 
-            shortname=input('Please enter 10-characters for that ship name: ','s')
+            shortname=input('Please enter 10-characters for that ship name: ','s');
             while(length(shortname)>10)
-                shortname=input('I said enter 10-CHARACTERS for that ship name: ','s')
+                shortname=input('I said enter 10-CHARACTERS for that ship name: ','s');
             end
 
             long_shipname=shipname;
@@ -263,10 +355,10 @@ if isempty(strmatch('UNKNOWN',upper(mfd)))
 end
 
 %fill values for surface parm 
-profiledata.cruiseID=cruiseID;
+profiledata.Cruise_ID=cruiseID;
 surfcodeNames = {'CSID','GCLL','PEQ$','RCT$','OFFS','SCAL',...
              'SER#','MFD#','HTL$','CRC$','TWI#','SHP#'};
-varsList = {'profiledata.nss','gcll','probetype','recordertype', ...
+varsList = {'pd.nss','gcll','probetype','recordertype', ...
     'offset','scale','serno','mfd','dropheight','crc','lineno', ...
     'shortname'};
 
@@ -283,43 +375,66 @@ for a = 1:length(surfcodeNames)
         surfqparm = [surfqparm; '0'];
     end
 end
-profiledata.nsurfc=length(surfqparm);
+profiledata.Nsurfc=length(surfqparm);
 
-profiledata.surfpcode=surfpcode;
-profiledata.surfparm=surfparm;
-profiledata.surfqparm=surfqparm;
-
-%CS: Fill in other fields in profiledata
-profiledata.identcode='';
-profiledata.PRCcode='';
-profiledata.Version='';
-profiledata.PRCdate='';
-profiledata.Actcode='';
-profiledata.Actparm='';
-profiledata.AuxID='';
-profiledata.PreviousVal='';
-profiledata.flagseverity='';
+profiledata.SRFC_Code=surfpcode;
+profiledata.SRFC_Parm=surfparm;
+profiledata.SRFC_Q_Parm=surfqparm;
 
 profiledata.D_P_Code='D';
-profiledata.profile_type='TEMP            '; %CHECK
+profiledata.Prof_Type='TEMP            ';
  
-%CS: Parameter data and QC flags
-%CS: Depths
-depths = ncread(fname,'depth');
+% Parameter data and QC flags
+depths = rawdata.depth;
 ndepths = length(depths);
-profiledata.depth(1,1,1)=0; 
-profiledata.depth(1,1,1:ndepths) = depths;
-profiledata.deep_depth=max(depths);
-profiledata.nodepths=ndepths;
-%CS: Depth QC
-profiledata.depresQ(1,1,1:ndepths)='0';
-%CS: Profile parameter
-profiledata.profparm(1,1,1)=0;
-profiledata.profparm(1,1,1:ndepths) = ncread(fname,'temperature');
-%CS: Profile parameter QC
-profiledata.profQparm(1,1,1:ndepths)='0';
+profiledata.Depthpress(:,1) = depths;
+profiledata.Deep_Depth=max(depths);
+profiledata.No_Depths=ndepths;
+profiledata.DepresQ(1,1:ndepths,1)='0';
+profiledata.Profparm(1,1,:,1,1) = ncread(fname,'temperature');
+profiledata.ProfQP(1,1,1,1:ndepths,1,1)='0';
 
-profiledata.ndep=profiledata.nodepths; %CHECK
-profiledata.autoqc=0;
+profiledata.Aux_ID=0; %was profiledata.autoqc
 
+%make the pd structure for plotting and adding QC
+pd.latitude=profiledata.latitude;
+pd.longitude=profiledata.longitude;
+pd.year=profiledata.woce_date(1:4);
+pd.month=profiledata.woce_date(5:6);
+pd.day=profiledata.woce_date(7:8);
+pd.ndep=profiledata.No_Depths;
+wt=profiledata.woce_time;
+wt=floor(wt/100);
+wt2=sprintf('%4i',wt);
+jk=strfind(wt2,' ');
+if(~isempty(jk))
+    wt2(jk)='0';
+end
+pd.time=[wt2(1:2) ':' wt2(3:4)];
+pd.depth = depths;
+pd.qc = profiledata.ProfQP;
+pd.depth_qc = profiledata.DepresQ;
+pd.temp = profiledata.Profparm;
+pd.Flag_severity = profiledata.Flag_severity;
+pd.numhists = profiledata.Num_Hists;
+pd.nparms = profiledata.Nparms;
+pd.QC_code = profiledata.Act_Code;
+pd.QC_depth = profiledata.Aux_ID;
+pd.PRC_Date = profiledata.PRC_Date;
+pd.PRC_Code = profiledata.PRC_Code;
+pd.Version = profiledata.Version;
+pd.Act_Parm = profiledata.Act_Parm;
+pd.Previous_Val = profiledata.Previous_Val;
+pd.Ident_Code = profiledata.Ident_Code;
+pd.surfcode = profiledata.SRFC_Code;
+pd.surfparm = profiledata.SRFC_Parm;
+pd.surfqparm = profiledata.SRFC_Q_Parm;
+pd.nsurfc = profiledata.Nsurfc;
+
+%add in some more stuff to profiledata"
+ju=julian([pd.year pd.month pd.day ...
+    floor(pd.time/100) rem(pd.time,100) 0])-2415020.5;
+profiledata.time = ju;
+profiledata.woce_time = int32(profiledata.woce_time);
+profiledata.woce_date = int32(str2double(profiledata.woce_date));
 return

@@ -6,7 +6,7 @@ profileinfo{2}=sprintf('Latitude : %6.2f',pd.latitude);
 profileinfo{3}=sprintf('Longitude : %6.2f',pd.longitude);
 profileinfo{4}=[' ' ];
 
-profileinfo{5}=[pd.date '/' pd.month '/' ...
+profileinfo{5}=[pd.day '/' pd.month '/' ...
     pd.year '   ' pd.time];
 
 profileinfo{6}=[' '];
