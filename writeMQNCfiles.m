@@ -167,60 +167,40 @@ end
 if(writekeys)
     
     keysfile=[pd.outputfile{1} '_keys.nc'];
-    try
-        newkeysdata=netcdf(keysfile,'write');
-        d1 = newkeysdata{'stn_num'};
-    catch
-        newkeysdata = [];
-    end
-    if(isempty(newkeysdata)) || isempty(d1)
+    if exist(keysfile,'file') ~= 2
         %create keys file...
         createkeys
-        newkeysdata=netcdf(keysfile,'write');
     end
 
     %fill keys file:
-    nc=netcdf(keysfile);
-    holdthis=nc{'priority'}(:);
-    if(length(holdthis)==1)
-        if(isempty(holdthis(1)))
-            holdthis=[];
-        end
-    end
-    dimkeys=length(holdthis)+1;
-        close(nc)
-
-    ss=num2str(profiledata.nss);
+    kf = ncinfo(keysfile);
+    np = kf.Dimensions(1).Length;
+    
+    ss=pd.nss;
     ssn='          ';
     ssn(1:length(ss))=ss;
     calls='          ';
-    kk=strmatch('GCLL',profiledata.surfpcode);
+    kk=strmatch('GCLL',pd.surfcode);
     if(~isempty(kk))
-        calls=profiledata.surfparm(kk,:);
+        calls=pd.surfparm(kk,:);
     end
-    newkeysdata{'obslat'}(dimkeys) = profiledata.lat;
-    newkeysdata{'obslng'}(dimkeys) = profiledata.lon;
-    newkeysdata{'c360long'}(dimkeys) = profiledata.lon;
-    newkeysdata{'autoqc'}(dimkeys) = profiledata.autoqc;
+    ncwrite(keysfile,'obslat',pd.latitude,np+1);
+    ncwrite(keysfile,'obslng',pd.longitude,np+1);
+    ncwrite(keysfile,'c360long',pd.longitude,np+1);
+    ncwrite(keysfile,'autoqc',0,np+1);
 
-    newkeysdata{'stn_num'}(dimkeys,1:10) = ssn;
-    newkeysdata{'callsign'}(dimkeys,1:10) = calls;
-    newkeysdata{'obs_y'}(dimkeys,1:4) = num2str(profiledata.year);
+    ncwrite(keysfile,'stn_num',ssn',[1,np+1]);
+    ncwrite(keysfile,'callsign',calls',[1,np+1]);
+    ncwrite(keysfile,'obs_y',pd.year',[1,np+1]);
+    ncwrite(keysfile,'obs_m',pd.month',[1,np+1]);
+    ncwrite(keysfile,'obs_d',pd.day',[1,np+1]);
+    tt=[pd.time(1:2) pd.time(4:5)];
+    ncwrite(keysfile,'obs_t',tt',[1,np+1]);
 
-    mm=sprintf('%2i',profiledata.month);
-    dd=sprintf('%2i',profiledata.day);
-    newkeysdata{'obs_m'}(dimkeys,1:2) = mm;
-    newkeysdata{'obs_d'}(dimkeys,1:2) = dd;
-
-    tt=sprintf('%6i',profiledata.time);
-    newkeysdata{'obs_t'}(dimkeys,1:4)=tt(1:4);
-
-    newkeysdata{'data_t'}(dimkeys,1:2) = profiledata.datat;
-    newkeysdata{'d_flag'}(dimkeys) = 'N';
-    newkeysdata{'data_source'}(dimkeys,1:10)= profiledata.source;
-    newkeysdata{'priority'}(dimkeys) = profiledata.priority;
-
-    close(newkeysdata);
+    ncwrite(keysfile,'data_t',profiledata.Data_Type',[1,np+1]);
+    ncwrite(keysfile,'d_flag','N',[1,np+1]);
+    ncwrite(keysfile,'data_source',pd.source',[1,np+1]);
+    ncwrite(keysfile,'priority',pd.priority,np+1);
 
 end
 

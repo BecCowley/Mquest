@@ -15,13 +15,15 @@ function addqualityflag(qualflag,depthsource,severity)
 %                       1 = put at the cursor depth,
 %                       2 = put at the cursor depth (formerly at a depth from a menu),
 %       severity = the quality to be assigned to the parameter data (0-5,9)
+%
+%   Updated June, 2016 to use new pd structure and matlab netcdf tools.
 
 DECLAREGLOBALS
 endpoint=-1;
 
 %retrieveguidata
 
-profiledata=handles.profile_data;
+profiledata=handles.pd;
 handles.changed='Y';
 %     clo=datestr(clock,24);
 %     update=[clo(1:2) clo(4:5) clo(7:10)];
@@ -64,7 +66,7 @@ switch qualflag
         end
         
         
-        handles.profile_data=profiledata;
+        handles.pd=profiledata;
         %saveguidata
         
         
@@ -83,7 +85,7 @@ switch qualflag
             handles.Qkey='N';
             return
         end
-        handles.profile_data=profiledata;
+        handles.pd=profiledata;
         
         setdepth_tempbox;
         sortandsave;
@@ -100,7 +102,7 @@ switch qualflag
             handles.Qkey='N';
             return
         end
-        handles.profile_data=profiledata;
+        handles.pd=profiledata;
         
         setdepth_tempbox;
         sortandsave;
@@ -145,7 +147,7 @@ switch qualflag
         oldt='99.99';
         severity=2;
         addhistories
-        handles.profile_data=profiledata;
+        handles.pd=profiledata;
         
         setdepth_tempbox;
         sortandsave;
@@ -157,7 +159,7 @@ switch qualflag
         
         %remove previous wb flags if present...
         removepreviousflags
-        handles.profile_data=profiledata;
+        handles.pd=profiledata;
     case 'PLA'
         % premature launch flag - recorder started before probe entered
         % water. take current cursor position and move everything UP so it
@@ -190,7 +192,7 @@ switch qualflag
         %         severity=2;
         addhistories
         
-        handles.profile_data=profiledata;
+        handles.pd=profiledata;
         
         setdepth_tempbox;
         sortandsave;
@@ -228,7 +230,7 @@ switch qualflag
             %you must also change the keys file!!!
             keysdata.obslat(handles.currentprofile)=outputs.newlat;
             
-            handles.profile_data=profiledata;
+            handles.pd=profiledata;
             handles.keys=keysdata;
             
             %saveguidata
@@ -258,7 +260,7 @@ switch qualflag
             %you must also change the keys file!!!
             keysdata.obslon(handles.currentprofile)=profiledata.longitude;
             
-            handles.profile_data=profiledata;
+            handles.pd=profiledata;
             handles.keys=keysdata;
             
             %saveguidata
@@ -270,7 +272,7 @@ switch qualflag
                 profiledata.longitude,keysdata.prefix);
         end
         
-        handles.profile_data=profiledata;
+        handles.pd=profiledata;
         handles.keys=keysdata;
         
         %saveguidata
@@ -330,7 +332,7 @@ switch qualflag
             
             keysdata.time(handles.currentprofile)=newtime;
             
-            handles.profile_data=profiledata;
+            handles.pd=profiledata;
             handles.keys=keysdata;
             
             %saveguidata
@@ -354,7 +356,7 @@ switch qualflag
             if(~strcmp(outputs.newyear,outputs.origyear))
                 keysdata.year(handles.currentprofile)=str2num(outputs.newyear);
                 
-                handles.profile_data=profiledata;
+                handles.pd=profiledata;
                 handles.keys=keysdata;
                 %saveguidata
                 updatekeys('obs_y',keysdata.masterrecno(handles.currentprofile),...
@@ -364,7 +366,7 @@ switch qualflag
             if(~strcmp(outputs.newmonth,outputs.origmonth))
                 
                 keysdata.month(handles.currentprofile)=str2num(outputs.newmonth);
-                handles.profile_data=profiledata;
+                handles.pd=profiledata;
                 handles.keys=keysdata;
                 
                 %saveguidata
@@ -377,7 +379,7 @@ switch qualflag
             if(~strcmp(outputs.newdate,outputs.origdate))
                 keysdata.day(handles.currentprofile,:)=str2num(outputs.newdate);
                 
-                handles.profile_data=profiledata;
+                handles.pd=profiledata;
                 handles.keys=keysdata;
                 %saveguidata
                 
@@ -459,7 +461,7 @@ else
 end
 
 
-handles.profile_data=profiledata;
+handles.pd=profiledata;
 
 %saveguidata
 

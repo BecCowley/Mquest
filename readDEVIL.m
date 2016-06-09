@@ -411,9 +411,10 @@ if(~isempty(jk))
 end
 pd.time=[wt2(1:2) ':' wt2(3:4)];
 pd.depth = depths;
+pd.deep_depth = profiledata.Deep_Depth;
 pd.qc = profiledata.ProfQP;
 pd.depth_qc = profiledata.DepresQ;
-pd.temp = profiledata.Profparm;
+pd.temp = squeeze(profiledata.Profparm);
 pd.Flag_severity = profiledata.Flag_severity;
 pd.numhists = profiledata.Num_Hists;
 pd.nparms = profiledata.Nparms;
@@ -429,6 +430,7 @@ pd.surfcode = profiledata.SRFC_Code;
 pd.surfparm = profiledata.SRFC_Parm;
 pd.surfqparm = profiledata.SRFC_Q_Parm;
 pd.nsurfc = profiledata.Nsurfc;
+pd.ptype = profiledata.Prof_Type;
 
 %add in some more stuff to profiledata"
 ju=julian([pd.year pd.month pd.day ...
