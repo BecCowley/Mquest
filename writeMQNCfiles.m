@@ -147,7 +147,7 @@ createMQNCfiles(profiledata,filenamnew)
 % function
 
 flds = fieldnames(profiledata);
-for a = 1:31%:length(flds)
+for a = 1:length(flds)
     try
     if ~isempty(profiledata.(flds{a}))
         %     write edited file
@@ -156,7 +156,7 @@ for a = 1:31%:length(flds)
         ncwrite(filenam2,flds{a},profiledata.(flds{a}));
     end
     catch
-        disp([num2str(a) ' ' flds{a}])
+        disp(['writeMQNCfiles: Unable to write item: ' num2str(a) ' ' flds{a}])
         continue
     end
 end
@@ -166,7 +166,7 @@ end
 
 if(writekeys)
     
-    keysfile=[profiledata.outputfile{1} '_keys.nc'];
+    keysfile=[pd.outputfile{1} '_keys.nc'];
     try
         newkeysdata=netcdf(keysfile,'write');
         d1 = newkeysdata{'stn_num'};
