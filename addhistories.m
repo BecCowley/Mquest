@@ -20,16 +20,16 @@
 
 global DATA_QC_SOURCE
 
-    profiledata.numhists=profiledata.numhists+1;
-    numh=profiledata.numhists;
-    profiledata.QC_code(numh,1:2)=qualflag(1:2);
-    profiledata.QC_depth(numh)=histd;
-    profiledata.Act_Parm(numh,1:4)=actparm;
-    profiledata.PRC_Date(numh,1:8)=update;
-    profiledata.PRC_Code(numh,1:4)='CSCB';
-    profiledata.Version(numh,1:4)=' 1.0';
+    pd.numhists=pd.numhists+1;
+    numh=pd.numhists;
+    pd.QC_code(numh,1:2)=qualflag(1:2);
+    pd.QC_depth(numh)=histd;
+    pd.Act_Parm(numh,1:4)=actparm;
+    pd.PRC_Date(numh,1:8)=update;
+    pd.PRC_Code(numh,1:4)='CSCB';
+    pd.Version(numh,1:4)=' 1.0';
     
-    profiledata.Previous_Val(numh,1:length(oldt))=oldt;
-    profiledata.Ident_Code(numh,1:2)=DATA_QC_SOURCE;   %'CS';  
-    profiledata.Flag_severity(numh)=severity;
-    handles.profile_data=profiledata;
+    pd.Previous_Val(numh,1:length(oldt))=oldt;
+    pd.Ident_Code(numh,1:2)=DATA_QC_SOURCE;   %'CS';  
+    pd.Flag_severity(numh)=severity;
+    handles.pd=pd;

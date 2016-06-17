@@ -130,20 +130,20 @@ if profiledata.longitude < 0
 end
 
 %CS: Fill these extra fields:
-profiledata.Mky=str8;
-profiledata.One_Deg_Sq=str8;
-profiledata.Cruise_ID=str10; %fill in below
-profiledata.Data_Type='XB';
-profiledata.Iumsgno=str12;
+profiledata.Mky=str8';
+profiledata.One_Deg_Sq=str8';
+profiledata.Cruise_ID=str10'; %fill in below
+profiledata.Data_Type=('XB')';
+profiledata.Iumsgno=str12';
 profiledata.Stream_Source=str1;
 profiledata.Uflag='U'; %required for NOAA. 'U' = update, 'S' = skip. Bec Cowley, August 2014.
-profiledata.MEDS_Sta=str8;
+profiledata.MEDS_Sta=str8';
 profiledata.Q_Pos='1';
 profiledata.Q_Date_Time='1';
 profiledata.Q_Record='1';
-profiledata.Bul_Time=str12;
-profiledata.Bul_Header=str6;
-profiledata.Ident_Code=str2;
+profiledata.Bul_Time=str12';
+profiledata.Bul_Header=str6';
+profiledata.Ident_Code=repmat(str1,2,100);
 profiledata.PRC_Code=repmat(str1,4,100);
 profiledata.Version=repmat(str1,4,100);
 profiledata.PRC_Date=repmat(str1,8,100);
@@ -157,10 +157,10 @@ profiledata.Flag_severity=double.empty(100,0);%zeros here
 %As of August, 2014, the format has been changed to yyyymmdd to agree with
 %NOAA formats. Bec Cowley
 update = datestr(now,'yyyymmdd');
-profiledata.Up_date=update;
-profiledata.Source_ID=str4;
-profiledata.Stream_Ident=[DATA_QC_SOURCE 'XB'];
-profiledata.QC_Version=str4;
+profiledata.Up_date=update';
+profiledata.Source_ID=str4';
+profiledata.Stream_Ident=[DATA_QC_SOURCE 'XB']';
+profiledata.QC_Version=str4';
 profiledata.Data_Avail='A';
 
 %CS: Only 1 profile per file
@@ -169,13 +169,13 @@ profiledata.Nparms=0;
 profiledata.Num_Hists=0;
 
 % profiledata.nosseg=1;
-profiledata.Prof_Type(:,1)='TEMP            ';
+profiledata.Prof_Type(:,1)=('TEMP            ')';
 profiledata.Dup_Flag='N';
 profiledata.Digit_Code='7';
 profiledata.Standard='2';
 
-profiledata.Pcode=str4;
-profiledata.Parm=str10;
+profiledata.Pcode=str4';
+profiledata.Parm=str10';
 profiledata.Q_Parm=str1;
 
 %RC: Get global attributes
@@ -184,7 +184,7 @@ namesList = {'CallSign','Code','Voyage','InterfaceType','InterfaceCode', ...
     'LineNo','Ship','PreDropComments','PostDropComments'};
 varsList = {'gcll','probetype','cruiseID','cardtype','recordertype', ...
     'serno','mfd','dropheight','caseno','scale','offset','crc','lineno', ...
-    'shipname','profiledata.comments_pre','profiledata.comments_post'};
+    'shipname','profiledata.PreDropComments','profiledata.PostDropComments'};
 
 %read the Quoll/Devil file attributes
 finfo = ncinfo(fname);
@@ -355,7 +355,7 @@ if isempty(strmatch('UNKNOWN',upper(mfd)))
 end
 
 %fill values for surface parm 
-profiledata.Cruise_ID=cruiseID;
+profiledata.Cruise_ID=cruiseID';
 surfcodeNames = {'CSID','GCLL','PEQ$','RCT$','OFFS','SCAL',...
              'SER#','MFD#','HTL$','CRC$','TWI#','SHP#'};
 varsList = {'pd.nss','gcll','probetype','recordertype', ...
@@ -377,23 +377,21 @@ for a = 1:length(surfcodeNames)
 end
 profiledata.Nsurfc=length(surfqparm);
 
-profiledata.SRFC_Code=surfpcode;
-profiledata.SRFC_Parm=surfparm;
-profiledata.SRFC_Q_Parm=surfqparm;
+profiledata.SRFC_Code=surfpcode';
+profiledata.SRFC_Parm=surfparm';
+profiledata.SRFC_Q_Parm=surfqparm';
 
 profiledata.D_P_Code='D';
  
 % Parameter data and QC flags
 depths = rawdata.depth;
 ndepths = length(depths);
-profiledata.Depthpress(:,1) = depths;
+profiledata.Depthpress = depths;
 profiledata.Deep_Depth=max(depths);
 profiledata.No_Depths=ndepths;
-profiledata.DepresQ(1,1:ndepths,1)='0';
-profiledata.Profparm(1,1,:,1,1) = ncread(fname,'temperature');
-profiledata.ProfQP(1,1,1,1:ndepths,1,1)='0';
-
-profiledata.Aux_ID=0; %was profiledata.autoqc
+profiledata.DepresQ(1,1:ndepths)='0';
+profiledata.Profparm(1,1,:) = ncread(fname,'temperature');
+profiledata.ProfQP(1,1,1,1:ndepths)='0';
 
 %make the pd structure for plotting and adding QC
 pd.latitude=profiledata.latitude;
@@ -412,29 +410,29 @@ end
 pd.time=[wt2(1:2) ':' wt2(3:4)];
 pd.depth = depths;
 pd.deep_depth = profiledata.Deep_Depth;
-pd.qc = profiledata.ProfQP;
+pd.qc = squeeze(profiledata.ProfQP);
 pd.depth_qc = profiledata.DepresQ;
 pd.temp = squeeze(profiledata.Profparm);
 pd.Flag_severity = profiledata.Flag_severity;
 pd.numhists = profiledata.Num_Hists;
 pd.nparms = profiledata.Nparms;
-pd.QC_code = profiledata.Act_Code;
+pd.QC_code = profiledata.Act_Code';
 pd.QC_depth = profiledata.Aux_ID;
-pd.PRC_Date = profiledata.PRC_Date;
-pd.PRC_Code = profiledata.PRC_Code;
-pd.Version = profiledata.Version;
+pd.PRC_Date = profiledata.PRC_Date';
+pd.PRC_Code = profiledata.PRC_Code';
+pd.Version = profiledata.Version';
 pd.Act_Parm = profiledata.Act_Parm;
 pd.Previous_Val = profiledata.Previous_Val;
 pd.Ident_Code = profiledata.Ident_Code;
-pd.surfcode = profiledata.SRFC_Code;
-pd.surfparm = profiledata.SRFC_Parm;
-pd.surfqparm = profiledata.SRFC_Q_Parm;
+pd.surfcode = profiledata.SRFC_Code';
+pd.surfparm = profiledata.SRFC_Parm';
+pd.surfqparm = profiledata.SRFC_Q_Parm';
 pd.nsurfc = profiledata.Nsurfc;
-pd.ptype = profiledata.Prof_Type;
+pd.ptype = profiledata.Prof_Type';
 
-%add in some more stuff to profiledata"
-ju=julian([pd.year pd.month pd.day ...
-    floor(pd.time/100) rem(pd.time,100) 0])-2415020.5;
+%add in some more stuff to profiledata
+ju=julian([str2num(pd.year) str2num(pd.month) str2num(pd.day) ...
+    floor(wt/100) rem(wt,100) 0])-2415020.5;
 profiledata.time = ju;
 profiledata.woce_time = int32(profiledata.woce_time);
 profiledata.woce_date = int32(str2double(profiledata.woce_date));

@@ -35,13 +35,7 @@ for a = 1:length(finf.Variables)
     %get the field name
     nn = finf.Variables(a).Name;
     %get the data:
-    dat = ncread(fn,nn);
-    %get the size and number of dimensions:
-    nd = size(dat);
-    [nd,ii] = sort(nd,'descend');
-    %permute to order dimensions:
-    dat = permute(dat,ii);
-    
+    dat = ncread(fn,nn);    
     eval(['s.' nn '= dat;'])
 end
 

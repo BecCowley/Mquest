@@ -132,6 +132,11 @@ end
 filenam1=[filenam 'ed.nc'];
 filenam2=[filenam 'raw.nc'];
 
+%first, update the profiledata structure (written out to nc file) with
+%changes from the pd structure:
+
+profiledata = update_profiledata(profiledata,pd);
+
 %Now start writing:
 
 filenamnew=filenam1
@@ -157,6 +162,7 @@ for a = 1:length(flds)
     end
     catch
         disp(['writeMQNCfiles: Unable to write item: ' num2str(a) ' ' flds{a}])
+        keyboard
         continue
     end
 end
@@ -197,7 +203,7 @@ if(writekeys)
     tt=[pd.time(1:2) pd.time(4:5)];
     ncwrite(keysfile,'obs_t',tt',[1,np+1]);
 
-    ncwrite(keysfile,'data_t',profiledata.Data_Type',[1,np+1]);
+    ncwrite(keysfile,'data_t',profiledata.Data_Type,[1,np+1]);
     ncwrite(keysfile,'d_flag','N',[1,np+1]);
     ncwrite(keysfile,'data_source',pd.source',[1,np+1]);
     ncwrite(keysfile,'priority',pd.priority,np+1);

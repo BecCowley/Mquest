@@ -4,7 +4,7 @@
 %using a median filter of 25 points to smooth the data.  Note: original
 %values are not retained and can only be retrieved by "kill"!!!
 
-filttemp=profiledata.temp;
+filttemp=pd.temp;
 temptemp=filttemp;
 s1=min(startpoint,endpoint);
 s2=max(startpoint,endpoint);
@@ -15,8 +15,8 @@ for kk=s1:s2
     else
         start=kk-25;
     end
-    if(kk+25>profiledata.ndep)
-        endjj=profiledata.ndep;
+    if(kk+25>pd.ndep)
+        endjj=pd.ndep;
     else
         endjj=kk+25;
     end
@@ -29,6 +29,6 @@ for kk=s1:s2
     end
 end
 
-profiledata.temp=temptemp;
-handles.profile_data=profiledata;
+pd.temp=temptemp;
+handles.pd=pd;
 %saveguidata

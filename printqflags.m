@@ -3,7 +3,7 @@
 
 
 %plot grey line to show menu depth point...
-
+pd = handles.pd;
 xlimit=get(handles.profile,'Xlim');
 
 ymin=handles.menudepth-handles.profilefocus;

@@ -129,7 +129,7 @@ qcstring= [pd.QC_code(kk,:) num2str(pd.QC_depth(kk),' \t%9.2f')];
 
         i=handles.currentprofile;
         readnetcdf
-        pd=handles.profile_data;
+        pd=handles.pd;
         
         %now rewrite the keys elements that might have changed - do all just
         %to be sure.
@@ -171,7 +171,7 @@ qcstring= [pd.QC_code(kk,:) num2str(pd.QC_depth(kk),' \t%9.2f')];
         
         handles.keys=keysdata;
        
-        handles.profile_data=pd;
+        handles.pd=pd;
         
         axes(handles.profile);
         cla

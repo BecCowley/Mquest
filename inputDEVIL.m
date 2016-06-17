@@ -141,10 +141,10 @@ for i = 1:length(drop)
     
     %cruiseID
     if isempty(strmatch(crid,profiledata.Cruise_ID)) & ~exist('crid_voy','var')
-        disp(['CruiseID = ' profiledata.Cruise_ID])
+        disp(['CruiseID = ' profiledata.Cruise_ID'])
         crid = input('Enter correct cruiseID for this voyage, or return to accept: ','s');
         if isempty(crid)
-            crid_voy = profiledata.Cruise_ID;
+            crid_voy = profiledata.Cruise_ID';
         else
             crid_voy = crid;
         end
@@ -152,8 +152,8 @@ for i = 1:length(drop)
     
     %assign the voyage line if required
     if exist('crid_voy')
-        profiledata.Cruise_ID = '          ';
-        profiledata.Cruise_ID(1:length(crid_voy)) = crid_voy;
+        profiledata.Cruise_ID = ('          ')';
+        profiledata.Cruise_ID(1:length(crid_voy)) = crid_voy';
     end
     
 %     

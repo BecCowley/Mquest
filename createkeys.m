@@ -9,8 +9,8 @@ if ~exist(filenam,'file')
     
     ncwriteschema(filenam,nc);
 end
+return
 end
-
 
     newkeysfile=netcdf([keysfile ],'noclobber');
 

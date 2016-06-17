@@ -15,7 +15,7 @@ xlimit=get(handles.profile,'Xlim');
 % handles.buddies{:}
 cla
 
-profiledata=handles.profile_data;
+pd=handles.pd;
 
 i=handles.currentprofile;
 keysdata=handles.keys;
@@ -31,7 +31,7 @@ singleyear=handles.singleyearbuddies;
 singlemonth=handles.singlemonthbuddies;
 restrict=handles.restrictbuddies;
 buddyarea=handles.buddylim;
-iyear=str2num(profiledata.year);
+iyear=str2num(pd.year);
 if(handles.buddy>3)
     bud=handles.buddies;
    
@@ -292,8 +292,8 @@ end
 %    clear filenam;
 %    filenam=keysdata.prefix;
 %    readbuddynetcdf;
-btemp=profiledata.temp;
-bdepth=profiledata.depth;
+btemp=pd.temp;
+bdepth=pd.depth;
 isn=find(~isnan(btemp)& btemp<99);
     if(length(isn)==1)
         wx=plot(btemp(isn),bdepth(isn),'wx');
@@ -309,7 +309,7 @@ else
 %    blon=keysdata.obslon;
          
     for kk=max(1,i-buddyarea):min(length(keysdata.stnnum),i+buddyarea)   
-     if(singleyear & keysdata.year(kk)~=str2num(profiledata.year))
+     if(singleyear & keysdata.year(kk)~=str2num(pd.year))
             
      else
 
@@ -385,8 +385,8 @@ else
      end
 
 % now plot the original profile!!
-    btemp=profiledata.temp;
-    bdepth=profiledata.depth;
+    btemp=pd.temp;
+    bdepth=pd.depth;
     isn=find(~isnan(btemp)& btemp<99);
     if(length(isn)==1)
         wx=plot(btemp(isn),bdepth(isn),'wx');

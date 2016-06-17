@@ -49,6 +49,8 @@ profiledata = nc2struct(filenam);
 
 format short g;
 %extract some extra information and keep separate:
+pd.nss = nss;
+pd.outputfile = keysdata.prefix;
 wd=num2str(profiledata.woce_date);
 pd.latitude = profiledata.latitude;
 pd.longitude = profiledata.longitude;
@@ -82,8 +84,8 @@ if ~isempty(ij)
     end
 end
 
-h = profiledata.Profparm;
-qc = profiledata.ProfQP;
+h = squeeze(profiledata.Profparm);
+qc = squeeze(profiledata.ProfQP);
 dqc = profiledata.DepresQ;
 [m,n]=size(h);
 

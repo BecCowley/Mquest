@@ -13,6 +13,10 @@ function createMQNCfiles(profiledata,filenamnew)
 
 if ~exist(filenamnew,'file')
     nc = getMQschema(profiledata,filenamnew);
+    %create directory if required
+    if exist([filenamnew(1:length(filenamnew)-7)],'dir') ~= 7
+        mkdir([filenamnew(1:length(filenamnew)-7)])
+    end
     
     ncwriteschema(filenamnew,nc);
 else

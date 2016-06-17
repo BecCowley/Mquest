@@ -7,7 +7,7 @@
 DECLAREGLOBALS
 
 holdb=0;  %this is the index of buddies from the same year...
-profiledata=handles.profile_data;
+pd=handles.pd;
 
 i=handles.currentprofile;
 keysdata=handles.keys;
@@ -16,7 +16,7 @@ currentlon=keysdata.obslon(i);
 singleyear=handles.singleyearbuddies;
 
 buddyarea=handles.buddylim;
-iyear=str2num(profiledata.year);
+iyear=str2num(pd.year);
 if(handles.buddy>3)
     bud=handles.buddies;
    

@@ -3,25 +3,25 @@
 
 %retrieveguidata;
 
-profiledata=handles.profile_data;
-numh=profiledata.numhists;
+pd=handles.pd;
+numh=pd.numhists;
 clear h
 for i=1:numh
-    h(i)=profiledata.QC_depth(i);
+    h(i)=pd.QC_depth(i);
 end
 clear indexsort holdold
 if exist('h','var')
      [holdold,indexsort]=sort(h);
 %handles=guidata(gcbo);     
-     profiledata.QC_depth(1:numh)=profiledata.QC_depth(indexsort);
-     profiledata.QC_code(1:numh,:)=profiledata.QC_code(indexsort,:);
-     profiledata.PRC_Date(1:numh,:)=profiledata.PRC_Date(indexsort,:);
-     profiledata.PRC_Code(1:numh,:)=profiledata.PRC_Code(indexsort,:);
-     profiledata.Version(1:numh,:)=profiledata.Version(indexsort,:);
-     profiledata.Act_Parm(1:numh,:)=profiledata.Act_Parm(indexsort,:);
-     profiledata.Previous_Val(1:numh,:)=profiledata.Previous_Val(indexsort,:);
-     profiledata.Ident_Code(1:numh,:)=profiledata.Ident_Code(indexsort,:);  
-     profiledata.Flag_severity(1:numh)=profiledata.Flag_severity(indexsort);
+     pd.QC_depth(1:numh)=pd.QC_depth(indexsort);
+     pd.QC_code(1:numh,:)=pd.QC_code(indexsort,:);
+     pd.PRC_Date(1:numh,:)=pd.PRC_Date(indexsort,:);
+     pd.PRC_Code(1:numh,:)=pd.PRC_Code(indexsort,:);
+     pd.Version(1:numh,:)=pd.Version(indexsort,:);
+     pd.Act_Parm(1:numh,:)=pd.Act_Parm(indexsort,:);
+     pd.Previous_Val(1:numh,:)=pd.Previous_Val(indexsort,:);
+     pd.Ident_Code(1:numh,:)=pd.Ident_Code(indexsort,:);  
+     pd.Flag_severity(1:numh)=pd.Flag_severity(indexsort);
      
 end
 %add any extra handling in here...
@@ -30,7 +30,7 @@ end
 %finish and return
 
      handles.changed='Y';
-     handles.profile_data=profiledata;
+     handles.pd=pd;
 
 %     saveguidata
      

@@ -14,12 +14,22 @@ if exist('blank_nc.mat','file')
     nc.Variables(2).Attributes(4).Value = profiledata.woce_time;
     nc.Variables(3).Attributes(3).Value = profiledata.time;
     nc.Variables(3).Attributes(4).Value = profiledata.time;
+    nc.Dimensions(8).Length = profiledata.No_Depths;
+    nc.Variables(52).Dimensions(1).Length = profiledata.No_Depths;
+    nc.Variables(52).Size(1) = profiledata.No_Depths;
+    nc.Variables(53).Dimensions(3).Length = profiledata.No_Depths;
+    nc.Variables(53).Size(3) = profiledata.No_Depths;
+    nc.Variables(54).Dimensions(2).Length = profiledata.No_Depths;
+    nc.Variables(54).Size(2) = profiledata.No_Depths;
+    nc.Variables(55).Dimensions(4).Length = profiledata.No_Depths;
+    nc.Variables(55).Size(4) = profiledata.No_Depths;
     return
 else
     disp('Unable to make the netcdf file from scratch, need to do more coding here')
     return
 end
-    %make it from scratch
+    %make it from scratch. This needs to be developed, but shouldn't be
+    %needed if the blank_nc.mat file is available.
     
 no_depths = profiledata.No_Depths;
 

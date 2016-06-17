@@ -17,42 +17,27 @@ clear variable
 
 filen=[prefix '_keys.nc'];
 
-variable=getnc(filen,field);
-
-keysfile=netcdf(filen,'w');
-
 if(strcmp(field,'obslat')|strcmp(field,'obslng')|strcmp(field,'c360long')...
-        |strcmp(field,'autoqc'))
-    variable(recno)=newval;
-    keysfile{field}(:)=variable;
+        |strcmp(field,'autoqc') | strcmp(field,'priority'))
+    ncwrite(filen,field,newval,recno);
 else
-    variable(recno,:)=newval;
-    keysfile{field}(:,:)=variable;
+    ncwrite(filen,field,newval',[1,recno]);
 end
 
 
-close(keysfile);
-
 if(handles.qc)
-    clear variable
 
     filen=[prefix '_keysQC.nc'];
-    stnlist=str2num(getnc(filen,'stn_num'));
+    stnlist=str2num(ncread(filen,'stn_num'));
     stn=handles.keys.stnnum(handles.currentprofile);
     [icomm,ia,ib]=intersect(stn,stnlist,'rows');
     recno=ib;
     
-    variable=getnc(filen,field);
-
-    keysfile=netcdf(filen,'w');
-
     if(strcmp(field,'obslat')|strcmp(field,'obslng')|strcmp(field,'c360long')...
-            |strcmp(field,'autoqc'))
-        variable(recno)=newval;
-        keysfile{field}(:)=variable;
+            |strcmp(field,'autoqc') | strcmp(field,'priority'))
+        ncwrite(filen,field,newval,recno);
     else
-        variable(recno,:)=newval;
-        keysfile{field}(:,:)=variable;
+        ncwrite(filen,field,newval',[1,recno]);
     end
 
 end

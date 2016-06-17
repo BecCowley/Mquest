@@ -23,7 +23,7 @@ endpoint=-1;
 
 %retrieveguidata
 
-profiledata=handles.pd;
+pd=handles.pd;
 handles.changed='Y';
 %     clo=datestr(clock,24);
 %     update=[clo(1:2) clo(4:5) clo(7:10)];
@@ -38,35 +38,35 @@ switch qualflag
     case 'CSA'
         
         if(strmatch('XC',handles.keys.datatype(handles.currentprofile,:)))
-            kk=find(profiledata.depth<=1.9);
+            kk=find(pd.depth<=1.9);
         else
-            kk=find(profiledata.depth<=3.6);
+            kk=find(pd.depth<=3.6);
         end
-        profiledata.qc(kk)='5';
-        nn=profiledata.numhists:profiledata.numhists+length(kk);
+        pd.qc(kk)='5';
+        nn=pd.numhists:pd.numhists+length(kk);
         for i=1:length(kk)
-            histd=profiledata.depth(kk(i));
+            histd=pd.depth(kk(i));
             actparm='TEMP';
-            oldt=num2str(profiledata.temp(kk(i)));
+            oldt=num2str(pd.temp(kk(i)));
             addhistories
         end
-        profiledata.temp(kk)=99.99;
+        pd.temp(kk)=99.99;
         
         if(strmatch('XC',handles.keys.datatype(handles.currentprofile,:)))
-            kk=find(profiledata.depth<=2.9);
-            profiledata.salqc(kk)='5';
-            nn=profiledata.numhists:profiledata.numhists+length(kk);
+            kk=find(pd.depth<=2.9);
+            pd.salqc(kk)='5';
+            nn=pd.numhists:pd.numhists+length(kk);
             for i=1:length(kk)
-                histd=profiledata.depth(kk(i));
+                histd=pd.depth(kk(i));
                 actparm='PSAL';
-                oldt=num2str(profiledata.sal(kk(i)));
+                oldt=num2str(pd.sal(kk(i)));
                 addhistories
             end
-            profiledata.sal(kk)=99.99;
+            pd.sal(kk)=99.99;
         end
         
         
-        handles.pd=profiledata;
+        handles.pd=pd;
         %saveguidata
         
         
@@ -78,14 +78,14 @@ switch qualflag
         
     case 'SPA'
         histindex=get(handles.depthdisplay,'Value');
-        histdepth=profiledata.depth(histindex);
-        oldt=num2str(profiledata.temp(get(handles.depthdisplay,'Value')));
+        histdepth=pd.depth(histindex);
+        oldt=num2str(pd.temp(get(handles.depthdisplay,'Value')));
         interpolatespikes;
         if(endpoint==-1)
             handles.Qkey='N';
             return
         end
-        handles.pd=profiledata;
+        handles.pd=pd;
         
         setdepth_tempbox;
         sortandsave;
@@ -95,14 +95,14 @@ switch qualflag
         
     case 'IPA'
         histindex=get(handles.depthdisplay,'Value');
-        histdepth=profiledata.depth(histindex);
-        oldt=num2str(profiledata.temp(get(handles.depthdisplay,'Value')));
+        histdepth=pd.depth(histindex);
+        oldt=num2str(pd.temp(get(handles.depthdisplay,'Value')));
         interpolatespikes;
         if(endpoint==-1)
             handles.Qkey='N';
             return
         end
-        handles.pd=profiledata;
+        handles.pd=pd;
         
         setdepth_tempbox;
         sortandsave;
@@ -125,29 +125,29 @@ switch qualflag
         %if key is h alone, filter entire profile:
         if(handles.Qkey=='Y')
             endpoint=launchendindex('UserData',{centering selectionstring qualflag});
-            endpoint=min(endpoint,profiledata.ndep);
+            endpoint=min(endpoint,pd.ndep);
             if(endpoint==-1);
                 handles.Qkey='N';
                 return;
             end
         else
-            ptemp=profiledata.qc;
+            ptemp=pd.qc;
             gg=strfind(ptemp,'5');
             if(isempty(gg))
                 gg=0;
             end
             startpoint=gg(end)+1;
-            endpoint=profiledata.ndep;
+            endpoint=pd.ndep;
         end
         
         medianfilter;
         qualflag='HF';
-        histd=profiledata.depth(startpoint);
+        histd=pd.depth(startpoint);
         actparm='TEMP';
         oldt='99.99';
         severity=2;
         addhistories
-        handles.pd=profiledata;
+        handles.pd=pd;
         
         setdepth_tempbox;
         sortandsave;
@@ -159,40 +159,40 @@ switch qualflag
         
         %remove previous wb flags if present...
         removepreviousflags
-        handles.pd=profiledata;
+        handles.pd=pd;
     case 'PLA'
         % premature launch flag - recorder started before probe entered
         % water. take current cursor position and move everything UP so it
         % corresponds to the first depth (0.67)
         histindex=get(handles.depthdisplay,'Value');
-        histd=profiledata.depth(1);
-        oldt=num2str(profiledata.depth(histindex));
+        histd=pd.depth(1);
+        oldt=num2str(pd.depth(histindex));
         
-        %        profiledata.depth(1:profiledata.ndep-histindex+1)=profiledata.depth(histindex:profiledata.ndep);
-        profiledata.depth(profiledata.ndep-histindex+2:profiledata.ndep)=NaN;
-        profiledata.temp(1:profiledata.ndep-histindex+1)=profiledata.temp(histindex:profiledata.ndep);
-        profiledata.temp(profiledata.ndep-histindex+2:profiledata.ndep)=NaN;
-        if isfield(profiledata,'sal')
-            profiledata.sal(1:profiledata.ndep-histindex+1)=profiledata.sal(histindex:profiledata.ndep);
-            profiledata.depthsal(1:profiledata.ndep-histindex+1)=profiledata.depthsal(histindex:profiledata.ndep);
-            profiledata.sal(profiledata.ndep-histindex+2:profildata.ndep)=NaN;
-            profiledata.depthsal(profiledata.ndep-histindex+2:profiledata.ndep)=NaN;
+        %        pd.depth(1:pd.ndep-histindex+1)=pd.depth(histindex:pd.ndep);
+        pd.depth(pd.ndep-histindex+2:pd.ndep)=NaN;
+        pd.temp(1:pd.ndep-histindex+1)=pd.temp(histindex:pd.ndep);
+        pd.temp(pd.ndep-histindex+2:pd.ndep)=NaN;
+        if isfield(pd,'sal')
+            pd.sal(1:pd.ndep-histindex+1)=pd.sal(histindex:pd.ndep);
+            pd.depthsal(1:pd.ndep-histindex+1)=pd.depthsal(histindex:pd.ndep);
+            pd.sal(pd.ndep-histindex+2:profildata.ndep)=NaN;
+            pd.depthsal(pd.ndep-histindex+2:pd.ndep)=NaN;
         end
-        profiledata.depth_qc(1:profiledata.ndep-histindex+1)='2';
-        %          profiledata.depth_qc(profiledata.ndep-histindex+2:profiledata.ndep)='';
-        profiledata.qc(1:profiledata.ndep-histindex+1)=profiledata.qc(histindex:profiledata.ndep);
-        %          profiledata.qc(profiledata.ndep-histindex+2:profiledata.ndep)='';
+        pd.depth_qc(1:pd.ndep-histindex+1)='2';
+        %          pd.depth_qc(pd.ndep-histindex+2:pd.ndep)='';
+        pd.qc(1:pd.ndep-histindex+1)=pd.qc(histindex:pd.ndep);
+        %          pd.qc(pd.ndep-histindex+2:pd.ndep)='';
         
-        profiledata.qc(profiledata.ndep-histindex+2:end)=' ';
-        profiledata.depth_qc(profiledata.ndep-histindex+2:end)=' ';
-        profiledata.ndep=profiledata.ndep-histindex+1;
-        profiledata.deep_depth=profiledata.depth(profiledata.ndep);
+        pd.qc(pd.ndep-histindex+2:end)=' ';
+        pd.depth_qc(pd.ndep-histindex+2:end)=' ';
+        pd.ndep=pd.ndep-histindex+1;
+        pd.deep_depth=pd.depth(pd.ndep);
         severity = 2;
         actparm='DEPH';
         %         severity=2;
         addhistories
         
-        handles.pd=profiledata;
+        handles.pd=pd;
         
         setdepth_tempbox;
         sortandsave;
@@ -206,20 +206,20 @@ switch qualflag
         keysdata=handles.keys;
         if(keysdata.map180)
             [outputs]=changeposition('UserData',...
-                [profiledata.latitude,keysdata.lon180(handles.currentprofile)]);
+                [pd.latitude,keysdata.lon180(handles.currentprofile)]);
         else
             [outputs]=changeposition('UserData',...
-                [profiledata.latitude,profiledata.longitude]);
+                [pd.latitude,pd.longitude]);
         end
         
         handles.lastprofile=handles.currentprofile;
-        histd=max(profiledata.depth(1),0.0);
+        histd=max(pd.depth(1),0.0);
         severity=5;
-        profiledata.pos_qc=num2str(severity);
+        pd.pos_qc=num2str(severity);
         difflat=abs(outputs.origlat-outputs.newlat);
         %        if(outputs.origlat~=outputs.newlat)
         if(difflat>0.002)
-            profiledata.latitude=outputs.newlat;
+            pd.latitude=outputs.newlat;
             oldt=num2str(outputs.origlat);
             actparm=outputs.parmlat;
             addhistories
@@ -230,7 +230,7 @@ switch qualflag
             %you must also change the keys file!!!
             keysdata.obslat(handles.currentprofile)=outputs.newlat;
             
-            handles.pd=profiledata;
+            handles.pd=pd;
             handles.keys=keysdata;
             
             %saveguidata
@@ -241,12 +241,12 @@ switch qualflag
         difflon=abs(outputs.origlon-outputs.newlon);
         if(difflon>.002)
             %        if(outputs.origlon~=outputs.newlon)
-            oldt=num2str(profiledata.longitude);
+            oldt=num2str(pd.longitude);
             if(keysdata.map180 & outputs.newlon<0)
-                profiledata.longitude=360+outputs.newlon;
+                pd.longitude=360+outputs.newlon;
                 keysdata.lon180(handles.currentprofile)=outputs.newlon;
             else
-                profiledata.longitude=outputs.newlon;
+                pd.longitude=outputs.newlon;
             end
             actparm=outputs.parmlon;
             addhistories
@@ -258,21 +258,21 @@ switch qualflag
             
             %            c= mod(720-outputs.newlon,360);
             %you must also change the keys file!!!
-            keysdata.obslon(handles.currentprofile)=profiledata.longitude;
+            keysdata.obslon(handles.currentprofile)=pd.longitude;
             
-            handles.pd=profiledata;
+            handles.pd=pd;
             handles.keys=keysdata;
             
             %saveguidata
             
             updatekeys('obslng',keysdata.masterrecno(handles.currentprofile),...
-                profiledata.longitude,keysdata.prefix);
+                pd.longitude,keysdata.prefix);
             
             updatekeys('c360long',keysdata.masterrecno(handles.currentprofile),...
-                profiledata.longitude,keysdata.prefix);
+                pd.longitude,keysdata.prefix);
         end
         
-        handles.pd=profiledata;
+        handles.pd=pd;
         handles.keys=keysdata;
         
         %saveguidata
@@ -288,15 +288,15 @@ switch qualflag
     case 'TEA'
         %        changetime - launch the gui to allow imput of the new date or time:
         [outputs]=changedatetime('UserData',...
-            [profiledata.year,profiledata.month,...
-            profiledata.date,profiledata.time]);
+            [pd.year,pd.month,...
+            pd.date,pd.time]);
         keysdata=handles.keys;
         handles.lastprofile=handles.currentprofile;
-        histd=max(profiledata.depth(1),0.0);
+        histd=max(pd.depth(1),0.0);
         severity=5;
-        profiledata.juld_qc=num2str(severity);
-        olddate=(str2num(profiledata.year)*10000)+(str2num(profiledata.month)*100)...
-            +str2num(profiledata.date);
+        pd.juld_qc=num2str(severity);
+        olddate=(str2num(pd.year)*10000)+(str2num(pd.month)*100)...
+            +str2num(pd.date);
         newdate=(str2num(outputs.newyear)*10000)+(str2num(outputs.newmonth)*100)...
             +str2num(outputs.newdate);
         st=strfind(outputs.newtime,':');
@@ -324,7 +324,7 @@ switch qualflag
         difftime=abs(oldtime-newtime);
         if(difftime>1)
             %        if(oldtime~=newtime)
-            profiledata.time=outputs.newtime;
+            pd.time=outputs.newtime;
             oldt=outputs.origtime;
             actparm='TIME';
             addhistories
@@ -332,7 +332,7 @@ switch qualflag
             
             keysdata.time(handles.currentprofile)=newtime;
             
-            handles.pd=profiledata;
+            handles.pd=pd;
             handles.keys=keysdata;
             
             %saveguidata
@@ -344,9 +344,9 @@ switch qualflag
         diffdate=abs(olddate-newdate);
         if(diffdate>=1)
             %        if(olddate~=newdate)
-            profiledata.date=outputs.newdate;
-            profiledata.month=outputs.newmonth;
-            profiledata.year=outputs.newyear;
+            pd.date=outputs.newdate;
+            pd.month=outputs.newmonth;
+            pd.year=outputs.newyear;
             
             oldt=num2str(olddate);
             actparm='DATE';
@@ -356,7 +356,7 @@ switch qualflag
             if(~strcmp(outputs.newyear,outputs.origyear))
                 keysdata.year(handles.currentprofile)=str2num(outputs.newyear);
                 
-                handles.pd=profiledata;
+                handles.pd=pd;
                 handles.keys=keysdata;
                 %saveguidata
                 updatekeys('obs_y',keysdata.masterrecno(handles.currentprofile),...
@@ -366,7 +366,7 @@ switch qualflag
             if(~strcmp(outputs.newmonth,outputs.origmonth))
                 
                 keysdata.month(handles.currentprofile)=str2num(outputs.newmonth);
-                handles.pd=profiledata;
+                handles.pd=pd;
                 handles.keys=keysdata;
                 
                 %saveguidata
@@ -379,7 +379,7 @@ switch qualflag
             if(~strcmp(outputs.newdate,outputs.origdate))
                 keysdata.day(handles.currentprofile,:)=str2num(outputs.newdate);
                 
-                handles.pd=profiledata;
+                handles.pd=pd;
                 handles.keys=keysdata;
                 %saveguidata
                 
@@ -404,29 +404,29 @@ switch qualflag
 end
 
 if(depthsource==0)     %put flag at surface
-    histdepth=max(profiledata.depth(1),0.0);
-    oldt=num2str(profiledata.temp(1));
+    histdepth=max(pd.depth(1),0.0);
+    oldt=num2str(pd.temp(1));
 end
 
 if(depthsource==10)   %put flag at 10m (CTR)
-    histdepth=max(profiledata.depth(1),10.0);
-    oldt=num2str(profiledata.temp(1));
+    histdepth=max(pd.depth(1),10.0);
+    oldt=num2str(pd.temp(1));
 end
 if(depthsource==3);   %put the flag at the end of the valid data
     histdepth=[];
-    d=diff(profiledata.temp);
+    d=diff(pd.temp);
     try
         d=[0 d(1:end)'];
-        jj=find(profiledata.temp>-2.4 & profiledata.temp < 31.9 & d'<=0.1);
+        jj=find(pd.temp>-2.4 & pd.temp < 31.9 & d'<=0.1);
     catch
         d=[0 d(1:end)];
-        jj=find(profiledata.temp>-2.4 & profiledata.temp < 31.9 & d<=0.1);
+        jj=find(pd.temp>-2.4 & pd.temp < 31.9 & d<=0.1);
     end
     % d(end+1)=d(end);
     
-    if(~isempty(jj) & ~isnan(profiledata.temp(jj(end)+1)))
-        histdepth=profiledata.depth(jj(end)+1);
-        oldt=num2str(profiledata.temp(jj(end)+1));
+    if(~isempty(jj) & ~isnan(pd.temp(jj(end)+1)))
+        histdepth=pd.depth(jj(end)+1);
+        oldt=num2str(pd.temp(jj(end)+1));
     else
         %no appropriate point found:
         handles.Qkey='N';
@@ -436,8 +436,8 @@ end
 
 if(depthsource==2 | depthsource==1)   %put flag at cursor point
     histindex=get(handles.depthdisplay,'Value');
-    histdepth=profiledata.depth(histindex);
-    oldt=num2str(profiledata.temp(get(handles.depthdisplay,'Value')));
+    histdepth=pd.depth(histindex);
+    oldt=num2str(pd.temp(get(handles.depthdisplay,'Value')));
 end
 
 if(isempty(histdepth))
@@ -461,7 +461,7 @@ else
 end
 
 
-handles.pd=profiledata;
+handles.pd=pd;
 
 %saveguidata
 

@@ -9,7 +9,7 @@ if(strcmp(handles.changed,'y') | strcmp(handles.changed,'Y'))
     writenetcdf;
 end
 try
-    profiledata=handles.profile_data;
+    pd=handles.pd;
 end
 keysdata=handles.keys;
 handles.ss=keysdata.stnnum(handles.currentprofile); %keysdata.stnnum(i);   %

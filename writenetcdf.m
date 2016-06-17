@@ -120,30 +120,10 @@ if(dpcode=='P')
     end
 end
 
-%now write all the edits to the file:
-%pd contains the changed data
-%Make sure that all the edits to pd are transferred to profiledata
-%structure.
-%update the profiledata structure with edits in the pd structure:
-wd(1:4)=num2str(pd.year);
-wd(5:6) = num2str(pd.month,'%02f');
-wd(7:8)= num2str(pd.day,'%02f');
-wt=pd.time;
-profiledata.woce_date = wd;
-profiledata.woce_time = str2double([wt(1:2) wt(4:5)])*100;
+%first, update the profiledata structure (written out to nc file) with
+%changes from the pd structure:
 
-vars_in = {'latitude','longitude','ndep','depth','deep_depth','qc','depth_qc',...
-    'temp','Flag_Severity','numhists','nparms','QC_code','QC_depth','PRC_Date',...
-    'PRC_Code','Version','Act_Parm','Previous_Val','Ident_Code','surfcode',...
-    'surfparm','surfqparm','nsurfc'};
-vars_out = {'latitude','longitude','No_Depths','Depthpress','Deep_Depth','ProfQP','DepresQ',...
-    'Profparm','Flag_Severity','Num_Hists','Nparms','Act_Code','Aux_ID','PRC_Date',...
-    'PRC_Code','Version','Act_Parm','Previous_Val','Ident_Code','SRFC_Code',...
-    'SRFC_Parm','SRFC_Q_Parm','Nsurfc'};
-
-for a = 1:length(vars_in)
-    profiledata.(vars_out{a}) = pd.(vars_in{a});
-end
+profiledata = update_profiledata(profiledata,pd);
 
 %record today's date
 update = datestr(now,'yyyymmdd');
@@ -158,7 +138,7 @@ for a = 1:length(flds)
         ncwrite(filenam,flds{a},profiledata.(flds{a}));
     end
     catch
-        disp(['writeMQNCfiles: Unable to write item: ' num2str(a) ' ' flds{a}])
+        disp(['writenetcdf: Unable to write item: ' num2str(a) ' ' flds{a}])
         continue
     end
 end
