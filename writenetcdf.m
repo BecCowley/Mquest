@@ -17,7 +17,7 @@ pd = handles.pd;
 %construct the filename of the data file from the unique id and the
 %database prefix
 
-ss=pd.nss;
+ss=str2num(pd.nss);
 clear filenam
 filenam=pd.outputfile;
 nss=num2str(ss);
@@ -98,8 +98,8 @@ if(~isempty(kk))
     pd.depth(kk)=-99.99;
 end
 
-pt=strmatch('TEMP',pd.ptype);
-ps=strmatch('PSAL',pd.ptype);
+% pt=strmatch('TEMP',pd.ptype);
+% ps=strmatch('PSAL',pd.ptype);
 
 
 kk=find(isnan(depth2));
