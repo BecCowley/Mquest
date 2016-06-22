@@ -1,0 +1,8 @@
+ann   newchinesedata   All   All   1   1   1   ship
+lisa   newGTSPPmer2006   All   All   1   1   1   ship
+mership   newGTSPPmer2006   Aug   All   1   1   3   ship
+mastertasman   unknown   All   All   1   1   1   none
+juan   rtqc4   All   All   1   1   1   none
+aomltest   testaoml   All   All   1   1   1   ship
+tv   antarctic2005   All   All   1   1   1   none
+investigator   unknown   All   All   1   1   1   unknown
