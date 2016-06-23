@@ -57,7 +57,7 @@ pd.longitude = profiledata.longitude;
 pd.year=wd(1:4);
 pd.month=wd(5:6);
 pd.day=wd(7:8);
-pd.ndep = profiledata.No_Depths;
+pd.ndep = profiledata.No_Depths(1);
 
 wt=profiledata.woce_time;
 wt=floor(wt/100);
@@ -68,8 +68,8 @@ if(~isempty(jk))
 end
 pd.time=[wt2(1:2) ':' wt2(3:4)];
 
-pt=find(strncmp('TEMP',profiledata.Prof_Type',4));
-ps=find(strncmp('PSAL',profiledata.Prof_Type',4));
+pt=strmatch('TEMP',profiledata.Prof_Type');
+ps=strmatch('PSAL',profiledata.Prof_Type');
 
 de = profiledata.Depthpress;
 pd.depth = de;
@@ -86,7 +86,10 @@ end
 
 h = squeeze(profiledata.Profparm);
 qc = squeeze(profiledata.ProfQP);
-dqc = profiledata.DepresQ';
+dqc = squeeze(profiledata.DepresQ);
+[mm,nn]=size(dqc);
+[ii,jj] = sort([mm,nn],'descend');
+dqc = permute(dqc,jj);
 [m,n]=size(h);
 
 if(n==profiledata.No_Prof)
@@ -130,7 +133,7 @@ end
 
 pd.numhists=profiledata.Num_Hists;
 pd.nparms=profiledata.Nparms;
-pd.deep_depth = profiledata.Deep_Depth;
+pd.deep_depth = profiledata.Deep_Depth(1);
 pd.QC_code=profiledata.Act_Code';
 pd.QC_depth=double(profiledata.Aux_ID);
 pd.PRC_Date=profiledata.PRC_Date';

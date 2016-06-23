@@ -53,7 +53,7 @@ de=ncread(filenam,'Depthpress');
 if dpcode=='P' %convert to depth if necessary
     %change to teos-10 on 17 Sept 2014
 %     de=sw_dpth(de,profiledata.latitude(1));
-    de=-gsw_z_from_p(de,profiledata.latitude(1));
+    de=-gsw_z_from_p(de,pd.latitude(1));
 end
 
 tempqc=squeeze(ncread(filenam,'ProfQP'));
