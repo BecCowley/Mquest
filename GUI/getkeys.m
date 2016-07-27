@@ -69,7 +69,7 @@ end
 col=['g' 'b' 'y' 'r' 'g'];
     if(~exist(keysfile))
 % you must create the file before you can add to it...
-            createkeys
+            createkeys(keysfile)
             mkdir(prefix{1}) 
             dir2=pwd;
 % and you must fill the file before you can use it!!!
