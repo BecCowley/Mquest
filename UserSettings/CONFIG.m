@@ -17,7 +17,7 @@ if(~ispc)
 global UNIQUE_ID_PATH_UNIX LAND_MASK_FILE_UNIX MAP_FILE_UNIX  TOPO_FILE_UNIX 
 global CLIMATOLOGY_PATH_UNIX LEVITUSDATA_PATH_UNIX MQUEST_DIRECTORY_UNIX
     
-UNIQUE_ID_PATH_UNIX='/Users/cow074/Documents/work_mac/Mquest/Mquest/';
+UNIQUE_ID_PATH_UNIX='/Users/cow074/Documents/work_mac/Mquest/Mquest/UserSettings/';
 
     MAP_FILE_UNIX='/Users/cow074/Documents/work_mac/Mquest/Mquest/Bathymetry/terrainbase';
 
