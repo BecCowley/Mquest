@@ -134,17 +134,17 @@ end
 pd.numhists=profiledata.Num_Hists;
 pd.nparms=profiledata.Nparms;
 pd.deep_depth = profiledata.Deep_Depth(1);
-pd.QC_code=profiledata.Act_Code';
+pd.QC_code=profiledata.Act_Code;
 pd.QC_depth=double(profiledata.Aux_ID);
-pd.PRC_Date=profiledata.PRC_Date';
-pd.PRC_Code=profiledata.PRC_Code';
-pd.Version=profiledata.Version';
-pd.Act_Parm=profiledata.Act_Parm';
-pd.Previous_Val=profiledata.Previous_Val';
-pd.Ident_Code=profiledata.Ident_Code';
+pd.PRC_Date=profiledata.PRC_Date;
+pd.PRC_Code=profiledata.PRC_Code;
+pd.Version=profiledata.Version;
+pd.Act_Parm=profiledata.Act_Parm;
+pd.Previous_Val=profiledata.Previous_Val;
+pd.Ident_Code=profiledata.Ident_Code;
 
-pd.surfcode = profiledata.SRFC_Code';
-pd.surfparm = profiledata.SRFC_Parm';
+pd.surfcode = profiledata.SRFC_Code;
+pd.surfparm = profiledata.SRFC_Parm;
 pd.surfqparm = profiledata.SRFC_Q_Parm;
 pd.nsurfc = profiledata.Nsurfc;
 
