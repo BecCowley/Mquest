@@ -54,16 +54,16 @@ end
 if vartyp==1
    avar = [prop '00an1'];
    mvar = [prop '0112an1'];
-   mfnm = [pth 'monthly/' mvar];
+   mfnm = [pth 'monthly/' mvar '.nc'];
 else
    avar = [prop '00sd1'];
    doy = [];
 end
 
-afnm = [pth 'annual/' avar];
+afnm = [pth 'annual/' avar '.nc'];
 
-lon = getnc(afnm,'lon');
-lat = getnc(afnm,'lat');
+lon = ncread(afnm,'lon');
+lat = ncread(afnm,'lat');
 
 % Quite excusable cheat
 if any(lats>89.5)
@@ -78,7 +78,7 @@ if any(lons>=359.5)
 end
 
 
-adeps = getnc(afnm,'depth');
+adeps = ncread(afnm,'depth');
 nadps = length(adeps);  
 
 ldeps = dep_csl(deps,1);
@@ -98,7 +98,7 @@ end
  
 
 if nargin>=5 & ~isempty(doy)
-   mdeps = getnc(mfnm,'depth');
+   mdeps = ncread(mfnm,'depth');
    nmdps = length(mdeps);
 
    if max(ceil(ldeps)) > nmdps
@@ -123,16 +123,16 @@ if nargin>=5 & ~isempty(doy)
       ix = [min(ix) max(ix)+1];
       iy = round(lats(kk)+90);
       iy = [min(iy) max(iy)+1];
-      dat = getnc(mfnm,mvar,[month 1 iy(1) ix(1)],[month ndp iy(2) ix(2)]);
+      dat = ncread(mfnm,mvar,[ix(1) iy(1) 1 month],[ix(2)-ix(1)+1 iy(2)-iy(1)+1 ndp 1]);
 
       X = 1 + lons(kk) - lon(ix(1));
       Y = 1 + lats(kk) - lat(iy(1));
 
       if nadp>0
-	 dat2 = getnc(afnm,avar,[1 ndp+1 iy(1) ix(1)],[1 nadp iy(2) ix(2)]);
+	 dat2 = ncread(afnm,avar,[ix(1) iy(1) ndp+1 1],[ix(2)-ix(1)+1 iy(2)-iy(1)+1 nadp-ndp 1]);
 	 dat = [dat; dat2];
       end
-      dat = shiftdim(dat,1);
+      dat = permute(dat,[2,1,3]);
       
       for ii = noint
 	 vv(ii,kk) = interp2(squeeze(dat(:,:,ldeps(ii))),X,Y,'*linear');
@@ -155,12 +155,12 @@ else
    ix = [min(ix) max(ix)+1];
    iy = round(lats+90);
    iy = [min(iy) max(iy)+1];
-   dat = getnc(afnm,avar,[1 1 iy(1) ix(1)],[1 nadp iy(2) ix(2)]);
+   dat = ncread(afnm,avar,[ix(1) iy(1) 1 1],[ix(2)-ix(1)+1 iy(2)-iy(1)+1 nadp 1]);
 
    X = 1 + lons - lon(ix(1));
    Y = 1 + lats - lat(iy(1));
 
-   dat = shiftdim(dat,1);
+      dat = permute(dat,[2,1,3]);
       
    for ii = noint
       vv(ii,:) = interp2(squeeze(dat(:,:,ldeps(ii))),X,Y,'*linear');

@@ -96,8 +96,8 @@ out = 1:ncast;
 ic = 1:ncast;
 if isempty(rot) | rot==0
     if isempty(findstr(cfnm,'cars2005')) & isempty(findstr(cfnm,'cars2006'))
-        ic = find(lon>=min(cnrs(2,:)) & lon<=max(cnrs(2,:)) & ...
-            lat>=min(cnrs(1,:)) & lat<=max(cnrs(1,:)));
+        ic = find(lon>=min(cnrs(:,2)) & lon<=max(cnrs(:,2)) & ...
+            lat>=min(cnrs(:,1)) & lat<=max(cnrs(:,1)));
         out(ic) = [];
     else
         out = find(lat<-70 | lat>26 | (lon>270 & lat>=10));
@@ -135,7 +135,7 @@ if ~isempty(ic)
     [X,Y] = coord2grd(lon(ic),lat(ic),gor(2),gor(1),gsp(2),gsp(1),rot);
     
     if isempty(doy)
-        [mn,t2,t3,t4,t5,ix,iy] = getchunk22(prop,deps,rng,cpath,fname,-2,vart);
+        [mn,t2,t3,t4,t5,ix,iy] = getchunk2(prop,deps,rng,cpath,fname,-2,vart);
         if isempty(mn)
             return
         end
