@@ -1,7 +1,7 @@
 %the script to draw the map window with positions of all profiles in the
 %current database subset:
 
-try
+% try
     axes(handles.map);
     cla
 keysdata=handles.keys;
@@ -40,4 +40,4 @@ set(gg,'LineWidth',2);
 
 %gebco
 %coast
-end
+% end
