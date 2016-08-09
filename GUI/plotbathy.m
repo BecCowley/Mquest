@@ -10,8 +10,8 @@ if(~exist('xb'))
         pwd
         fname=MAP_FILE_PC;
     end
-    xb = getnc(fname,'lon');
-    yb = getnc(fname,'lat');
+    xb = ncread(fname,'lon');
+    yb = ncread(fname,'lat');
 end
 
 v=[xlimit ylimit];
@@ -23,8 +23,8 @@ if(handles.keys.map180)
     ixw=find((xb > 360+v(1) & xb <= 360));
     ixe=find(xb >= 0 & xb<v(2));
     iy = find(yb > v(3) & yb < v(4));
-    hbe = -1*getnc(fname,'height',[min(iy) min(ixe)],[max(iy) max(ixe)],[4 4]);
-    hbw = -1*getnc(fname,'height',[min(iy) min(ixw)],[max(iy) max(ixw)],[4 4]);
+    hbe = -1*ncread(fname,'height',[min(ixe) min(iy)],[ max(ixe)-min(ixe)+1 max(iy)]);
+    hbw = -1*ncread(fname,'height',[min(ixw) min(iy)],[ max(ixw)-min(ixw)+1 max(iy)]);
 
     hb=[hbw hbe];
     xbw=-(360-xb(ixw));
@@ -34,13 +34,13 @@ if(handles.keys.map180)
 else    
     ix = find(xb > v(1) & xb < v(2));
     iy = find(yb > v(3) & yb < v(4));
-    hbe = -1*getnc(fname,'height',[min(iy) min(ix)],[max(iy) max(ix)],[4 4]);
-
-    hb = hbe;;
+    hbe = -1*ncread(fname,'height',[min(ix) min(iy)],[max(ix)-min(ix)+1 max(iy)-min(iy)+1]);
+    
+    hb = hbe;
     xb2 = xb(ix);
     yb2 = yb(iy);
 end
-contourf(xb2(1:4:end),yb2(1:4:end),hb,[0:100:2000],'k');
+contourf(xb2(1:4:end),yb2(1:4:end),hb(1:4:end,1:4:end)',[0:100:2000],'k');
 %contourf(xb2,yb2,hb,[0:100:2000],'k')
 caxis([0,2000]);
 %colorbar

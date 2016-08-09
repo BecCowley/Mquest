@@ -19,7 +19,7 @@ global CLIMATOLOGY_PATH_UNIX LEVITUSDATA_PATH_UNIX MQUEST_DIRECTORY_UNIX
     
 UNIQUE_ID_PATH_UNIX='/Users/cow074/Documents/work_mac/Mquest/Mquest/UserSettings/';
 
-    MAP_FILE_UNIX='/Users/cow074/Documents/work_mac/Mquest/Mquest/Bathymetry/terrainbase';
+    MAP_FILE_UNIX='/Users/cow074/Documents/work_mac/Mquest/Mquest/Bathymetry/terrainbase.nc';
 
     CLIMATOLOGY_PATH_UNIX='/Users/cow074/Documents/work_mac/Mquest/Mquest/CARSatlas/';
 %     LEVITUSDATA_PATH_UNIX='/media/sf_Mquest/CARSatlas/levitusdata/';
