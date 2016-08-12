@@ -7,10 +7,10 @@ profiledata=handles.profile_data;
 if i == 1
     clear recwritten
 end
-if(strmatch('TP',profiledata.QC_code(:,:)))
+if(strmatch('TP',profiledata.Act_Code(:,:)))
     return
 end
-if(strmatch('DU',profiledata.QC_code(:,:)))
+if(strmatch('DU',profiledata.Act_Code(:,:)))
     return
 end
 prefix=[handles.outputfile '.MA'];
@@ -35,6 +35,20 @@ else
     mky = profiledata.Mky(1:6);
 end
 
+%get some time fields
+wd=num2str(profiledata.woce_date);
+profiledata.year=wd(1:4);
+profiledata.month=wd(5:6);
+profiledata.day=wd(7:8);
+wt = profiledata.woce_time;
+wt=floor(wt/100);
+wt2=sprintf('%4i',wt);
+jk=strfind(wt2,' ');
+if(~isempty(jk))
+    wt2(jk)='0';
+end
+profiledata.wt=[wt2(1:2) ':' wt2(3:4)];
+
 clear a
 
 % Changes to format as discussed with Norm Hall, NOAA. Implemented by Bec
@@ -51,7 +65,7 @@ end
 %deal with it when it happens:
 profiledata.Up_date = reformatdates(profiledata.Up_date')';
 %Now PRC
-for i = 1:profiledata.numhists
+for i = 1:profiledata.Num_Hists
     profiledata.PRC_Date(i,:) = reformatdates(profiledata.PRC_Date(i,:))';
 end
 % start the sort key (Mky) at 1. Format is ssssssrr where ssssss is the sequential
@@ -59,12 +73,12 @@ end
 % more the 1500 records, we add another record #. 00 is the first, header,
 % record. Then increment 1 for each parameter and segment.
 a=profiledata.Mky;
-if(~isempty(strfind(profiledata.time,':')))
+if(~isempty(strfind(profiledata.wt,':')))
     a=[a profiledata.One_Deg_Sq' profiledata.Cruise_ID' profiledata.year profiledata.month ...
-    profiledata.date profiledata.time(1:2) profiledata.time(4:5)]
+    profiledata.day profiledata.wt(1:2) profiledata.wt(4:5)]
 else
     a=[a profiledata.One_Deg_Sq' profiledata.Cruise_ID' profiledata.year profiledata.month ...
-    profiledata.date profiledata.time]
+    profiledata.day profiledata.wt]
 end
 
 a=[a profiledata.Data_Type' profiledata.Iumsgno' profiledata.Stream_Source' profiledata.Uflag' profiledata.MEDS_Sta'];
@@ -84,7 +98,7 @@ a=[a profiledata.Up_date' profiledata.Bul_Time' profiledata.Bul_Header' profiled
 
 a=[a profiledata.QC_Version' profiledata.Data_Avail];
 
-nprofs=sprintf('%2i',profiledata.nprof);
+No_Profs=sprintf('%2i',profiledata.No_Prof);
 if(profiledata.Nparms==0)
     nparms=' 0';
 else
@@ -95,16 +109,16 @@ if(profiledata.Nsurfc==0)
 else
     nsurfc=sprintf('%2i',profiledata.Nsurfc);
 end
-if(profiledata.numhists==0)
-    numhists='  0';
+if(profiledata.Num_Hists==0)
+    Num_Hists='  0';
 else
-    numhists=sprintf('%3i',profiledata.numhists);
+    Num_Hists=sprintf('%3i',profiledata.Num_Hists);
 end
-a=[a nprofs nparms nsurfc numhists];
+a=[a No_Profs nparms nsurfc Num_Hists];
 
 clear noseg
 
-for i=1:profiledata.nprof
+for i=1:profiledata.No_Prof
     %need to replace the dup_flag with 'Y' or 'N'. We don't pass dups through,
     %but do this anyway:
     if ~isempty(strmatch('D',profiledata.Dup_Flag(i)))
@@ -112,13 +126,13 @@ for i=1:profiledata.nprof
     else
         profiledata.Dup_Flag(i) = 'N';
     end
-    noseg(i)=floor(profiledata.ndep(i)./1500)+1;
+    noseg(i)=floor(profiledata.No_Depths(i)./1500)+1;
     if noseg(i) < 0
         noseg(i) = 1;
     end
     anoseg=sprintf('%2i',noseg(i));
     a=[a anoseg ];
-    a=[a profiledata.ptype(i,1:4) profiledata.Dup_Flag(i) profiledata.Digit_Code(i) profiledata.Standard(i)];
+    a=[a profiledata.Prof_Type(1:4,i)' profiledata.Dup_Flag(i) profiledata.Digit_Code(i) profiledata.Standard(i)];
 
     clear adeepdepth
     adeepdepth=sprintf('%5.1f',profiledata.Deep_Depth(i));
@@ -137,10 +151,10 @@ if(profiledata.Nsurfc>0)
     end
 end
 
-if(profiledata.numhists>0)
-    if(profiledata.numhists>100);profiledata.numhists=100;end
-    for i=1:profiledata.numhists
-        aauxid=sprintf('%8.2f',profiledata.QC_depth(i));
+if(profiledata.Num_Hists>0)
+    if(profiledata.Num_Hists>100);profiledata.Num_Hists=100;end
+    for i=1:profiledata.Num_Hists
+        aauxid=sprintf('%8.2f',profiledata.Aux_ID(i));
         prevv=str2num(profiledata.Previous_Val(i,:));
         if ~isempty(prevv)
             aprevv=sprintf('%10.3f',prevv);
@@ -148,7 +162,7 @@ if(profiledata.numhists>0)
             aprevv=profiledata.Previous_Val(i,:);
         end
         a=[a profiledata.Ident_Code(i,:) profiledata.PRC_Code(i,:) profiledata.Version(i,:) ...
-            profiledata.PRC_Date(i,:) profiledata.QC_code(i,:) profiledata.Act_Parm(i,:) ...
+            profiledata.PRC_Date(i,:) profiledata.Act_Code(i,:) profiledata.Act_Parm(i,:) ...
             aauxid(1:8) aprevv(1:10)];
     end
 end
@@ -169,7 +183,7 @@ count2=fprintf(fid,'\n');
 % setup header info:
 mkyrec=str2num(profiledata.Mky(end-1:end));
 
-for j=1:profiledata.nprof
+for j=1:profiledata.No_Prof
 
     ij=0;
     for k=1:noseg(j)
@@ -179,42 +193,42 @@ for j=1:profiledata.nprof
     mkyrec = mkyrec + 1;
     a = [mky num2str(mkyrec,'%02.0f')];
     
-    if(~isempty(strfind(profiledata.time,':')))
+    if(~isempty(strfind(profiledata.wt,':')))
         a=[a profiledata.One_Deg_Sq' profiledata.Cruise_ID' profiledata.year profiledata.month ...
-        profiledata.date profiledata.time(1:2) profiledata.time(4:5)];
+        profiledata.day profiledata.wt(1:2) profiledata.wt(4:5)];
     else
         a=[a profiledata.One_Deg_Sq' profiledata.Cruise_ID' profiledata.year profiledata.month ...
-        profiledata.date profiledata.time];
+        profiledata.day profiledata.wt];
     end
 
     if(k==noseg)
-        ndepths=rem(profiledata.ndep(j),1500);
+        No_Depthsths=rem(profiledata.No_Depths(j),1500);
     else
-        ndepths=1500;
+        No_Depthsths=1500;
     end
-    ndp=sprintf('%4i',ndepths);
+    ndp=sprintf('%4i',No_Depthsths);
     nseg=sprintf('%2i',k);
-    a=[a profiledata.Data_Type' profiledata.Iumsgno' profiledata.ptype(j,1:4) nseg ndp profiledata.D_P_Code(j)];
+    a=[a profiledata.Data_Type' profiledata.Iumsgno' profiledata.Prof_Type(1:4,j)' nseg ndp profiledata.D_P_Code(j)];
 
-    for i=1:ndepths
+    for i=1:No_Depthsths
         ij=ij+1;
         clear d t qd qc
         if(strfind(a,'0191902122200'))
                 j=j;
                 ij=ij;
                 profiledata;
-                ndepths
+                No_Depthsths
         end
-        d=sprintf('%6.2f',profiledata.depth(j,ij));
-        t=sprintf('%9.3f',profiledata.data(j,ij));
+        d=sprintf('%6.2f',profiledata.Depthpress(ij,j));
+        t=sprintf('%9.3f',profiledata.Profparm(ij,j));
            
         try
-            a=[a d(1:6) profiledata.depthqc(j,ij) t(1:9) profiledata.qc(j,ij)];
+            a=[a d(1:6) profiledata.DepresQ(ij,j) t(1:9) profiledata.ProfQP(ij,j)];
         catch
             ij=ij
             j=j
-            profiledata.depthqc;
-            profiledata.qc;
+            profiledata.DepresQ;
+            profiledata.ProfQP;
         end
     end
     
