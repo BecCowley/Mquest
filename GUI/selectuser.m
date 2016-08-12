@@ -114,6 +114,7 @@ try
     fid = fopen(buddydata);
     [buddydatalist]=textscan(fid,'%s');
     fclose(fid);
+    buddydatalist = buddydatalist{1};
 catch
     buddydatalist=[];
 end

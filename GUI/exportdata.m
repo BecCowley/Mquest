@@ -374,7 +374,9 @@ reversestartdate=reorderdate(handles.startdate);
        for i=1:length(kk2)
          ss=keysdata2.stnnum(subsetkeys(kk2(i)),:);
 
-         readnetcdfforexport
+         handles.profile_data = readnetcdf;
+         
+%          readnetcdfforexport
          switch exform
              case 1
 %                 c='here MA'

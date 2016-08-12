@@ -6,10 +6,10 @@ global DATA_PRIORITY
 global MQUEST_DIRECTORY_PC
 global DATA_QC_SOURCE
 
-   DATA_SOURCE='CSIRO';
-%      DATA_SOURCE='AODC';
-   DATA_QC_SOURCE='CS';
-%     DATA_QC_SOURCE='AD';
+%    DATA_SOURCE='CSIRO';
+     DATA_SOURCE='AODC';
+%    DATA_QC_SOURCE='CS';
+    DATA_QC_SOURCE='AD';
     DATA_PRIORITY=1;
     
 if(~ispc)
@@ -22,15 +22,21 @@ UNIQUE_ID_PATH_UNIX='/Users/cow074/Documents/work_mac/Mquest/Mquest/UserSettings
     MAP_FILE_UNIX='/Users/cow074/Documents/work_mac/Mquest/Mquest/Bathymetry/terrainbase.nc';
 
     CLIMATOLOGY_PATH_UNIX='/Users/cow074/Documents/work_mac/Mquest/Mquest/CARSatlas/';
-%     LEVITUSDATA_PATH_UNIX='/media/sf_Mquest/CARSatlas/levitusdata/';
+    LEVITUSDATA_PATH_UNIX='/Users/cow074/Documents/work_mac/Mquest/Mquest/CARSatlas/levitusdata/';
 
-    MQUEST_DIRECTORY_UNIX='/Users/cow074/Documents/work_mac/Mquest/Mquest/UserSettings/';
-    addpath(MQUEST_DIRECTORY_UNIX);
+    MQUEST_DIRECTORY_UNIX='/Users/cow074/Documents/work_mac/Mquest/Mquest/';
+    addpath(MQUEST_DIRECTORY_UNIX)
+    dirn = dir(MQUEST_DIRECTORY_UNIX);
+    for a = 1:length(dirn)
+        if dirn(a).isdir && isempty(strfind(dirn(a).name(1),'.'))
+            addpath([MQUEST_DIRECTORY_UNIX dirn(a).name],'-begin');
+        end
+    end
    
 else
 % configuration bits for PC:
 global UNIQUE_ID_PATH_PC LAND_MASK_FILE_PC MAP_FILE_PC  TOPO_FILE_PC 
-global CLIMATOLOGY_PATH_PC LEVITUSDATA_PATH_PC MQUEST_DIRECTORY_PC
+global CLIMATOLOGY_PATH_PC LEVITUSDATA_PATH_PC
 
     UNIQUE_ID_PATH_PC='/home/gronell/';
     

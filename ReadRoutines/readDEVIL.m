@@ -224,10 +224,10 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if(~isempty(shipname))
     kk=strcmpi(shipname,S.fullname);
-    if(~isempty(kk))
+    if sum(kk) > 0
         shortname=S.shortname(kk);
         s=shortname;
-        shortname=s{1};
+        shortname=s{1}
     else
         if ~isempty(strmatch('RV METOC',shipname)) || ...
                 (~isempty(strmatch('SHIP',gcll)) || ~isempty(strmatch('ship',gcll)))
@@ -250,37 +250,56 @@ if(~isempty(shipname))
                 shipname = S.fullname{ij};
             end
         else
-            disp('Ship name does not match any existing entries in ships.txt')
-            disp(['Ship name = "' shipname '" from file = "' fname '"'])
-            %long_shipname=input('Please enter full ship name: ','s')
-            disp(['Current Ship.txt contains:'])
-
-            if(ispc)
-                global MQUEST_DIRECTORY_PC
-                fnm=[ MQUEST_DIRECTORY_PC '\ships.txt'];
-            else
-                global MQUEST_DIRECTORY_UNIX
-                fnm=[ MQUEST_DIRECTORY_UNIX '/ships.txt'];
+            kk = find(cellfun(@isempty,strfind(S.fullname,shipname)) == 0);
+            if length(kk) > 1
+                disp(['Multiple ships match this ship: ' shipname])
+                for aa = 1:length(kk)
+                    disp([num2str(kk(aa)) ': ' S.fullname{kk(aa)}])
+                end
+                kk = input('Please select the correct index number for this ship, return for no match:','s');
+                if ~isempty(kk)
+                    kk = str2num(kk);
+                    shortname=S.shortname(kk);
+                    s=shortname;
+                    shortname=s{1}
+                else %no match
+                    shortname=input('Please enter 10-characters for that ship name: ','s');
+                    while(length(shortname)>10)
+                        shortname=input('I said enter 10-CHARACTERS for that ship name: ','s');
+                    end
+                    long_shipname=shipname;
+                    S=writeshipnames(long_shipname,shortname);
+                end
+            elseif isempty(kk) %there is no match
+                disp('Ship name does not match any existing entries in ships.txt')
+                disp(['Ship name = "' shipname '" from file = "' fname '"'])
+                %long_shipname=input('Please enter full ship name: ','s')
+                disp(['Current Ship.txt contains:']            )
+                if(ispc)
+                    global MQUEST_DIRECTORY_PC
+                    fnm=[ MQUEST_DIRECTORY_PC '\ships.txt'];
+                else
+                    global MQUEST_DIRECTORY_UNIX
+                    fnm=[ MQUEST_DIRECTORY_UNIX '/ships.txt'];
+                end
+                fid = fopen(fnm,'r');
+                j=0;
+                tmpdb = textscan(fid,'%s','delimiter',',');
+                fclose(fid);
+                tmpdb = tmpdb{1};
+                for i=1:2:length(tmpdb)
+                    j=j+1;
+                    disp(['   ' S.fullname{j} ',' S.shortname{j}])
+                end
+                shortname=input('Please enter 10-characters for that ship name: ','s');
+                while(length(shortname)>10)
+                    shortname=input('I said enter 10-CHARACTERS for that ship name: ','s');
+                end
+                long_shipname=shipname;
+                S=writeshipnames(long_shipname,shortname);
             end
-
-            fid = fopen(fnm,'r');
-            j=0;
-            tmpdb = textscan(fid,'%s','delimiter',',');
-            fclose(fid);
-            tmpdb = tmpdb{1};
-            for i=1:2:length(tmpdb)
-                j=j+1;
-                disp(['   ' S.fullname{j} ',' S.shortname{j}])
-            end
-
-            shortname=input('Please enter 10-characters for that ship name: ','s');
-            while(length(shortname)>10)
-                shortname=input('I said enter 10-CHARACTERS for that ship name: ','s');
-            end
-
-            long_shipname=shipname;
-            S=writeshipnames(long_shipname,shortname);
-    end
+            
+        end
     end
 else
     disp('No ship name has been specified! Please enter full ship name: ')
