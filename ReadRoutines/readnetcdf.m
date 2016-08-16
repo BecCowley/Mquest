@@ -1,4 +1,4 @@
-function profiledata = readnetcdf
+function profiledata = readnetcdf(ss)
 %readnetcdf - this script reads the profile data from the file - 
 %       currently it reads only the variables required for Mquest.
 %   The entire file is read in the script "readnetcdfforexport".
@@ -6,12 +6,15 @@ function profiledata = readnetcdf
 %  Updated to read netcdf using Matlab tools. 
 %   Also to be a function.
 %  May 2016, Bec Cowley.
+% And to allow optional passing of the profile id in.
 global handles
 
 keysdata = handles.keys;
 
 filenam=keysdata.prefix;
-ss = handles.ss;
+if nargin == 0
+    ss = handles.ss;
+end
 nss=num2str(ss);
 for j=1:2:length(num2str(ss));
     

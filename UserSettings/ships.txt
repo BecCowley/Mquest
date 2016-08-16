@@ -59,8 +59,8 @@ Akademik Shokalskiy,AkadShokal
 SHENGKING,Shengking
 Pacific Triangle,PacificTri
 Baruna Jaya VIII,BarunaJaya
-bj8,BarunaJayaSouthern
-Southern Survey,SouthernSUrania,
+bj8,BarunaJaya
+Southern Survey,SouthernS
 Urania,Urania    
 Capitaine Fearn,CapitFearn
 Investigator,Investigat
@@ -69,5 +69,5 @@ Manila Express,ManilaExps
 Swan River Bridge,SwanRiverB
 Patricia Schulte,PatriciaS
 SIANGTAN,Siangtan
-Maersk Jalan,MaerskJale
+Maersk Jalan,MaerskJala
 HMAS Benalla,HMASBenall

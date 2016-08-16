@@ -2,15 +2,14 @@
 % and outputs it in the data exchange format meds-ascii.
 
 %retrieveguidata
-profiledata=handles.profile_data;
 
 if i == 1
     clear recwritten
 end
-if(strmatch('TP',profiledata.Act_Code(:,:)))
+if(strmatch('TP',profiledata.Act_Code(:,:)'))
     return
 end
-if(strmatch('DU',profiledata.Act_Code(:,:)))
+if(strmatch('DU',profiledata.Act_Code(:,:)'))
     return
 end
 prefix=[handles.outputfile '.MA'];
@@ -49,6 +48,16 @@ if(~isempty(jk))
 end
 profiledata.wt=[wt2(1:2) ':' wt2(3:4)];
 
+%get rid of extra dimensions to make writing to MA easier:
+profiledata.Profparm = squeeze(profiledata.Profparm);
+profiledata.DepresQ = squeeze(profiledata.DepresQ);
+if profiledata.No_Prof == 1
+    %re-orient
+    profiledata.DepresQ = profiledata.DepresQ(:);
+end
+profiledata.ProfQP = squeeze(profiledata.ProfQP);
+profiledata.Depthpress = squeeze(profiledata.Depthpress);
+
 clear a
 
 % Changes to format as discussed with Norm Hall, NOAA. Implemented by Bec
@@ -66,7 +75,7 @@ end
 profiledata.Up_date = reformatdates(profiledata.Up_date')';
 %Now PRC
 for i = 1:profiledata.Num_Hists
-    profiledata.PRC_Date(i,:) = reformatdates(profiledata.PRC_Date(i,:))';
+    profiledata.PRC_Date(:,i) = reformatdates(profiledata.PRC_Date(:,i)')';
 end
 % start the sort key (Mky) at 1. Format is ssssssrr where ssssss is the sequential
 % station number in the MA file, and rr is the parameter record number. If
@@ -126,7 +135,7 @@ for i=1:profiledata.No_Prof
     else
         profiledata.Dup_Flag(i) = 'N';
     end
-    noseg(i)=floor(profiledata.No_Depths(i)./1500)+1;
+    noseg(i)=floor(profiledata.No_Depths(i)./1500);
     if noseg(i) < 0
         noseg(i) = 1;
     end
@@ -147,7 +156,7 @@ end
 
 if(profiledata.Nsurfc>0)
     for i=1:profiledata.Nsurfc
-        a=[a profiledata.SRFC_Code(i,:) profiledata.SRFC_Parm(i,:) profiledata.SRFC_Q_Parm(i,:)];
+        a=[a profiledata.SRFC_Code(:,i)' profiledata.SRFC_Parm(:,i)' profiledata.SRFC_Q_Parm(:,i)'];
     end
 end
 
@@ -155,14 +164,14 @@ if(profiledata.Num_Hists>0)
     if(profiledata.Num_Hists>100);profiledata.Num_Hists=100;end
     for i=1:profiledata.Num_Hists
         aauxid=sprintf('%8.2f',profiledata.Aux_ID(i));
-        prevv=str2num(profiledata.Previous_Val(i,:));
+        prevv=str2num(profiledata.Previous_Val(:,i)');
         if ~isempty(prevv)
             aprevv=sprintf('%10.3f',prevv);
         else
-            aprevv=profiledata.Previous_Val(i,:);
+            aprevv=profiledata.Previous_Val(:,i)';
         end
-        a=[a profiledata.Ident_Code(i,:) profiledata.PRC_Code(i,:) profiledata.Version(i,:) ...
-            profiledata.PRC_Date(i,:) profiledata.Act_Code(i,:) profiledata.Act_Parm(i,:) ...
+        a=[a profiledata.Ident_Code(:,i)' profiledata.PRC_Code(:,i)' profiledata.Version(:,i)' ...
+            profiledata.PRC_Date(:,i)' profiledata.Act_Code(:,i)' profiledata.Act_Parm(:,i)' ...
             aauxid(1:8) aprevv(1:10)];
     end
 end
@@ -202,33 +211,32 @@ for j=1:profiledata.No_Prof
     end
 
     if(k==noseg)
-        No_Depthsths=rem(profiledata.No_Depths(j),1500);
+        ndepths=rem(profiledata.No_Depths(j),1500);
     else
-        No_Depthsths=1500;
+        ndepths=1500;
     end
-    ndp=sprintf('%4i',No_Depthsths);
+    ndp=sprintf('%4i',ndepths);
     nseg=sprintf('%2i',k);
     a=[a profiledata.Data_Type' profiledata.Iumsgno' profiledata.Prof_Type(1:4,j)' nseg ndp profiledata.D_P_Code(j)];
 
-    for i=1:No_Depthsths
+    for i=1:ndepths
         ij=ij+1;
         clear d t qd qc
         if(strfind(a,'0191902122200'))
                 j=j;
                 ij=ij;
                 profiledata;
-                No_Depthsths
+                ndepths
         end
+        
         d=sprintf('%6.2f',profiledata.Depthpress(ij,j));
         t=sprintf('%9.3f',profiledata.Profparm(ij,j));
-           
         try
             a=[a d(1:6) profiledata.DepresQ(ij,j) t(1:9) profiledata.ProfQP(ij,j)];
         catch
+            keyboard
             ij=ij
             j=j
-            profiledata.DepresQ;
-            profiledata.ProfQP;
         end
     end
     
