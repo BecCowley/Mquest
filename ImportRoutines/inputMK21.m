@@ -133,10 +133,10 @@ for i = 1:length(drop)
             else
                 writekeys=1;
             end
-            writeMQNCfiles(profiledata,writekeys);
+            writeMQNCfiles(profiledata,pd,writekeys);
         end
     else
-        writeMQNCfiles(profiledata,writekeys);
+        writeMQNCfiles(profiledata,pd,writekeys);
     end
       
 
