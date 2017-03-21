@@ -236,15 +236,17 @@ dataforms=get(handles.inputformats,'Value');
  
             usethis=0;
             
-        case 3
-            
-            usethis=0;
-            
+        case 3 %MK21 data from the RAN
+             usethis=0;
         case 4
             
             usethis=0;
             
         case 5
+            
+            usethis=0;
+            
+        case 6
             
             for i=1:length(suff)
                 isinput=strfind(suff(i),'.txt');
@@ -254,9 +256,9 @@ dataforms=get(handles.inputformats,'Value');
                     usethis(i)=0;
                 end
             end
-        case 6 %TSK data
+        case 7 %TSK data
             usethis=0;
-        case 7
+        case 8
             for i=1:length(suff)
                 isinput=strfind(suff(i),'.nc');
                 if(~isempty(isinput{1}))
@@ -265,8 +267,6 @@ dataforms=get(handles.inputformats,'Value');
                     usethis(i)=0;
                 end
             end
-        case 8 %MK21 data from the RAN
-             usethis=0;
            
     end
 
@@ -371,24 +371,24 @@ end
 
             inputDEVIL(inputdata,outputdata)
  
-        case 3
+        case 4
             
             inputMK21(inputdata,outputdata,0)
             
-        case 4
+        case 5
             
             inputSCRIPPSdata(inputdata,outputdata)
             
-        case 5
+        case 6
             
             inputRTQC(inputdata,outputdata)
             
-        case 6
-            inputTSK(inputdata,outputdata)
         case 7
+            inputTSK(inputdata,outputdata)
+        case 8
 % disabled until it can be properly tested. Bec, 13 September, 2012
             inputMQNC(inputdata,outputdata)
-        case 8
+        case 3
             inputMK21(inputdata,outputdata,1)
             
   

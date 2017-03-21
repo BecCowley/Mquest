@@ -1,7 +1,11 @@
-function profiledata=readMK21(fname,uniqueid)
+function [profiledata,pd]=readMK21_RAN(fname,uniqueid)
 %this function reads a single profile from a Sippican Mk21 file and creates the
 %structure "profiledata" containing all the variables necessary to either
 %plot or write the data into another format.
+%Updated August 16, 2016 to match the profiledata format from Devil files and
+%pd structure used throughout Mquest now. Bec Cowley.
+
+
 %make these global so they can be seen from the reading routine:
 global calls
 global cruiseID
@@ -19,7 +23,7 @@ else
 end
 
 %setup output files:
-profiledata.nss=num2str(uniqueid);
+pd.nss=num2str(uniqueid);
 
 % initialise strings
 str1 = ' ';
@@ -28,6 +32,17 @@ str6 = '      ';
 str8 = '        ';
 str10 = '          ';
 str12 = '            ';
+
+profiledata.woce_date = num2str(rawdata.woce_date);
+%CS: profile time - get rid of milliseconds
+time = rawdata.woce_time;
+profiledata.woce_time = floor(time/100)*100;
+profiledata.latitude = rawdata.latitude;
+%CS: need to multiply lon by -1 so same convention as MA
+profiledata.longitude = rawdata.longitude;
+if profiledata.longitude < 0
+    profiledata.longitude = profiledata.longitude +360;
+end
 
 %if this data is to be added:
 %CS: Fill these extra fields:
