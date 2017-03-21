@@ -61,7 +61,10 @@ end
    pref = b(:,1);
    suff2=b(:,3);
    [m,n]=size(b);
-   
+   if isempty(m)
+       disp(['No datafiles for import in ' inputdir])
+       return
+   end
     for i=1:m
         isdrop=strfind(upper(suff2{i}),'EDF');
         doubledot=strfind(suff2{i},'.');
