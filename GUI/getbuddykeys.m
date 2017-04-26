@@ -25,19 +25,19 @@ else
 end
     col=['g' 'b' 'y' 'r' 'g'];
 
-    stationnumber=getnc(bkeysfile,'stn_num');
+    stationnumber=ncread(bkeysfile,'stn_num');
 
-    month=getnc(bkeysfile,'obs_m');
-    year=getnc(bkeysfile,'obs_y');
-    day=getnc(bkeysfile,'obs_d');
-    time=getnc(bkeysfile,'obs_t');
-    latitude=getnc(bkeysfile,'obslat');
-    longitude=getnc(bkeysfile,'c360long');
-    autoqc=getnc(bkeysfile,'autoqc');
-    callsign=getnc(bkeysfile,'callsign');
-    dsource=getnc(bkeysfile,'data_source');
-    priority=getnc(bkeysfile,'priority');
-    stnnum=getnc(bkeysfile,'stn_num');
+    month=ncread(bkeysfile,'obs_m')';
+    year=ncread(bkeysfile,'obs_y')';
+    day=ncread(bkeysfile,'obs_d')';
+    time=ncread(bkeysfile,'obs_t')';
+    latitude=ncread(bkeysfile,'obslat');
+    longitude=ncread(bkeysfile,'c360long');
+    autoqc=ncread(bkeysfile,'autoqc');
+    callsign=ncread(bkeysfile,'callsign')';
+    dsource=ncread(bkeysfile,'data_source')';
+    priority=ncread(bkeysfile,'priority');
+    stnnum=ncread(bkeysfile,'stn_num')';
 
  if(~isempty(strmatch('all',mmm{1})) | ~isempty(strmatch('All',mmm{1})))
     kk=1:length(month);   

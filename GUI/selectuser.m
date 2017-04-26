@@ -413,7 +413,7 @@ else
 end
 %getkeys and then call QuotaQuest...
 
-u=user;
+u=user(userno);
 p=user_all.prefix(userno);
 m=user_all.mm(userno);
 y=user_all.yy(userno);
