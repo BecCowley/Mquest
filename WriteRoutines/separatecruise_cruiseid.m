@@ -22,8 +22,22 @@ if ~isempty(kk2)
         for iii=1:length(kk4) %for each profile
             ipnum = ipnum +1;;
             ss=keysdata2.stnnum(subsetkeys(kk4(iii)),:);
+            profiledata = readnetcdf(ss);
+            %get some time fields
+            wd=num2str(profiledata.woce_date);
+            profiledata.year=wd(1:4);
+            profiledata.month=wd(5:6);
+            profiledata.day=wd(7:8);
+            wt = profiledata.woce_time;
+            wt=floor(wt/100);
+            wt2=sprintf('%4i',wt);
+            jk=strfind(wt2,' ');
+            if(~isempty(jk))
+                wt2(jk)='0';
+            end
+            profiledata.wt=[wt2(1:2) ':' wt2(3:4)];
 
-            readnetcdfforexport
+%             readnetcdfforexport
             %get rid of blanks and '/'
             ic = strfind(profiledata.Cruise_ID','/');
             if ~isempty(ic)
