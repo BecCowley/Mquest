@@ -17,10 +17,10 @@ global SHIP_NAMES
 
 if(ispc)
     global MQUEST_DIRECTORY_PC
-    fnm=[ MQUEST_DIRECTORY_PC '\ships.txt'];
+    fnm=[ MQUEST_DIRECTORY_PC '\UserSettings\ships.txt'];
 else
     global MQUEST_DIRECTORY_UNIX
-    fnm=[ MQUEST_DIRECTORY_UNIX '/ships.txt'];
+    fnm=[ MQUEST_DIRECTORY_UNIX '/UserSettings/ships.txt'];
 end
 
 fid = fopen(fnm,'r');
