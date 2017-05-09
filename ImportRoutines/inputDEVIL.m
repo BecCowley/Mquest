@@ -123,22 +123,23 @@ for i = 1:length(drop)
     
     %LINE
     iline = strmatch('TWI#',pd.surfcode);
-    if isempty(strmatch(line,pd.surfparm(iline,:))) & ~exist('line_voy','var')
-        disp(['Line = ' pd.surfparm(iline,:)])
-        line = input('Enter correct line for this voyage, or return to accept: ','s');
-        if isempty(line)
-            line_voy = pd.surfparm(iline,:);
-        else
-            line_voy = line;
+    if ~isempty(iline)
+        if isempty(strmatch(line,pd.surfparm(iline,:))) & ~exist('line_voy','var')
+            disp(['Line = ' pd.surfparm(iline,:)])
+            line = input('Enter correct line for this voyage, or return to accept: ','s');
+            if isempty(line)
+                line_voy = pd.surfparm(iline,:);
+            else
+                line_voy = line;
+            end
+        end
+        
+        %assign the voyage line if required
+        if exist('line_voy')
+            pd.surfparm(iline,:) = '          ';
+            pd.surfparm(iline,1:length(line_voy)) = line_voy;
         end
     end
-    
-    %assign the voyage line if required
-    if exist('line_voy')
-        pd.surfparm(iline,:) = '          ';
-        pd.surfparm(iline,1:length(line_voy)) = line_voy;
-    end
-    
     %cruiseID
     if isempty(strmatch(crid,profiledata.Cruise_ID)) & ~exist('crid_voy','var')
         disp(['CruiseID = ' profiledata.Cruise_ID'])

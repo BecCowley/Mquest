@@ -14,21 +14,14 @@ global CALLS
 
 %  call it something short while loading:  'S'
 
-
-if(ispc)
-    global MQUEST_DIRECTORY_PC
-    fnm=[ MQUEST_DIRECTORY_PC '\calls.txt'];
-else
-    global MQUEST_DIRECTORY_UNIX
-    fnm=[ MQUEST_DIRECTORY_UNIX '/calls.txt'];
-end
+fnm = 'calls.txt';
 
 fid = fopen(fnm,'r');
 j=0;
-    tmpdb = textscan(fid,'%s','delimiter',',','bufsize',10000);
+    tmpdb = textscan(fid,'%s','delimiter',',');
     tmpdb = tmpdb{1};
 for i=1:3:length(tmpdb)
-    j=j+1
+    j=j+1;
     C.shipname{j}=tmpdb{i};
     C.calls{j}=tmpdb{i+1};
 end

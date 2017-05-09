@@ -232,13 +232,7 @@ if(~isempty(shipname))
         if ~isempty(strmatch('RV METOC',shipname)) || ...
                 (~isempty(strmatch('SHIP',gcll)) || ~isempty(strmatch('ship',gcll)))
             %default for RAN data, check what ship it belongs to
-            if ispc
-                global MQUEST_DIRECTORY_PC
-                fnm=[ MQUEST_DIRECTORY_PC '\calls.txt'];
-            else
-                global MQUEST_DIRECTORY_UNIX
-                fnm=[ MQUEST_DIRECTORY_UNIX '/calls.txt'];
-            end
+            fnm='calls.txt';
             fid = fopen(fnm,'r');
             tmpdb = textscan(fid,'%s%s%s','delimiter',',');
             fclose(fid);
@@ -275,13 +269,7 @@ if(~isempty(shipname))
                 disp(['Ship name = "' shipname '" from file = "' fname '"'])
                 %long_shipname=input('Please enter full ship name: ','s')
                 disp(['Current Ship.txt contains:']            )
-                if(ispc)
-                    global MQUEST_DIRECTORY_PC
-                    fnm=[ MQUEST_DIRECTORY_PC '\ships.txt'];
-                else
-                    global MQUEST_DIRECTORY_UNIX
-                    fnm=[ MQUEST_DIRECTORY_UNIX '/ships.txt'];
-                end
+                fnm='ships.txt';
                 fid = fopen(fnm,'r');
                 j=0;
                 tmpdb = textscan(fid,'%s','delimiter',',');
@@ -322,7 +310,7 @@ if ~isempty(strmatch('SHIP',gcll)) || ~isempty(strmatch('ship',gcll))
     else
         C = CALLS;
     end
-    ii = strmatch(shipname,C.shipname,'exact');
+    ii = strmatch(upper(shipname),C.shipname,'exact');
     if ~isempty(ii) && length(ii) == 1
         gcll = char(C.calls(ii));
     else
@@ -343,43 +331,55 @@ if isempty(recordertype)
     recordertype = input('Missing recordertype, please enter in GTSPP code: ','s');
 end
 
-%ask for missing launch height and batch date information
-if ~exist('launchheight','var')
-    launchheight = dropheight;
-end
-if isempty(dropheight) && ~isempty(launchheight)
-    lh = input(['Please enter a launch height: [default: ' ...
-        launchheight 'm]'],'s');
-    if isempty(lh); lh = launchheight; end
-    dropheight = launchheight;
-elseif isempty(dropheight) & isempty(launchheight)
-    launchheight = input('Please enter a launch height in m[default: ''Unknown'']:','s');
-    if isempty(launchheight)
-        launchheight = 'Unknown';
-    end
-    dropheight = launchheight;
-end
+%if the user is AODC, skip dropheight, batchdate and lineno, don't put them in the
+%file.
 
-if  isempty(mfd)
-    disp(fname)
-    mfd = input('Please enter a batch date for this probe (mm/dd/yy)[''Unknown'']:','s');
-    if isempty(mfd)
-        mfd = 'Unknown';
+if isempty(strmatch('AD',DATA_QC_SOURCE))
+    %ask for missing launch height and batch date information
+    if ~exist('launchheight','var')
+        launchheight = dropheight;
     end
-end
-%reformat the batch date to yyyymmdd
-if isempty(strmatch('UNKNOWN',upper(mfd)))
-    dt = datenum(mfd,'mm/dd/yy');
-    mfd = datestr(dt,'yyyymmdd');
+    if isempty(dropheight) && ~isempty(launchheight)
+        lh = input(['Please enter a launch height: [default: ' ...
+            launchheight 'm]'],'s');
+        if isempty(lh); lh = launchheight; end
+        dropheight = launchheight;
+    elseif isempty(dropheight) & isempty(launchheight)
+        launchheight = input('Please enter a launch height in m[default: ''Unknown'']:','s');
+        if isempty(launchheight)
+            launchheight = 'Unknown';
+        end
+        dropheight = launchheight;
+    end
+    
+    if  isempty(mfd)
+        disp(fname)
+        mfd = input('Please enter a batch date for this probe (mm/dd/yy)[''Unknown'']:','s');
+        if isempty(mfd)
+            mfd = 'Unknown';
+        end
+    end
+    %reformat the batch date to yyyymmdd
+    if isempty(strmatch('UNKNOWN',upper(mfd)))
+        dt = datenum(mfd,'mm/dd/yy');
+        mfd = datestr(dt,'yyyymmdd');
+    end
+    surfcodeNames = {'CSID','GCLL','PEQ$','RCT$','OFFS','SCAL',...
+        'SER#','MFD#','HTL$','CRC$','TWI#','SHP#'};
+    varsList = {'pd.nss','gcll','probetype','recordertype', ...
+        'offset','scale','serno','mfd','dropheight','crc','lineno', ...
+        'shortname'};
+else
+    surfcodeNames = {'CSID','GCLL','PEQ$','RCT$','OFFS','SCAL',...
+        'SER#','CRC$','SHP#'};
+    varsList = {'pd.nss','gcll','probetype','recordertype', ...
+        'offset','scale','serno','crc', ...
+        'shortname'};
+
 end
 
 %fill values for surface parm 
 profiledata.Cruise_ID=cruiseID';
-surfcodeNames = {'CSID','GCLL','PEQ$','RCT$','OFFS','SCAL',...
-             'SER#','MFD#','HTL$','CRC$','TWI#','SHP#'};
-varsList = {'pd.nss','gcll','probetype','recordertype', ...
-    'offset','scale','serno','mfd','dropheight','crc','lineno', ...
-    'shortname'};
 
 surfpcode = [];
 surfparm =[];
