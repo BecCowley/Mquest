@@ -33,40 +33,29 @@ str8 = '        ';
 str10 = '          ';
 str12 = '            ';
 
-profiledata.woce_date = num2str(rawdata.woce_date);
-%CS: profile time - get rid of milliseconds
-time = rawdata.woce_time;
-profiledata.woce_time = floor(time/100)*100;
-profiledata.latitude = rawdata.latitude;
-%CS: need to multiply lon by -1 so same convention as MA
-profiledata.longitude = rawdata.longitude;
-if profiledata.longitude < 0
-    profiledata.longitude = profiledata.longitude +360;
-end
-
 %if this data is to be added:
 %CS: Fill these extra fields:
-profiledata.mky=str8;
-profiledata.onedegsq=str8;
-profiledata.cruiseID=cruiseID; 
-profiledata.datat='XB';
-profiledata.iumsgno=str12;
-profiledata.streamsource=str1;
-profiledata.uflag=str1;
-profiledata.medssta=str8;
-profiledata.qpos='1';
-profiledata.qdatetime='1';
-profiledata.qrec='1';
-profiledata.bultime=str12;
-profiledata.bulheader=str6;
+profiledata.Mky=str8';
+profiledata.One_Deg_Sq=str8';
+profiledata.Cruise_ID=cruiseID';
+profiledata.Data_Type=('XB')';
+profiledata.Iumsgno=str12';
+profiledata.Stream_Source=str1;
+profiledata.Uflag='U';
+profiledata.MEDS_Sta=str8';
+profiledata.Q_Pos='1';
+profiledata.Q_Date_Time='1';
+profiledata.Q_Record='1';
+profiledata.Bul_Time=str12';
+profiledata.Bul_Header=str6';
 %     clo=datestr(clock,24);
 %     update=[clo(1:2) clo(4:5) clo(7:10)];
 %As of August, 2014, the format has been changed to yyyymmdd to agree with
 %NOAA formats. Bec Cowley
 update = datestr(now,'yyyymmdd');
-profiledata.update=update;
-profiledata.sourceID=str4;
-profiledata.streamident=[DATA_QC_SOURCE 'XB'];
+profiledata.Up_date=update';
+profiledata.Source_ID=str4';
+profiledata.Stream_Ident=[DATA_QC_SOURCE 'XB']';
 
 
 if(~isempty(shipname))
@@ -101,33 +90,27 @@ if(~isempty(shipname))
             disp(['Ship name = "' shipname '" from file = "' fname '"'])
             %long_shipname=input('Please enter full ship name: ','s')
             disp(['Current Ship.txt contains:'])
-
-            if(ispc)
-                global MQUEST_DIRECTORY_PC
-                fnm=[ MQUEST_DIRECTORY_PC '\ships.txt'];
-            else
-                global MQUEST_DIRECTORY_UNIX
-                fnm=[ MQUEST_DIRECTORY_UNIX '/ships.txt'];
-            end
-
+            
+            fnm='ships.txt';
+            
             fid = fopen(fnm,'r');
             j=0;
-            tmpdb = textscan(fid,'%s','delimiter',',','bufsize',10000);
-            fclose(fid)
+            tmpdb = textscan(fid,'%s','delimiter',',');
+            fclose(fid);
             tmpdb = tmpdb{1};
             for i=1:2:length(tmpdb)
                 j=j+1;
                 disp(['   ' S.fullname{j} ',' S.shortname{j}])
             end
-
+            
             shortname=input('Please enter 10-characters for that ship name: ','s')
             while(length(shortname)>10)
                 shortname=input('I said enter 10-CHARACTERS for that ship name: ','s')
             end
-
+            
             long_shipname=shipname;
             S=writeshipnames(long_shipname,shortname);
-    end
+        end
     end
 else
     disp('No ship name has been specified! Please enter full ship name: ')
@@ -163,35 +146,35 @@ if ~isempty(strmatch('SHIP',calls)) || ~isempty(strmatch('ship',calls))
     end
     
 end
-profiledata.QCversion=str4;
-profiledata.dataavail='A';
+profiledata.QC_Version=str4';
+profiledata.Data_Avail='A';
 coeff4=[];
-profiledata.nparms=0;
-profiledata.nsurfc=0;
-profiledata.nhists=0;
+profiledata.Nparms=0;
+profiledata.Nsurfc=0;
+profiledata.Num_Hists=0;
 
-profiledata.dup_flag='';
-profiledata.digit_code='';
-profiledata.standard='';
+profiledata.Dup_Flag='';
+profiledata.Digit_Code='';
+profiledata.Standard='';
 
-profiledata.pcode='';
-profiledata.parm='';
-profiledata.qparm='';
-profiledata.surfpcode='';
-profiledata.surfparm='';
-profiledata.surfqparm='';
-profiledata.identcode='';
-profiledata.PRCcode='';
-profiledata.Version='';
-profiledata.PRCdate='';
-profiledata.Actcode='';
-profiledata.Actparm='';
-profiledata.AuxID=0;
-profiledata.PreviousVal='';
-profiledata.flagseverity=0;
+profiledata.Pcode=str4';
+profiledata.Parm=str10';
+profiledata.Q_Parm=str1;
+profiledata.SRFC_Code='';
+profiledata.SRFC_Parm='';
+profiledata.SRFC_Q_Parm='';
+profiledata.Ident_Code=repmat(str1,2,100);
+profiledata.PRC_Code=repmat(str1,4,100);
+profiledata.Version=repmat(str1,4,100);
+profiledata.PRC_Date=repmat(str1,8,100);
+profiledata.Act_Code=repmat(str1,2,100);
+profiledata.Act_Parm=repmat(str1,4,100);
+profiledata.Aux_ID=double.empty(100,0);
+profiledata.Previous_Val=repmat(str1,4,100);
+profiledata.Flag_severity=double.empty(100,0);%zeros here
 
-profiledata.D_P_Code='';
-profiledata.profile_type='';
+profiledata.D_P_Code='D';
+profiledata.Prof_Type='';
 
 correctDepths=0;
 
@@ -203,14 +186,18 @@ while isempty(strmatch('Depth (m)',d))
     
     if(strmatch('Date',d))
         
-        profiledata.year=str2num(d(24:27));
-        profiledata.day=str2num(d(21:22));
-        profiledata.month=str2num(d(18:19));
-        
+        pd.year=d(24:27);
+        pd.day=d(21:22);
+        pd.month=d(18:19);
+        %set up woce_date and woce_time variables
+        wd = [d(24:27) d(18:19) d(21:22)];
+        profiledata.woce_date = strrep(wd,' ','0');
+
     elseif(strmatch('Time',d))
         
         %change time to decimal:
-        profiledata.time=(str2num(d(18:19))*100 + str2num(d(21:22))) *100;
+        pd.time = d(18:22);
+        profiledata.woce_time = num2str((str2num(d(18:19))*100 + str2num(d(21:22))) *100);
         
     elseif(strmatch('Latitude',d))
         
@@ -222,11 +209,10 @@ while isempty(strmatch('Depth (m)',d))
             ss=1;
         end
         if ~isempty(s)
-            profiledata.lat=str2num(d(18:19))+str2num(d(21:s-1))/60;
-            if(ss);profiledata.lat=-profiledata.lat;end
-            profiledata.latitude=profiledata.lat;
+            profiledata.latitude=str2num(d(18:19))+str2num(d(21:s-1))/60;
+            if(ss);profiledata.latitude=-profiledata.latitude;end
         else
-            profiledata.lat=[];
+            profiledata.latitude=[];
         end
         
     elseif(strmatch('Longitude',d))
@@ -240,16 +226,14 @@ while isempty(strmatch('Depth (m)',d))
         end
         space=find(d(18:end)==' ');
         if ~isempty(space)
-            profiledata.lon=str2num(d(18:18+space(1)-1))+str2num(d(18+space(1):e-1))/60;
-            if(~ee);profiledata.lon=-profiledata.lon;end
+            profiledata.longitude=str2num(d(18:18+space(1)-1))+str2num(d(18+space(1):e-1))/60;
+            if(~ee);profiledata.longitude=-profiledata.longitude;end
             %need to multiply longitude by -1 and change to 360 degree long
-            profiledata.longitude=profiledata.lon;
             if(profiledata.longitude<0)
                 profiledata.longitude=360+profiledata.longitude;
             end
-            profiledata.lon=profiledata.longitude;
         else
-            profiledata.lon=[];
+            profiledata.longitude=[];
         end
         
     elseif(strmatch('Serial',d))
@@ -288,7 +272,7 @@ if ~isempty(strmatch('T-4',probetypec));
         correctDepths=1;
         %        pause
     end
-elseif ~isempty(strmatch('T-7',probetypec)) 
+elseif ~isempty(strmatch('T-7',probetypec))
     if(str2num(coeff2)==6.691)
         probetype='042';
     else
@@ -319,15 +303,11 @@ else
 end
 
 
-profiledata.depth(1,1,1)=0;
-profiledata.depresQ(1,1,1)=0;
-profiledata.profparm(1,1,1)=0;
-profiledata.profQparm(1,1,1)=0;
-profiledata.nodepths=0;
+profiledata.No_Depths=0;
 
 proftypes=d;
 kk=find(proftypes=='-');
-profiledata.nprof=length(kk);
+profiledata.No_Prof=length(kk);
 
 kt=strfind(proftypes,'Temp');
 ks=strfind(proftypes,'Sal');
@@ -337,23 +317,23 @@ kc=strfind(proftypes,'Cond');
 
 if(~isempty(kt))
     kindt=find(kk<kt);
-    profiledata.prof_type(kindt(end),:)='TEMP            ';
+    profiledata.Prof_Type(kindt(end),:)='TEMP            ';
 end
 if(~isempty(ks))
     kinds=find(kk<ks);
-    profiledata.prof_type(kinds(end),:)='PSAL            ';
+    profiledata.Prof_Type(kinds(end),:)='PSAL            ';
 end
 if(~isempty(ksv))
     kindsv=find(kk<ksv);
-    profiledata.prof_type(kindsv(end),:)='SVEL            ';
+    profiledata.Prof_Type(kindsv(end),:)='SVEL            ';
 end
 if(~isempty(kd))
     kindd=find(kk<kd);
-    profiledata.prof_type(kindd(end),:)='DENS            ';
+    profiledata.Prof_Type(kindd(end),:)='DENS            ';
 end
 if(~isempty(kc))
     kindc=find(kk<kc);
-    profiledata.prof_type(kindc(end),:)='COND            ';
+    profiledata.Prof_Type(kindc(end),:)='COND            ';
 end
 
 m=0;
@@ -376,15 +356,15 @@ while(~feof(fid))
     m=m+1;
     
     for j=2:length(data)
-        profiledata.depth(j-1,m)=data(1);
-        profiledata.depresQ(j-1,m)='0';
-        profiledata.profparm(j-1,m)=data(j);
-        profiledata.profQparm(j-1,m)='0';
+        profiledata.Depthpress(m,j-1)=data(1);
+        profiledata.DepresQ(1,m,j-1)='0';
+        profiledata.Profparm(1,1,m,1,j-1)=data(j);
+        profiledata.ProfQP(1,1,1,m,1,j-1)='0';
     end
     d=fgets(fid);
     
 end
-fclose(fid)
+fclose(fid);
 
 %convert last point:
 finished=0;
@@ -406,42 +386,42 @@ if ~isempty(data)
 end
 
 for j=2:length(data)
-    profiledata.depth(j-1,m)=data(1);
-    profiledata.depresQ(j-1,m)='0';
-    profiledata.profparm(j-1,m)=data(j);
-    profiledata.profQparm(j-1,m)='0';
+    profiledata.Depthpress(m,j-1)=data(1);
+    profiledata.DepresQ(1,m,j-1)='0';
+    profiledata.Profparm(1,1,m,1,j-1)=data(j);
+    profiledata.ProfQP(1,1,1,m,1,j-1)='0';
 end
 
-if isempty(profiledata.lat)
-    profiledata.lat=input('enter DECIMAL latitude:');
-    profiledata.latitude=profiledata.lat;
+if isempty(profiledata.latitude)
+    profiledata.latitude=input('enter DECIMAL latitude:');
 end
-if isempty(profiledata.lon)
-    profiledata.lon=input('enter DECIMAL longitude (360 degree globe):');
-    profiledata.longitude=profiledata.lon;
+if isempty(profiledata.longitude)
+    profiledata.longitude=input('enter DECIMAL longitude (360 degree globe):');
 end
 
 if correctDepths
-    calc_depths;
-    [mm,nn]=size(profiledata.depth);
-    profiledata.depth=[];
-    for j=1:mm
-        profiledata.depth(j,1:nn)=[0 z(1:nn-1)];
-    end
-    
-    probetype(3:3)='2';
-    coeff2='6.691';
-    coeff3='-0.00225';
+    disp('Need to enable the correct depths code!! Talk to Bec')
+    keyboard
+%     calc_depths;
+%     [mm,nn]=size(profiledata.Depthpress);
+%     profiledata.depth=[];
+%     for j=1:mm
+%         profiledata.Depthpress(j,1:nn)=[0 z(1:nn-1)];
+%     end
+%     
+%     probetype(3:3)='2';
+%     coeff2='6.691';
+%     coeff3='-0.00225';
 end
 
 
-for i=1:profiledata.nprof
-    profiledata.dup_flag(i)='N';
-    profiledata.digit_code(i)='7';
-    profiledata.standard(i)='2';
-    profiledata.ndep=m;
+for i=1:profiledata.No_Prof
+    profiledata.Dup_Flag(i)='N';
+    profiledata.Digit_Code(i)='7';
+    profiledata.Standard(i)='2';
+    profiledata.No_Depths=m;
     profiledata.D_P_Code(i)='D';
-    profiledata.deep_depth(i)=profiledata.depth(i,m);
+    profiledata.Deep_Depth(i)=profiledata.Depthpress(m,i);
 end
 
 
@@ -500,15 +480,49 @@ if exist('soundsal','var')
     surfparm(length(surfqparm)+1,:)=soundsal;
     surfqparm(length(surfqparm)+1)='0';
 end
-profiledata.nsurfc=length(surfqparm);
+profiledata.Nsurfc=length(surfqparm);
 
-profiledata.surfpcode=surfpcode;
-profiledata.surfparm=surfparm;
-profiledata.surfqparm=surfqparm;
+profiledata.SRFC_Code=surfpcode';
+profiledata.SRFC_Parm=surfparm';
+profiledata.SRFC_Q_Parm=surfqparm';
 
 %now read the data types, then the data
 %while (strmatch('Depth (m)',d)==0 | isempty(strmatch('Depth (m)',d)))
 
-profiledata.autoqc=0;
+% profiledata.autoqc=0;
+
+%make the pd structure for plotting and adding QC
+pd.latitude=profiledata.latitude;
+pd.longitude=profiledata.longitude;
+pd.ndep=profiledata.No_Depths;
+pd.depth = squeeze(profiledata.Depthpress);
+pd.deep_depth = profiledata.Deep_Depth;
+pd.qc = squeeze(profiledata.ProfQP);
+pd.depth_qc = profiledata.DepresQ;
+pd.temp = squeeze(profiledata.Profparm);
+pd.Flag_severity = profiledata.Flag_severity;
+pd.numhists = profiledata.Num_Hists;
+pd.nparms = profiledata.Nparms;
+pd.QC_code = profiledata.Act_Code';
+pd.QC_depth = profiledata.Aux_ID;
+pd.PRC_Date = profiledata.PRC_Date';
+pd.PRC_Code = profiledata.PRC_Code';
+pd.Version = profiledata.Version';
+pd.Act_Parm = profiledata.Act_Parm;
+pd.Previous_Val = profiledata.Previous_Val;
+pd.Ident_Code = profiledata.Ident_Code;
+pd.surfcode = profiledata.SRFC_Code';
+pd.surfparm = profiledata.SRFC_Parm';
+pd.surfqparm = profiledata.SRFC_Q_Parm';
+pd.nsurfc = profiledata.Nsurfc;
+pd.ptype = profiledata.Prof_Type;
+
+profiledata.Prof_Type = profiledata.Prof_Type';
+%add in some more stuff to profiledata
+ju=julian([str2num(pd.year) str2num(pd.month) str2num(pd.day) ...
+    floor(profiledata.woce_time/100) rem(profiledata.woce_time,100) 0])-2415020.5;
+profiledata.time = ju;
+profiledata.woce_time = int32(profiledata.woce_time);
+profiledata.woce_date = int32(str2double(profiledata.woce_date));
 
 return

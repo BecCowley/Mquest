@@ -56,8 +56,7 @@ end
     alreadychecked=0;
 
 %CS: Write drops to file so can cycle through them
-%if(ispc)
-   b=dirc(inputdir);
+   b=dirc(inputdir,'f');
    pref = b(:,1);
    suff2=b(:,3);
    [m,n]=size(b);
@@ -65,25 +64,10 @@ end
        disp(['No datafiles for import in ' inputdir])
        return
    end
-    for i=1:m
-        isdrop=strfind(upper(suff2{i}),'EDF');
-        doubledot=strfind(suff2{i},'.');
-        if(~isempty(isdrop))
-            isdrop2(i)=1;
-        else
-            isdrop2(i)=0;
-        end
-    end
-    kk=find(isdrop2==1);
+   kk = find(cellfun(@isempty,strfind(upper(suff2),'EDF')) == 0);
 
-%end
 
-%CS: matrix to hold drop filenames
-drop = [];
-
-for i=1:length(kk)
-drop = [drop; pref(kk(i),1)];
-end
+drop = pref(kk);
 
 for i = 1:length(drop)
     %check if the file is binary, if so, skip
@@ -100,20 +84,20 @@ for i = 1:length(drop)
     if ran == 0
         profiledata=readMK21([inputdir drop{i}],uniqueid);
     else
-        profiledata=readMK21_RAN([inputdir drop{i}],uniqueid);
+        [profiledata,pd]=readMK21_RAN([inputdir drop{i}],uniqueid);
     end
-    profiledata.source='          ';
-    profiledata.outputfile=prefix;
-    profiledata.source(1:length(s))=s;
-    profiledata.priority=p;
-    profiledata.surfqparm(1)=num2str(p);
+    pd.source='          ';
+    pd.outputfile=prefix;
+    pd.source(1:length(s))=s;
+    pd.priority=p;
+    pd.surfqparm(1)=num2str(p);
     ss='          ';
     ss(1:length(s))=s; 
-    profiledata.surfparm(1,:)=ss;
+    pd.surfparm(1,:)=ss;
 
     %CS: Check for duplicates (script not function)
     if(~isempty(keysdata.year))
-            d=0.
+            d=0;
         checkforduplicates
     end
     

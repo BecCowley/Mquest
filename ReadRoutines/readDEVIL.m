@@ -390,7 +390,7 @@ for a = 1:length(surfcodeNames)
         surfpcode = [surfpcode; surfcodeNames{a}];
         d = str10;
         d(1:length(dat)) = dat;
-        surfparm = [surfparm; d];
+        surfparm =[surfparm; d];
         surfqparm = [surfqparm; '0'];
     end
 end
