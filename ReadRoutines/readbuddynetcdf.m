@@ -40,7 +40,7 @@ format short g
 nprof=ncread(filenam,'No_Prof');
 ptype=ncread(filenam,'Prof_Type');
 
-if(nprof==1);ptype=ptype';end
+ptype=ptype';
 
 %if(nprof==1);ptype=ptype';end
 

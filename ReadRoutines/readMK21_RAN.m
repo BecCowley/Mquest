@@ -419,7 +419,7 @@ for i=1:profiledata.No_Prof
     profiledata.Dup_Flag(i)='N';
     profiledata.Digit_Code(i)='7';
     profiledata.Standard(i)='2';
-    profiledata.No_Depths=m;
+    profiledata.No_Depths(i)=m;
     profiledata.D_P_Code(i)='D';
     profiledata.Deep_Depth(i)=profiledata.Depthpress(m,i);
 end

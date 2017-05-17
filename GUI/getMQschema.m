@@ -14,21 +14,21 @@ if exist('blank_nc.mat','file')
     nc.Variables(2).Attributes(4).Value = profiledata.woce_time;
     nc.Variables(3).Attributes(3).Value = profiledata.time;
     nc.Variables(3).Attributes(4).Value = profiledata.time;
-    nc.Dimensions(8).Length = profiledata.No_Depths;
-    nc.Variables(52).Dimensions(1).Length = profiledata.No_Depths;
-    nc.Variables(52).Size(1) = profiledata.No_Depths;
+    nc.Dimensions(8).Length = profiledata.No_Depths(1);
+    nc.Variables(52).Dimensions(1).Length = profiledata.No_Depths(1);
+    nc.Variables(52).Size(1) = profiledata.No_Depths(1);
     nc.Variables(52).Dimensions(2).Length = profiledata.No_Prof;
     nc.Variables(52).Size(2) = profiledata.No_Prof;
-    nc.Variables(53).Dimensions(3).Length = profiledata.No_Depths;
-    nc.Variables(53).Size(3) = profiledata.No_Depths;
+    nc.Variables(53).Dimensions(3).Length = profiledata.No_Depths(1);
+    nc.Variables(53).Size(3) = profiledata.No_Depths(1);
     nc.Variables(53).Dimensions(5).Length = profiledata.No_Prof;
     nc.Variables(53).Size(5) = profiledata.No_Prof;
-    nc.Variables(54).Dimensions(2).Length = profiledata.No_Depths;
-    nc.Variables(54).Size(2) = profiledata.No_Depths;
+    nc.Variables(54).Dimensions(2).Length = profiledata.No_Depths(1);
+    nc.Variables(54).Size(2) = profiledata.No_Depths(1);
     nc.Variables(54).Dimensions(3).Length = profiledata.No_Prof;
     nc.Variables(54).Size(3) = profiledata.No_Prof;
-    nc.Variables(55).Dimensions(4).Length = profiledata.No_Depths;
-    nc.Variables(55).Size(4) = profiledata.No_Depths;
+    nc.Variables(55).Dimensions(4).Length = profiledata.No_Depths(1);
+    nc.Variables(55).Size(4) = profiledata.No_Depths(1);
     nc.Variables(55).Dimensions(6).Length = profiledata.No_Prof;
     nc.Variables(55).Size(6) = profiledata.No_Prof;
     return
@@ -39,7 +39,7 @@ end
     %make it from scratch. This needs to be developed, but shouldn't be
     %needed if the blank_nc.mat file is available.
     
-no_depths = profiledata.No_Depths;
+no_depths = profiledata.No_Depths(1);
 no_profs = profiledata.No_Prof;
 
 %Dimensions
