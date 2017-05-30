@@ -27,17 +27,20 @@ vars_out = {'latitude','longitude','No_Depths','Depthpress','Deep_Depth','ProfQP
     'SRFC_Parm','SRFC_Q_Parm','Nsurfc'};
 
     %first, if nprof is more than one
-    if profiledata.No_Prof > 1
-        pd.depth = [pd.depth profiledata.Depthpress(:,2:end)];
-        p = squeeze(profiledata.Profparm);
-        pd.temp = [pd.temp p(:,2:end)];
-        p=squeeze(profiledata.DepresQ);
-        pd.depth_qc = [pd.depth_qc p(:,2:end)];
-        p=squeeze(profiledata.ProfQP);
-        pd.qc = [pd.qc p(:,2:end)];
-        pd.ndep = [pd.ndep profiledata.No_Depths(2:end)];
-        pd.deep_depth = [pd.deep_depth profiledata.Deep_Depth(2:end)];
-    end        
+    np = profiledata.No_Prof;
+    if np > 1
+        if size(pd.depth,2) < np
+            pd.depth = [pd.depth profiledata.Depthpress(:,2:end)];
+            p = squeeze(profiledata.Profparm);
+            pd.temp = [pd.temp p(:,2:end)];
+            p=squeeze(profiledata.DepresQ);
+            pd.depth_qc = [pd.depth_qc p(:,2:end)];
+            p=squeeze(profiledata.ProfQP);
+            pd.qc = [pd.qc p(:,2:end)];
+            pd.ndep = [pd.ndep profiledata.No_Depths(2:end)];
+            pd.deep_depth = [pd.deep_depth profiledata.Deep_Depth(2:end)];
+        end
+    end
     
 for a = 1:length(vars_in)
     %need to orient correctly:
