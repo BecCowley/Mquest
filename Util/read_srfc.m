@@ -1,6 +1,6 @@
 % script to see what is in the surface codes fields for XBT netcdf files:
 
-fname = '/Volumes/UOT-data/quest/RANdata/training/RAN/89/00/69/86ed.nc'
+fname = '/Volumes/UOT-data/quest/RANdata/RANxbt14/RANxbt14/89/00/20/43ed.nc'
 
 srfc = ncread(fname,'SRFC_Code')';
 srfcp = ncread(fname,'SRFC_Parm')';
