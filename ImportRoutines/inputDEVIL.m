@@ -162,11 +162,7 @@ for i = 1:length(drop)
      pd.outputfile=prefix;
      pd.source(1:length(source))=source;
      pd.priority=p;
-     pd.surfqparm(1)=num2str(p);
-     ss='          ';
-     ss(1:length(source))=source; 
-     pd.surfparm(1,:)=ss;
-    
+     pd.surfqparm(1)=num2str(p);    
 
     % if the lat and long are out of range, give error message and SKIP...
     
