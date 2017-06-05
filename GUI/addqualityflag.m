@@ -289,14 +289,14 @@ switch qualflag
         %        changetime - launch the gui to allow imput of the new date or time:
         [outputs]=changedatetime('UserData',...
             [pd.year,pd.month,...
-            pd.date,pd.time]);
+            pd.day,pd.time]);
         keysdata=handles.keys;
         handles.lastprofile=handles.currentprofile;
         histd=max(pd.depth(1),0.0);
         severity=5;
         pd.juld_qc=num2str(severity);
         olddate=(str2num(pd.year)*10000)+(str2num(pd.month)*100)...
-            +str2num(pd.date);
+            +str2num(pd.day);
         newdate=(str2num(outputs.newyear)*10000)+(str2num(outputs.newmonth)*100)...
             +str2num(outputs.newdate);
         st=strfind(outputs.newtime,':');
@@ -344,7 +344,7 @@ switch qualflag
         diffdate=abs(olddate-newdate);
         if(diffdate>=1)
             %        if(olddate~=newdate)
-            pd.date=outputs.newdate;
+            pd.day=outputs.newdate;
             pd.month=outputs.newmonth;
             pd.year=outputs.newyear;
             
