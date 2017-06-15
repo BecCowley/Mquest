@@ -128,7 +128,7 @@ qcstring= [pd.QC_code(kk,:) num2str(pd.QC_depth(kk),' \t%9.2f')];
         %saveguidata
 
         i=handles.currentprofile;
-        readnetcdf
+        readnetcdf(ss,rawfile);
         pd=handles.pd;
         
         %now rewrite the keys elements that might have changed - do all just

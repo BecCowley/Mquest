@@ -1,4 +1,4 @@
-function profiledata = readnetcdf(ss)
+function profiledata = readnetcdf(ss,rawfile)
 %readnetcdf - this script reads the profile data from the file - 
 %       currently it reads only the variables required for Mquest.
 %   The entire file is read in the script "readnetcdfforexport".
@@ -32,7 +32,7 @@ for j=1:2:length(num2str(ss));
         end
     end
 end
-if(~exist('rawfile'))
+if ~exist('rawfile','var')
     rawfile=0;
 end
 %keep the full path name (without the ed/raw.nc):
