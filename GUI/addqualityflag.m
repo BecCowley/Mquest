@@ -423,11 +423,12 @@ if(depthsource==3);   %put the flag at the end of the valid data
         jj=find(pd.temp>-2.4 & pd.temp < 31.9 & d<=0.1);
     end
     % d(end+1)=d(end);
-    
-    if(~isempty(jj) & ~isnan(pd.temp(jj(end)+1)))
+    try
+%     if(~isempty(jj) & ~isnan(pd.temp(jj(end)+1)))
         histdepth=pd.depth(jj(end)+1);
         oldt=num2str(pd.temp(jj(end)+1));
-    else
+%     else
+    catch
         %no appropriate point found:
         handles.Qkey='N';
         return
