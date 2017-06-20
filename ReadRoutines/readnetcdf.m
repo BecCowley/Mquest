@@ -1,4 +1,4 @@
-function profiledata = readnetcdf(ss,rawfile)
+function [profiledata,pd] = readnetcdf(ss,rawfile)
 %readnetcdf - this script reads the profile data from the file - 
 %       currently it reads only the variables required for Mquest.
 %   The entire file is read in the script "readnetcdfforexport".

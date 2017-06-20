@@ -14,36 +14,36 @@ if i == 1
     %set start number of profiles to be written: 
     pnum = 0;
 end
-if(strmatch('TP',profiledata.QC_code(:,:)))
+if(strmatch('TP',pd.QC_code(:,:)))
     return
 end
-if(strmatch('DU',profiledata.QC_code(:,:)))
+if(strmatch('DU',pd.QC_code(:,:)))
     return
 end
 
 prefix=[handles.outputfile];
 
 %create depth/temp arrays to 2m...
-pno=strmatch('TEMP',profiledata.ptype);
-if(~isempty(pno))
-    temp=profiledata.data(pno,:);
-    ndep = profiledata.ndep;
+pno = 1; %if more than one variable, the first will be associated with temp.
+if(~isempty(pd.temp))
+    temp=pd.temp;
+    ndep = pd.ndep(:,pno);
 else
     return
 end
 
-g=find(profiledata.qc(pno,1:ndep)=='0' | profiledata.qc(pno,1:ndep)=='1' ...
-    | profiledata.qc(pno,1:ndep)=='2' | profiledata.qc(pno,1:ndep)=='5');
+g=find(pd.qc(1:ndep,pno)=='0' | pd.qc(1:ndep,pno)=='1' ...
+    | pd.qc(1:ndep,pno)=='2' | pd.qc(1:ndep,pno)=='5');
 if isempty(g)
     return
 end
-gg = find(~isnan(temp(g)'.*profiledata.depth(pno,g)'));
+gg = find(~isnan(temp(g).*pd.depth(g,pno)));
 
 g = g(gg);
 
-d=fix(profiledata.depth(pno,max(g)));
+d=fix(pd.depth(max(g),pno));
 temp=temp(g);
-depth=profiledata.depth(pno,g);
+depth=pd.depth(g,pno);
 kktmp=find(temp>99 & depth<5);
 
 if length(kktmp) == length(temp)
@@ -76,29 +76,29 @@ if(length(temp)>4)
     pn(4-length(pnn):end) = pnn;
     disp([pn ': ' num2str(ss)])
         
-    if profiledata.latitude < 0
+    if pd.latitude < 0
         latdir = 'S';
     else
         latdir = 'N';
     end
     lat1 = '00';lat2 = '00';
-    llt = num2str(fix(abs(profiledata.latitude)));
-    dec = num2str(fix(rem(abs(profiledata.latitude),1)*60));
+    llt = num2str(fix(abs(pd.latitude)));
+    dec = num2str(fix(rem(abs(pd.latitude),1)*60));
     lat1(3-length(llt):end) = llt;
     lat2(3-length(dec):end) = dec;
     lat = [lat1 lat2];;
     
     %convert 360 degrees to E/W longitude
-    if 180-profiledata.longitude > 0
-        ln = profiledata.longitude;
+    if 180-pd.longitude > 0
+        ln = pd.longitude;
         londir = 'E';
     else
-        ln = -(360-profiledata.longitude);
+        ln = -(360-pd.longitude);
         londir = 'W';
     end
     lon1 = '000';lon2 = '00';
-    llt = num2str(fix(abs(profiledata.longitude)));
-    dec = num2str(fix(rem(abs(profiledata.longitude),1)*60));
+    llt = num2str(fix(abs(pd.longitude)));
+    dec = num2str(fix(rem(abs(pd.longitude),1)*60));
     lon1(4-length(llt):end) = llt;
     lon2(3-length(dec):end) = dec;
     lon = [lon1 lon2];
@@ -109,7 +109,7 @@ if(length(temp)>4)
     rp(5-length(refpres):end) = refpres;
     
     %did it hit the bottom?
-    ihb = strmatch('HB',profiledata.QC_code);
+    ihb = strmatch('HB',pd.QC_code);
     if ~isempty(ihb)
         hbr = 'HB';
     else
@@ -117,19 +117,19 @@ if(length(temp)>4)
     end
     
     %get probe type and recorder type information:
-    irct = strmatch('RCT$',profiledata.SRFC_Code);
+    irct = strmatch('RCT$',pd.surfcode);
     if ~isempty(irct)
         rct = '     ';
-        rc = strtrim(profiledata.SRFC_Parm(irct,:));
+        rc = strtrim(pd.surfparm(irct,:));
         rct(1:length(rc)) = rc;
         rct = ['RCT$ ' rct];
     else
         rct = 'RCT$ unkno';
     end
-    iprt = strmatch('PEQ$',profiledata.SRFC_Code);
+    iprt = strmatch('PEQ$',pd.surfcode);
     if ~isempty(iprt)
         peq = '     ';
-        pq = strtrim(profiledata.SRFC_Parm(iprt,:));
+        pq = strtrim(pd.surfparm(iprt,:));
         peq(1:length(pq)) = pq;
         peq = ['PEQ$ ' peq];
     else
@@ -152,8 +152,8 @@ if(length(temp)>4)
             crid = str;
         end
     end
-    headerstring=[crid pn ' ' profiledata.year profiledata.month ...
-        profiledata.date  profiledata.time(1:2) profiledata.time(4:5) 'Z' ...
+    headerstring=[crid pn ' ' pd.year pd.month ...
+        pd.day  pd.time(1:2) pd.time(4:5) 'Z' ...
         lat latdir  ...
         lon londir rp '  ' hbr '  ' ...
         rct peq 'TEMP ' profiledata.Data_Type'];

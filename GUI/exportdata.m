@@ -373,7 +373,7 @@ reversestartdate=reorderdate(handles.startdate);
    if(~isempty(kk2))
        for i=1:length(kk2)
          ss=keysdata2.stnnum(subsetkeys(kk2(i)),:);
-         profiledata = readnetcdf(ss);
+         [profiledata,pd] = readnetcdf(ss);
          
 %          readnetcdfforexport
          switch exform
