@@ -22,7 +22,7 @@ if ~isempty(kk2)
         for iii=1:length(kk4) %for each profile
             ipnum = ipnum +1;;
             ss=keysdata2.stnnum(subsetkeys(kk4(iii)),:);
-            profiledata = readnetcdf(ss);
+            [profiledata,pd] = readnetcdf(ss);
             %get some time fields
             wd=num2str(profiledata.woce_date);
             profiledata.year=wd(1:4);
