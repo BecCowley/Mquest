@@ -71,15 +71,15 @@ else
             startpoint==1 | endpoint==pd.ndep(1))
         pd.temp(startpoint:endpoint)=99.99;
     else
-        pd(1:2)=[pd.depth(startpoint-1) pd.depth(endpoint+1)];
+        dd(1:2)=[pd.depth(startpoint-1) pd.depth(endpoint+1)];
         pt(1:2)=[pd.temp(startpoint-1) pd.temp(endpoint+1)];
         pd.temp(startpoint:endpoint)=...
-            interp1(pd,pt,pd.depth(startpoint:endpoint));
+            interp1(dd,pt,pd.depth(startpoint:endpoint));
         if(isfield(pd,'sal'))
             pd(1:2)=[pd.depthsal(startpoint-1) pd.depthsal(endpoint+1)];
             pt(1:2)=[pd.sal(startpoint-1) pd.sal(endpoint+1)];
             pd.sal(startpoint:endpoint)=...
-                interp1(pd,pt,pd.depthsal(startpoint:endpoint));
+                interp1(dd,pt,pd.depthsal(startpoint:endpoint));
         end
     end
 end
