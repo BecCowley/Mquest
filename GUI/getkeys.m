@@ -81,8 +81,12 @@ end
           
     end
     
-    stationnumber=ncread(keysfile,'stn_num');
-
+    try
+        stationnumber=ncread(keysfile,'stn_num');
+    catch
+        stationnumber = [];
+    end
+    
     if(isempty(stationnumber))
     %    errordlg('this appears to be a new file - returning')
         keysdata.prefix=prefix{1};
