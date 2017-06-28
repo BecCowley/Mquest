@@ -14,7 +14,7 @@ ch = get(gcbo,'Userdata') ;
 %if key is 1, chop only one point:
 if(~strcmp(ch,'1'))
     endpoint=launchendindex('UserData',{centering selectionstring qualflag});
-    if(endpoint==-1);
+    if ~isnumeric(endpoint)
         return;
     end
 else
