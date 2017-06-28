@@ -22,8 +22,10 @@
         severity=handles.rejectlevel(cc2);
     end  
     if(handles.Qkey=='Y')
-        if(strmatch(ch,'2'))
-            placement=0;
+        if exist('ch','var') == 1
+            if(strmatch(ch,'2'))
+                placement=0;
+            end
         end
     end
     if(strmatch(qualf,'NON'))
