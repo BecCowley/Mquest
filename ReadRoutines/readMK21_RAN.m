@@ -267,7 +267,6 @@ if ~isempty(strmatch('T-4',probetypec));
     if (str2num(coeff2)==6.691)
         probetype='002';
     else
-        disp('ERROR!!! - you must use the new fall rate coefficients')
         probetype='001';
         correctDepths=1;
         %        pause
@@ -276,7 +275,6 @@ elseif ~isempty(strmatch('T-7',probetypec))
     if(str2num(coeff2)==6.691)
         probetype='042';
     else
-        disp('ERROR!!! - you must use the new fall rate coefficients')
         probetype='041';
         correctDepths=1;
         %        pause
@@ -285,7 +283,6 @@ elseif ~isempty(strmatch('Deep',probetypec))
     if(str2num(coeff2)==6.691)
         probetype='052';
     else
-        disp('ERROR!!! - you must use the new fall rate coefficients')
         probetype='051';
         correctDepths=1;
         %        pause
@@ -400,18 +397,11 @@ if isempty(profiledata.longitude)
 end
 
 if correctDepths
-    disp('Need to enable the correct depths code!! Talk to Bec')
-    keyboard
-%     calc_depths;
-%     [mm,nn]=size(profiledata.Depthpress);
-%     profiledata.depth=[];
-%     for j=1:mm
-%         profiledata.Depthpress(j,1:nn)=[0 z(1:nn-1)];
-%     end
-%     
-%     probetype(3:3)='2';
-%     coeff2='6.691';
-%     coeff3='-0.00225';
+    disp('Old coefficients used, updating to new')
+    profiledata = calc_depths(probetype,profiledata);    
+    probetype(3:3)='2';
+    coeff2='6.691';
+    coeff3='-0.00225';
 end
 
 
@@ -458,28 +448,31 @@ if exist('soundsal','var')
 end
 
 %fill surface codes group:
+recordertype = '06';
+surfcodeNames = {'CSID','GCLL','PEQ$','RCT$',...
+    'SER#','SHP#'};
+varsList = {'uqid','calls','probetype','recordertype', ...
+    'serno','shortname'};
+surfpcode = [];
+surfparm =[];
+surfqparm = [];
+for a = 1:length(surfcodeNames)
+    eval(['dat = ' varsList{a} ';'])
+    if ~isempty(dat)
+        surfpcode = [surfpcode; surfcodeNames{a}];
+        d = str10;
+        d(1:length(dat)) = dat;
+        surfparm =[surfparm; d];
+        surfqparm = [surfqparm; '0'];
+    end
+end
 
-surfpcode = ['IOTA';...
-    'GCLL';...
-    'CSID';...
-    'PEQ$';...
-    'RCT$';...
-    'SER#';...
-    'SHP#'];
-
-surfparm  = ['          ';...
-    calls;...
-    uqid;...
-    probetype;...
-    '06        ';...
-    serno;...
-    shortname];
-surfqparm = ['0';'0';'0';'0';'0';'0';'0';'0';'0';'0';'0'];
 if exist('soundsal','var')
     surfpcode(length(surfqparm)+1,:)='SSPS';  % sound velocity reference salinity
     surfparm(length(surfqparm)+1,:)=soundsal;
     surfqparm(length(surfqparm)+1)='0';
 end
+
 profiledata.Nsurfc=length(surfqparm);
 
 profiledata.SRFC_Code=surfpcode';
