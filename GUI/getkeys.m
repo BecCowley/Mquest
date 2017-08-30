@@ -184,18 +184,6 @@ else
     jj=1:length(kk(ll));
 end
 
-%resize time, day, month,year if only one profile:
-if length(kk) == 1
-    time = time';
-    day = day';
-    month = month';
-    year = year';
-    callsign = callsign';
-    stnnum = stnnum';
-    datat = datat';
-    dsource = dsource';
-end
-    
 %sort keys:
 t=time(kk(ll(jj)),:);
 d=day(kk(ll(jj)),:);

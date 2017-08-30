@@ -71,8 +71,13 @@ for a = 1:length(ia)
     filenam1=[filenam 'ed.nc'];
     filenam2=[filenam 'raw.nc'];
     
-    system(['rm ' filenam1]);
-    system(['rm ' filenam2]);
+    if ispc
+        system(['del ' filenam1]);
+        system(['del ' filenam2]);
+    else
+        system(['rm ' filenam1]);
+        system(['rm ' filenam2]);
+    end
     
 end
 
