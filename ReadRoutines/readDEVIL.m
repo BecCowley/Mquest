@@ -4,6 +4,9 @@ global SHIP_NAMES
 global CALLS
 global DATA_QC_SOURCE
 global launchheight
+global UNIQUE_ID_PATH_UNIX
+global UNIQUE_ID_PATH_PC
+
 
 %this function reads a single profile from a DEVIL drop file and creates the
 %structure "profiledata" containing all the variables necessary to either
@@ -269,7 +272,12 @@ if(~isempty(shipname))
                 disp(['Ship name = "' shipname '" from file = "' fname '"'])
                 %long_shipname=input('Please enter full ship name: ','s')
                 disp(['Current Ship.txt contains:']            )
-                fnm='ships.txt';
+                if(ispc)
+                    fnm=[ UNIQUE_ID_PATH_PC 'ships.txt'];
+                else
+                    fnm=[ UNIQUE_ID_PATH_UNIX '/ships.txt'];
+                end
+                
                 fid = fopen(fnm,'r');
                 j=0;
                 tmpdb = textscan(fid,'%s','delimiter',',');

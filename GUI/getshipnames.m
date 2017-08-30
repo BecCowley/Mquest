@@ -16,11 +16,11 @@ global SHIP_NAMES
 
 
 if(ispc)
-    global MQUEST_DIRECTORY_PC
-    fnm=[ MQUEST_DIRECTORY_PC '\UserSettings\ships.txt'];
+    global UNIQUE_ID_PATH_PC
+    fnm=[ UNIQUE_ID_PATH_PC 'ships.txt'];
 else
-    global MQUEST_DIRECTORY_UNIX
-    fnm=[ MQUEST_DIRECTORY_UNIX '/UserSettings/ships.txt'];
+    global UNIQUE_ID_PATH_UNIX
+    fnm=[ UNIQUE_ID_PATH_UNIX '/ships.txt'];
 end
 
 fid = fopen(fnm,'r');
