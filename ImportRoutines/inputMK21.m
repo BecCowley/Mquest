@@ -7,7 +7,7 @@ function inputMK21(inputdir,outputfile,ran)
 %remember to increment uniqueid!!!
 
 DECLAREGLOBALS
-  d=0.
+  d=0.;
 disp('*** INPUTTING SIPPICAN MK21 ASCII DATA ***')
 
 %s=input('enter the data source:','s')
@@ -79,6 +79,14 @@ for i = 1:length(drop)
     
     %CS: Increment uniqueid
     uniqueid=uniqueid+1;
+    
+    %check if the unique ID is already in use in this database. Possible if
+    %someone's uniqueID path is shared and is incorrect in CONFIG file.
+    if any(keysdata.stnnum == uniqueid)
+        disp('This uniqueid already exists in the database. Please check your CONFIG.m file for correct UNIQUE_ID_PATH_UNIX path.');
+        disp('Import has stopped.');
+        return
+    end
     
     %CS: Create structure
     if ran == 0
