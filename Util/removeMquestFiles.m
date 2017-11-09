@@ -34,7 +34,7 @@ createkeys(fnnew);
 
 %identify the index where the uids appear
 stn = str2num(ncread(fn,'stn_num')');
-[~,ia,~] = intersect(stn,uniqueid_list);
+ia = find(ismember(stn,uniqueid_list));
 
 %cycle through each variable and remove the uids
 for a = 1:length(nci.Variables)
