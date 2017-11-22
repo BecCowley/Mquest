@@ -109,7 +109,19 @@ for i = 1:length(drop)
     end
     
     %CS: Create structure
-    [profiledata,pd]=readDEVIL([inputdir drop{i}],uniqueid);
+    try
+        [profiledata,pd]=readDEVIL([inputdir drop{i}],uniqueid);
+    catch Me
+        %exit nicely
+        disp(['Error on import of Devil file ' inputdir ])
+        for jk = 1:length(Me.stack)
+            logerr(5,Me.stack(jk).file)
+            logerr(5,['Line: ' num2str(Me.stack(jk).line)])
+        end
+        uniqueid=uniqueid-1;
+        save (unique_file,'uniqueid');
+        return
+    end
     
     %check the callsign, line and voyage information is OK, RC, March 2014
     icalls = strmatch('GCLL',pd.surfcode);
@@ -213,24 +225,24 @@ for i = 1:length(drop)
             else
                 writekeys=1;
             end
-            writeMQNCfiles(profiledata,pd,writekeys);
+            try
+                writeMQNCfiles(profiledata,pd,writekeys);
+            catch Me
+                %exit nicely
+                disp(['Error on writing of Devil file ' inputdir ])
+                disp(['May need to remove this file from the keys file and database: ' num2str(uniqueid)])
+                for jk = 1:length(Me.stack)
+                    logerr(5,Me.stack(jk).file)
+                    logerr(5,['Line: ' num2str(Me.stack(jk).line)])
+                end
+                save (unique_file,'uniqueid');
+                return
+            end
         end
   end
+  %save uniqueid after every profile import in case of crash.
+  save (unique_file,'uniqueid');
 end 
-
-%CS: Save files
-if(ispc)
-    try
-        unique_file=[UNIQUE_ID_PATH_UNIX_FROM_PC 'uniqueid.mat'];
-        save (unique_file,'uniqueid');
-    catch
-        unique_file=[UNIQUE_ID_PATH_PC 'uniqueid.mat'];
-        save (unique_file,'uniqueid');
-    end
-else
-    unique_file=[UNIQUE_ID_PATH_UNIX 'uniqueid.mat'];
-    save (unique_file,'uniqueid');
-end
 
 disp(['*** INPUT DEVIL DATA COMPLETE  - ' num2str(length(drop)) ' - files imported ***'])
 
