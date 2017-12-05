@@ -132,7 +132,7 @@ switch qualflag
             end
         else
             ptemp=pd.qc;
-            gg=strfind(ptemp,'5');
+            gg=strfind(ptemp','5');
             if(isempty(gg))
                 gg=0;
             end
