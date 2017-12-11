@@ -135,7 +135,7 @@ for i=1:profiledata.No_Prof
     else
         profiledata.Dup_Flag(i) = 'N';
     end
-    noseg(i)=floor(profiledata.No_Depths(i)./1500);
+    noseg(i)=floor(profiledata.No_Depths(i)./1500)+1;
     if noseg(i) < 0
         noseg(i) = 1;
     end
