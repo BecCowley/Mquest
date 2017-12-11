@@ -1,4 +1,4 @@
-%writeMA - this program takes input from the identified netcdf file 
+%writeMA - this program takes input from the identified netcdf file
 % and outputs it in the data exchange format meds-ascii.
 
 %retrieveguidata
@@ -18,7 +18,7 @@ if(handles.first==0)
     fid=fopen(prefix,'at');
 else
     fid=fopen(prefix,'wt')
-
+    
 end
 if (fid==-1)
     return
@@ -64,7 +64,7 @@ clear a
 % Cowley, August, 2014
 % put in a 'U' for update in the Update field if it is empty. 'S' is used
 % for skip when sending updates to NOAA. For our purposes, use 'U' with all
-% new files. 
+% new files.
 if ~isempty(strmatch(' ',profiledata.Uflag))
     profiledata.Uflag = 'U';
 end
@@ -84,10 +84,10 @@ end
 a=profiledata.Mky;
 if(~isempty(strfind(profiledata.wt,':')))
     a=[a profiledata.One_Deg_Sq' profiledata.Cruise_ID' profiledata.year profiledata.month ...
-    profiledata.day profiledata.wt(1:2) profiledata.wt(4:5)]
+        profiledata.day profiledata.wt(1:2) profiledata.wt(4:5)]
 else
     a=[a profiledata.One_Deg_Sq' profiledata.Cruise_ID' profiledata.year profiledata.month ...
-    profiledata.day profiledata.wt]
+        profiledata.day profiledata.wt]
 end
 
 a=[a profiledata.Data_Type' profiledata.Iumsgno' profiledata.Stream_Source' profiledata.Uflag' profiledata.MEDS_Sta'];
@@ -135,14 +135,14 @@ for i=1:profiledata.No_Prof
     else
         profiledata.Dup_Flag(i) = 'N';
     end
-    noseg(i)=floor(profiledata.No_Depths(i)./1500)+1;
+    noseg(i)=floor(double(profiledata.No_Depths(i))./1500)+1;
     if noseg(i) < 0
         noseg(i) = 1;
     end
     anoseg=sprintf('%2i',noseg(i));
     a=[a anoseg ];
     a=[a profiledata.Prof_Type(1:4,i)' profiledata.Dup_Flag(i) profiledata.Digit_Code(i) profiledata.Standard(i)];
-
+    
     clear adeepdepth
     adeepdepth=sprintf('%5.1f',profiledata.Deep_Depth(i));
     a=[a adeepdepth(1:5)];
@@ -180,7 +180,7 @@ end
 %first, find any nulls in the "a" string and replace them with ''
 I = find(a == char(0));
 if(~isempty(I))
-   a(I) = ' ';
+    a(I) = ' ';
 end
 
 %write to the data file:
@@ -193,64 +193,64 @@ count2=fprintf(fid,'\n');
 mkyrec=str2num(profiledata.Mky(end-1:end));
 
 for j=1:profiledata.No_Prof
-
+    
     ij=0;
     for k=1:noseg(j)
         
-    clear a
-
-    mkyrec = mkyrec + 1;
-    a = [mky num2str(mkyrec,'%02.0f')];
-    
-    if(~isempty(strfind(profiledata.wt,':')))
-        a=[a profiledata.One_Deg_Sq' profiledata.Cruise_ID' profiledata.year profiledata.month ...
-        profiledata.day profiledata.wt(1:2) profiledata.wt(4:5)];
-    else
-        a=[a profiledata.One_Deg_Sq' profiledata.Cruise_ID' profiledata.year profiledata.month ...
-        profiledata.day profiledata.wt];
-    end
-
-    if(k==noseg)
-        ndepths=rem(profiledata.No_Depths(j),1500);
-    else
-        ndepths=1500;
-    end
-    ndp=sprintf('%4i',ndepths);
-    nseg=sprintf('%2i',k);
-    a=[a profiledata.Data_Type' profiledata.Iumsgno' profiledata.Prof_Type(1:4,j)' nseg ndp profiledata.D_P_Code(j)];
-
-    for i=1:ndepths
-        ij=ij+1;
-        clear d t qd qc
-        if(strfind(a,'0191902122200'))
+        clear a
+        
+        mkyrec = mkyrec + 1;
+        a = [mky num2str(mkyrec,'%02.0f')];
+        
+        if(~isempty(strfind(profiledata.wt,':')))
+            a=[a profiledata.One_Deg_Sq' profiledata.Cruise_ID' profiledata.year profiledata.month ...
+                profiledata.day profiledata.wt(1:2) profiledata.wt(4:5)];
+        else
+            a=[a profiledata.One_Deg_Sq' profiledata.Cruise_ID' profiledata.year profiledata.month ...
+                profiledata.day profiledata.wt];
+        end
+        
+        if(k==noseg)
+            ndepths=rem(double(profiledata.No_Depths(j)),1500);
+        else
+            ndepths=1500;
+        end
+        ndp=sprintf('%4i',ndepths);
+        nseg=sprintf('%2i',k);
+        a=[a profiledata.Data_Type' profiledata.Iumsgno' profiledata.Prof_Type(1:4,j)' nseg ndp profiledata.D_P_Code(j)];
+        
+        for i=1:ndepths
+            ij=ij+1;
+            clear d t qd qc
+            if(strfind(a,'0191902122200'))
                 j=j;
                 ij=ij;
                 profiledata;
                 ndepths
+            end
+            
+            d=sprintf('%6.2f',profiledata.Depthpress(ij,j));
+            t=sprintf('%9.3f',profiledata.Profparm(ij,j));
+            try
+                a=[a d(1:6) profiledata.DepresQ(ij,j) t(1:9) profiledata.ProfQP(ij,j)];
+            catch
+                keyboard
+                ij=ij
+                j=j
+            end
         end
         
-        d=sprintf('%6.2f',profiledata.Depthpress(ij,j));
-        t=sprintf('%9.3f',profiledata.Profparm(ij,j));
-        try
-            a=[a d(1:6) profiledata.DepresQ(ij,j) t(1:9) profiledata.ProfQP(ij,j)];
-        catch
-            keyboard
-            ij=ij
-            j=j
+        %prepare to write it to the file:
+        I = find(a == char(0));
+        if(~isempty(I))
+            a(I) = ' ';
         end
-    end
-    
-%prepare to write it to the file:
-    I = find(a == char(0));
-    if(~isempty(I))
-        a(I) = ' '; 
-    end
-
-%write to the data file:
-
-count=fprintf(fid,'%s',a);
-count2=fprintf(fid,'\n');
-
+        
+        %write to the data file:
+        
+        count=fprintf(fid,'%s',a);
+        count2=fprintf(fid,'\n');
+        
     end
 end
 
