@@ -88,7 +88,7 @@ for i = 1:length(drop)
     
     %check if the unique ID is already in use in this database. Possible if
     %someone's uniqueID path is shared and is incorrect in CONFIG file.
-    if any(keysdata.stnnum == uniqueid)
+    if isfield(keysdata,'stnnum') && any(keysdata.stnnum == uniqueid)
         disp('This uniqueid already exists in the database. Please check your CONFIG.m file for correct UNIQUE_ID_PATH_UNIX path.');
         disp('Import has stopped.');
         return
