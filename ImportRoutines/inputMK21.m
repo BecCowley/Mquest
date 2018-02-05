@@ -82,7 +82,7 @@ for i = 1:length(drop)
     
     %check if the unique ID is already in use in this database. Possible if
     %someone's uniqueID path is shared and is incorrect in CONFIG file.
-    if any(keysdata.stnnum == uniqueid)
+    if isfield(keysdata,'stnnum') && any(keysdata.stnnum == uniqueid)
         disp('This uniqueid already exists in the database. Please check your CONFIG.m file for correct UNIQUE_ID_PATH_UNIX path.');
         disp('Import has stopped.');
         return
@@ -98,10 +98,6 @@ for i = 1:length(drop)
     pd.outputfile=prefix;
     pd.source(1:length(s))=s;
     pd.priority=p;
-    pd.surfqparm(1)=num2str(p);
-    ss='          ';
-    ss(1:length(s))=s; 
-    pd.surfparm(1,:)=ss;
 
     %CS: Check for duplicates (script not function)
     if(~isempty(keysdata.year))
