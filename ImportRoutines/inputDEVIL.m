@@ -10,7 +10,7 @@ launchheight = [];
 
 CONFIG
 
-clc
+
 disp('*** INPUTTING DEVIL DATA ***')
 
 %CS: Enter details
