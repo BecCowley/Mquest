@@ -2,9 +2,9 @@
 %extracts information for JCOMMOPS for a year
 
 clear
-yr = 2016;
+yr = 2017;
 dirn = '/home/UOT-data/quest/';
-pref = {'mer/GTSPPmer2016MQNC'};
+pref = {'mer/GTSPPmer2017MQNC','antarctic/antarctic2016MQNC'};
 
 %% 1 first, set up the  databases - assume using quest...  This cell runs
 %first.

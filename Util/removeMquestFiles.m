@@ -14,6 +14,9 @@ function removeMquestFiles(dbname,uniqueid_list)
 
 %check nargin
 if nargin < 2
+    %try getting rid of duplciated uniqueids
+    uniqueid_list = [];
+elseif nargin == 0
     disp('Please try again with database name and uniqueids to remove')
     return
 end
@@ -29,11 +32,14 @@ catch Me
     return
 end
 
+stn = str2num(ncread(fn,'stn_num')');
+if isempty(uniqueid_list)
+   [uniqueid_list,ia,ib] = unique(stn);
+end
 %make a new keys file:
 createkeys(fnnew);
 
 %identify the index where the uids appear
-stn = str2num(ncread(fn,'stn_num')');
 ia = find(ismember(stn,uniqueid_list));
 
 %cycle through each variable and remove the uids

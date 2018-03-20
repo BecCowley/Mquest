@@ -124,7 +124,11 @@ for a = 1:length(alldat.ti)
         alldat.rct(a,:) = srfcparm(pp,:);
     end
     if ~isempty(qq)
-        alldat.height(a,:) = str2num(srfcparm(qq,:));
+        try
+            alldat.height(a,:) = str2num(srfcparm(qq,:));
+        catch
+            alldat.height(a,:) = [];
+        end            
     end
     if ~isempty(rr)
         alldat.serial(a,:) = srfcparm(rr,:);
