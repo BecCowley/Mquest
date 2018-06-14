@@ -115,8 +115,8 @@ for i = 1:length(drop)
         %exit nicely
         disp(['Error on import of Devil file ' inputdir ])
         for jk = 1:length(Me.stack)
-            logerr(5,Me.stack(jk).file)
-            logerr(5,['Line: ' num2str(Me.stack(jk).line)])
+            disp(Me.stack(jk).file)
+            disp(['Line: ' num2str(Me.stack(jk).line)])
         end
         uniqueid=uniqueid-1;
         save (unique_file,'uniqueid');
