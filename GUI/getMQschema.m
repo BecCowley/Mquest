@@ -14,6 +14,8 @@ if exist('blank_nc.mat','file')
     nc.Variables(2).Attributes(4).Value = profiledata.woce_time;
     nc.Variables(3).Attributes(3).Value = profiledata.time;
     nc.Variables(3).Attributes(4).Value = profiledata.time;
+    nc.Variables(4).Attributes(7).Value = profiledata.latitude;
+    nc.Variables(4).Attributes(8).Value = profiledata.longitude;
     nc.Dimensions(8).Length = profiledata.No_Depths(1);
     nc.Variables(52).Dimensions(1).Length = profiledata.No_Depths(1);
     nc.Variables(52).Size(1) = profiledata.No_Depths(1);
