@@ -34,9 +34,11 @@ for a = 1:length(flds)
     eval(['kd.' flds{a} ' = d;'])
 end
     
+%fill in the source first
+alldat.source = kd.datasource;
 alldat.ti = ti(iyr);
 
-[alldat.calls,alldat.line,alldat.crid,alldat.ship,alldat.probet,alldat.rct,alldat.serial,alldat.mfd] ...
+[alldat.calls,alldat.line,alldat.crid,alldat.ship,alldat.probet,alldat.rct,alldat.rctn,alldat.serial,alldat.mfd] ...
     = deal(repmat('          ',length(alldat.ti),1));
 [alldat.good,alldat.bad,dup_test,alldat.max,alldat.height] = deal(zeros(length(alldat.ti),1)); 
 [alldat.lat,alldat.lon,alldat.ac,alldat.bc] = deal(NaN*zeros(length(alldat.ti),1));
@@ -122,6 +124,11 @@ for a = 1:length(alldat.ti)
     end
     if ~isempty(pp)
         alldat.rct(a,:) = srfcparm(pp,:);
+        if str2num(srfcparm(pp,:)) == 71;
+            alldat.rctn(a,:) = 'Devil     ';
+        elseif  str2num(srfcparm(pp,:)) == 72;
+            alldat.rctn(a,:) = 'Quoll     ';
+        end
     end
     if ~isempty(qq)
         try
