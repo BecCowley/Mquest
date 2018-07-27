@@ -46,7 +46,7 @@ for a = 1:length(nci1.Variables)
 end
 
 %Now copy over the actual data files
-for a = 1:size(stn,1)
+for a = 1:size(stn,2)
     nss=strtrim(stn(:,a)');
     filenam = [];
     for j=1:2:length(nss);

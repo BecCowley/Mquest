@@ -209,7 +209,9 @@ while isempty(strmatch('Depth (m)',d))
             ss=1;
         end
         if ~isempty(s)
-            profiledata.latitude=str2num(d(18:19))+str2num(d(21:s-1))/60;
+            exp = '\w*[0-9.]\d*';
+            l = regexp(d,exp,'match');
+            profiledata.latitude=str2num(l{1})+str2num(l{2})/60;
             if(ss);profiledata.latitude=-profiledata.latitude;end
         else
             profiledata.latitude=[];
@@ -226,7 +228,9 @@ while isempty(strmatch('Depth (m)',d))
         end
         space=find(d(18:end)==' ');
         if ~isempty(space)
-            profiledata.longitude=str2num(d(18:18+space(1)-1))+str2num(d(18+space(1):e-1))/60;
+            exp = '\w*[0-9.]\d*';
+            l = regexp(d,exp,'match');
+            profiledata.longitude=str2num(l{1})+str2num(l{2})/60;
             if(~ee);profiledata.longitude=-profiledata.longitude;end
             %need to multiply longitude by -1 and change to 360 degree long
             if(profiledata.longitude<0)

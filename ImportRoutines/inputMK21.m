@@ -116,10 +116,11 @@ for i = 1:length(drop)
         if(whattodo~='s')
             if(whattodo=='r')
                 ss='          ';
-                ssn=num2str(profiledata.nss);
+                ssn=num2str(pd.nss);
                 ss(1:length(ssn))=ssn
-                kcsid=strmatch('CSID',profiledata.surfpcode);
-                profiledata.surfparm(kcsid,:)=ss;
+                kcsid=strmatch('CSID',pd.surfcode);
+                pd.surfparm(kcsid,:)=ss;
+                profiledata.SRFC_Parm = pd.surfparm';
                 writekeys=0;
             else
                 writekeys=1;
