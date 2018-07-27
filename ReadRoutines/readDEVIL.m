@@ -226,8 +226,8 @@ if ~isempty(ij) && ~isempty(ik)
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if(~isempty(shipname))
-    kk=strcmpi(shipname,S.fullname);
-    if sum(kk) > 0
+    kk = find(cellfun(@isempty,strfind(S.fullname,shipname)) == 0);
+    if length(kk) == 1 %only one match
         shortname=S.shortname(kk);
         s=shortname;
         shortname=s{1}
