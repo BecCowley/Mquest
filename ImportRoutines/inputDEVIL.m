@@ -193,7 +193,9 @@ for i = 1:length(drop)
         [profiledatan]=bad_lat_long('UserData',{[pd]});
       
         if(~isempty(profiledatan))
-            profiledata=profiledatan;
+            pd=profiledatan;
+            profiledata.longitude = pd.longitude;
+            profiledata.latitude = pd.latitude;
         end
   end
   

@@ -266,6 +266,9 @@ if(~isempty(shipname))
                     end
                     long_shipname=shipname;
                     S=writeshipnames(long_shipname,shortname);
+                    %retrieve the new ship names list
+                    S = getshipnames;
+
                 end
             elseif isempty(kk) %there is no match
                 disp('Ship name does not match any existing entries in ships.txt')
@@ -293,6 +296,8 @@ if(~isempty(shipname))
                 end
                 long_shipname=shipname;
                 S=writeshipnames(long_shipname,shortname);
+                %retrieve the new ship names list
+                S = getshipnames;
             end
             
         end
@@ -302,6 +307,8 @@ else
     long_shipname=input('Please enter full ship name: ','s')
     shortname=input('Please enter 10-character ship name: ','s')
     S=writeshipnames(long_shipname,shortname);
+    %retrieve the new ship names list
+    S = getshipnames;
 end
 
 if length(cruiseID)>10
