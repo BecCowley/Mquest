@@ -266,29 +266,14 @@ if(~isempty(shipname))
                     end
                     long_shipname=shipname;
                     S=writeshipnames(long_shipname,shortname);
-                    %retrieve the new ship names list
-                    S = getshipnames;
-
                 end
             elseif isempty(kk) %there is no match
                 disp('Ship name does not match any existing entries in ships.txt')
                 disp(['Ship name = "' shipname '" from file = "' fname '"'])
                 %long_shipname=input('Please enter full ship name: ','s')
                 disp(['Current Ship.txt contains:']            )
-                if(ispc)
-                    fnm=[ UNIQUE_ID_PATH_PC 'ships.txt'];
-                else
-                    fnm=[ UNIQUE_ID_PATH_UNIX '/ships.txt'];
-                end
-                
-                fid = fopen(fnm,'r');
-                j=0;
-                tmpdb = textscan(fid,'%s','delimiter',',');
-                fclose(fid);
-                tmpdb = tmpdb{1};
-                for i=1:2:length(tmpdb)
-                    j=j+1;
-                    disp(['   ' S.fullname{j} ',' S.shortname{j}])
+                for i=1:2:length(S)
+                    disp(['   ' S.fullname{i} ',' S.shortname{i}])
                 end
                 shortname=input('Please enter 10-characters for that ship name: ','s');
                 while(length(shortname)>10)
@@ -296,8 +281,6 @@ if(~isempty(shipname))
                 end
                 long_shipname=shipname;
                 S=writeshipnames(long_shipname,shortname);
-                %retrieve the new ship names list
-                S = getshipnames;
             end
             
         end
@@ -307,8 +290,6 @@ else
     long_shipname=input('Please enter full ship name: ','s')
     shortname=input('Please enter 10-character ship name: ','s')
     S=writeshipnames(long_shipname,shortname);
-    %retrieve the new ship names list
-    S = getshipnames;
 end
 
 if length(cruiseID)>10
