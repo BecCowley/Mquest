@@ -7,7 +7,7 @@ prefix=input('enter the database prefix:','s')
 stn = str2num(ncread([prefix '_keys.nc'],'stn_num')');
 
 %%
-for aa=1:length(calls)
+for aa=1:size(calls,1)
     stnn = stn(ii==aa);
     height = NaN*ones(length(stnn),1);
     for bb = 1:length(stnn)
@@ -21,7 +21,9 @@ for aa=1:length(calls)
         
         kk=strmatch('HTL$',srfccodes');
         if(~isempty(kk))
-            height(bb)=str2num(srfcparm(:,kk)');
+            if ~isempty(str2num(srfcparm(:,kk)'))
+                height(bb)=str2num(srfcparm(:,kk)');
+            end
         end
     end
     disp(['Callsign: ' calls(aa,:)])
