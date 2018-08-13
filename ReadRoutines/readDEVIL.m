@@ -4,6 +4,7 @@ global SHIP_NAMES
 global CALLS
 global DATA_QC_SOURCE
 global launchheight
+global kkeep
 global UNIQUE_ID_PATH_UNIX
 global UNIQUE_ID_PATH_PC
 
@@ -11,8 +12,8 @@ global UNIQUE_ID_PATH_PC
 %this function reads a single profile from a DEVIL drop file and creates the
 %structure "profiledata" containing all the variables necessary to either
 %plot or write the data into another format.
-% profiledata = 
-% 
+% profiledata =
+%
 %         woce_date: 20160426
 %         woce_time: 142500
 %              time: 42485
@@ -69,8 +70,8 @@ global UNIQUE_ID_PATH_PC
 
 %And a holding structure (pd) for QCd data, plotting. Returned to main
 %structure at write time.
-% pd = 
-% 
+% pd =
+%
 %          latitude: -25.35
 %         longitude: 131.03
 %              year: '2016'
@@ -227,6 +228,9 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if(~isempty(shipname))
     kk = find(cellfun(@isempty,strfind(S.fullname,shipname)) == 0);
+    if ~isempty(kkeep)
+        kk = kkeep;
+    end
     if length(kk) == 1 %only one match
         shortname=S.shortname(kk);
         s=shortname;
@@ -255,8 +259,8 @@ if(~isempty(shipname))
                 end
                 kk = input('Please select the correct index number for this ship, return for no match:','s');
                 if ~isempty(kk)
-                    kk = str2num(kk);
-                    shortname=S.shortname(kk);
+                    kkeep = str2num(kk);
+                    shortname=S.shortname(kkeep);
                     s=shortname;
                     shortname=s{1}
                 else %no match
@@ -272,20 +276,8 @@ if(~isempty(shipname))
                 disp(['Ship name = "' shipname '" from file = "' fname '"'])
                 %long_shipname=input('Please enter full ship name: ','s')
                 disp(['Current Ship.txt contains:']            )
-                if(ispc)
-                    fnm=[ UNIQUE_ID_PATH_PC 'ships.txt'];
-                else
-                    fnm=[ UNIQUE_ID_PATH_UNIX '/ships.txt'];
-                end
-                
-                fid = fopen(fnm,'r');
-                j=0;
-                tmpdb = textscan(fid,'%s','delimiter',',');
-                fclose(fid);
-                tmpdb = tmpdb{1};
-                for i=1:2:length(tmpdb)
-                    j=j+1;
-                    disp(['   ' S.fullname{j} ',' S.shortname{j}])
+                for i=1:2:length(S)
+                    disp(['   ' S.fullname{i} ',' S.shortname{i}])
                 end
                 shortname=input('Please enter 10-characters for that ship name: ','s');
                 while(length(shortname)>10)
@@ -294,7 +286,6 @@ if(~isempty(shipname))
                 long_shipname=shipname;
                 S=writeshipnames(long_shipname,shortname);
             end
-            
         end
     end
 else
@@ -383,10 +374,10 @@ else
     varsList = {'pd.nss','gcll','probetype','recordertype', ...
         'offset','scale','serno','crc', ...
         'shortname'};
-
+    
 end
 
-%fill values for surface parm 
+%fill values for surface parm
 profiledata.Cruise_ID=cruiseID';
 
 surfpcode = [];
@@ -409,7 +400,7 @@ profiledata.SRFC_Parm=surfparm';
 profiledata.SRFC_Q_Parm=surfqparm';
 
 profiledata.D_P_Code='D';
- 
+
 % Parameter data and QC flags
 depths = rawdata.depth;
 ndepths = length(depths);
