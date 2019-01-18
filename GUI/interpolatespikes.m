@@ -17,6 +17,9 @@ if(~strcmp(ch,'1'))
     if ~isnumeric(endpoint)
         return;
     end
+    if endpoint < 0
+        return
+    end
 else
     endpoint=startpoint;
 end
