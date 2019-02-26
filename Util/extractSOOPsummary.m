@@ -20,6 +20,7 @@ iyr=find(kd.year>=yr & kd.year < yr + 1);
 
 flds = fieldnames(kd);
 %subset
+
 for a = 1:length(flds)
     eval(['d = kd.' flds{a} ';'])
     [m,n]=size(d);
@@ -44,6 +45,7 @@ alldat.ti = ti(iyr);
 [alldat.lat,alldat.lon,alldat.ac,alldat.bc] = deal(NaN*zeros(length(alldat.ti),1));
 
 for a = 1:length(alldat.ti)
+    a
     %only XBTs
     if isempty(strmatch('XB',kd.datatype(a,:)))
         continue
@@ -200,29 +202,35 @@ for b = 1:length(ii)
     
     %quick fix for missing lines. Will fall over if two different lines are
     %found.
-    if size(uline,1) ~= size(uship,1)
-        disp(['More than one line for this ship: ' uship ])
-        disp(uline)
-        ans = input('Did this ship do all lines? (y/n)','s');
-        if ~isempty(strmatch('y',ans))
-            uship = repmat(uship,size(uline,1),1);
-            calls = repmat(callsign(b,:),size(uline,1),1);
-        else
-            mline = input('Enter the correct line: ','s');
-            ml = '          ';
-            ml(1:length(mline)) = mline;
-            mline = ml;
-            iline = input('Enter the number this line replaces (eg, 1 or 2): ');
-            %put the correct line in the original data:
-            ifix = strmatch(uline(iline,:),alldat.line(iship,:));
-            alldat.line(iship(ifix),:) = repmat(mline,length(ifix),1);
-            uline = unique(alldat.line(iship,:),'rows');
-            if size(uline,1) ~= size(uship,1)
-                disp('Still not the right number of lines for callsigns!')
-                return
-            end
+    
+  if size(uline,1) ~= size(uship,1)
+    % which is greater than 1?
+    if size(uline,1) > 1
+      disp(['More than one line for this ship: ' uship ])
+      disp(uline)
+      ans = input('Did this ship do all lines? (y/n)','s');
+      if ~isempty(strmatch('y',ans))
+        uship = repmat(uship,size(uline,1),1);
+        calls = repmat(callsign(b,:),size(uline,1),1);
+      else
+        mline = input('Enter the correct line: ','s');
+        ml = '          ';
+        ml(1:length(mline)) = mline;
+        mline = ml;
+        iline = input('Enter the number this line replaces (eg, 1 or 2): ');
+        %put the correct line in the original data:
+        ifix = strmatch(uline(iline,:),alldat.line(iship,:));
+        alldat.line(iship(ifix),:) = repmat(mline,length(ifix),1);
+        uline = unique(alldat.line(iship,:),'rows');
+        if size(uline,1) ~= size(uship,1)
+          disp('Still not the right number of lines for callsigns!')
+          return
         end
+      end
+    else
+      disp(['Check your database! Multiple ship names for this callsign: ' calls ]);
     end
+  end
         
     dat.callsign = [dat.callsign;calls];
     dat.line = [dat.line ; uline];
