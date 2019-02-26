@@ -2,13 +2,12 @@
 %extracts information for JCOMMOPS for a year
 
 clear
-yr = 2017;
+yr = 2018;
 dirn = '/home/UOT-data/quest/';
-pref = {'mer/GTSPPmer2017MQNC','antarctic/antarctic2016MQNC','BOM/BOM2017'};
+pref = {'mer/CSIROXBT2018','antarctic/CSIROXBT2018ant'};
 
 %% 1 first, set up the  databases - assume using quest...  This cell runs
 %first.
-figure(1);clf;hold on
 lat = [];
 lon = [];
 calls = [];
@@ -63,9 +62,7 @@ for aa = 1:length(pref)
     %colorbar
     hold on
        
-    
-    plot(alldat.lon,alldat.lat,'bx');
-    
+        
     %updated file as of 2017 (for 2016 dataset onwards)
 
     % line,cruiseid,transect#,yyyymmdd,HHMM,callsign,lat,long,operator,telecom type,
@@ -113,4 +110,40 @@ for aa = 1:length(pref)
     
     fclose(fid)
 end
+
+%%
+% add water depth contours
+figure(1);clf;hold on
+plot(lon,lat,'bx');
+
+v= [100 200.,-80,20];
+% 
+% if ~exist('hb')
+% %     addpath /home/dunn/matlab
+%     xb = getnc('/home/netcdf-data/terrainbase','lon');
+%     yb = getnc('/home/netcdf-data/terrainbase','lat');
+%     ix = find(xb > v(1) & xb < v(2));
+% %     ix = [1:length(xb)];
+%     iy = find(yb > v(3) & yb < v(4));
+%     
+%     hb = -1*getnc('/home/netcdf-data/terrainbase','height',[min(iy) min(ix)],[max(iy) max(ix)]);
+%     vx = xb(ix);
+%     vy = yb(iy);
+% end
+% 
+% contourf(vx,vy,hb,[0:100:2000]);
+coast('k-')
+t=title(['CSIRO SOOP High Density sampling - ' num2str(yr)])
+set(t,'FontSize',12)
+set(t,'FontWeight','bold')
+x=ylabel('Latitude')
+set(x,'FontWeight','bold')
+set(x,'FontSize',12)
+x=xlabel('Longitude')
+set(x,'FontWeight','bold')
+set(x,'FontSize',12)
+axis(v)
+axis equal
+
+print('-dpng',['/home/UOT-data/quest/CSIRO_SOOPdata' num2str(yr) '.png'])
 

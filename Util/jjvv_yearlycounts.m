@@ -4,7 +4,7 @@
 clear
 datapath = '/home/UOT/programs/xbt2gts_programs/SBDmessages_processed/';
 
-yr = '2017';
+yr = '2018';
 %%
 % get the directory listing
 d=dir([datapath '*sbd']);
