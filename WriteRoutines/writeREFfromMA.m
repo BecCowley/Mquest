@@ -78,22 +78,22 @@ if(length(temp)>4)
     end
     lat1 = '00';lat2 = '00';
     llt = num2str(fix(abs(profiledata.latitude)));
-    dec = num2str(fix(rem(abs(profiledata.latitude),1)*60));
+    dec = num2str(round(rem(abs(profiledata.latitude),1)*60));
     lat1(3-length(llt):end) = llt;
     lat2(3-length(dec):end) = dec;
     lat = [lat1 lat2];;
     
     %convert 360 degrees to E/W longitude
-    if 180-profiledata.longitude > 0
+    if profiledata.longitude < 180
         ln = profiledata.longitude;
         londir = 'E';
-    else
-        ln = -(360-profiledata.longitude);
+    else %west
+        ln = 360-profiledata.longitude;
         londir = 'W';
     end
     lon1 = '000';lon2 = '00';
     llt = num2str(fix(abs(profiledata.longitude)));
-    dec = num2str(fix(rem(abs(profiledata.longitude),1)*60));
+    dec = num2str(round(rem(abs(profiledata.longitude),1)*60));
     lon1(4-length(llt):end) = llt;
     lon2(3-length(dec):end) = dec;
     lon = [lon1 lon2];

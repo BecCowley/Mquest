@@ -83,7 +83,7 @@ if(length(temp)>4)
     end
     lat1 = '00';lat2 = '00';
     llt = num2str(fix(abs(pd.latitude)));
-    dec = num2str(fix(rem(abs(pd.latitude),1)*60));
+    dec = num2str(round(rem(abs(pd.latitude),1)*60));
     lat1(3-length(llt):end) = llt;
     lat2(3-length(dec):end) = dec;
     lat = [lat1 lat2];;
@@ -98,7 +98,7 @@ if(length(temp)>4)
     end
     lon1 = '000';lon2 = '00';
     llt = num2str(fix(abs(pd.longitude)));
-    dec = num2str(fix(rem(abs(pd.longitude),1)*60));
+    dec = num2str(round(rem(abs(pd.longitude),1)*60));
     lon1(4-length(llt):end) = llt;
     lon2(3-length(dec):end) = dec;
     lon = [lon1 lon2];

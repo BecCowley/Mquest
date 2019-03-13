@@ -21,6 +21,7 @@ profiledata.lat=str2num(d(63:70));
 profiledata.lon=str2num(d(71:79)); 
 profiledata.latitude=profiledata.lat;
 %need to multiply longitude by -1 and change to 360 degree long
+%MA FORMAT IS +west and -east. Opposite to the rest of the world....
 profiledata.longitude=-profiledata.lon;
 if(profiledata.longitude<0)
     profiledata.longitude=360+profiledata.longitude;

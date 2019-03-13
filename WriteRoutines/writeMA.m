@@ -93,7 +93,7 @@ end
 a=[a profiledata.Data_Type' profiledata.Iumsgno' profiledata.Stream_Source' profiledata.Uflag' profiledata.MEDS_Sta'];
 
 %need to convert longitude backto +/-180 degrees:
-
+% Decimal degrees (+ = west, - = east) for Meds-ascii format longitude
 plong=profiledata.longitude;
 if(plong<180);plong=-plong;end
 if(plong>=180);plong=-plong+360;end
