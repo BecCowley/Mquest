@@ -276,7 +276,7 @@ if(~isempty(shipname))
                 disp(['Ship name = "' shipname '" from file = "' fname '"'])
                 %long_shipname=input('Please enter full ship name: ','s')
                 disp(['Current Ship.txt contains:']            )
-                for i=1:2:length(S)
+                for i=1:2:length(S.fullname)
                     disp(['   ' S.fullname{i} ',' S.shortname{i}])
                 end
                 shortname=input('Please enter 10-characters for that ship name: ','s');
