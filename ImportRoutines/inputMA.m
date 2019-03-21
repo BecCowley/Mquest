@@ -9,6 +9,9 @@ CONFIG
 
 clc
 disp('*** INPUTTING MEDS ASCII DATA ***')
+source = input('Enter a <10-character name for the source of the data:','s');
+priority = input('Enter a value for the priority of the data (1-5):','s');
+priority = str2num(priority);
 
 fid=fopen(inputfile,'r');
 
@@ -16,8 +19,10 @@ fid=fopen(inputfile,'r');
 %p=input('enter the data priority (1 is best, 9 is worst):')
 %these are now defined in CONFIG.m
 
-s=DATA_SOURCE;
-p=DATA_PRIORITY;
+if isempty(source)
+source=DATA_SOURCE;
+priority=DATA_PRIORITY;
+end
 
 %get the existing keys for comparison and identification of dupes:
 prefix={outputfile};
@@ -48,21 +53,18 @@ while (~feof(fid))
  
     uniqueid=uniqueid+1
     
-profiledata=readMA(fid,uniqueid);
-profiledata.source='          ';
-profiledata.outputfile=prefix;
-if(profiledata.nsurfc>0)
-    kk=strmatch('IOTA',profiledata.surfpcode(:,:));
+[profiledata,pd]=readMA(fid,uniqueid);
+pd.source='          ';
+pd.source(1:length(source))=source;
+pd.outputfile=prefix;
+pd.source(1:length(source))=source;
+pd.priority=priority;
+if(pd.nsurfc>0)
+    kk=strmatch('IOTA',pd.surfcode(:,:));
     if(~isempty(kk))   %csid already exists in this MA file...
-        profiledata.source=profiledata.surfparm(kk(1),:);
-        profiledata.priority=profiledata.surfqparm(kk(1));
-    else
-        profiledata.source(1:length(s))=s;
-        profiledata.priority=p;
+        pd.source=pd.surfparm(kk(1),:);
+        pd.priority=str2num(pd.surfqparm(kk(1)));
     end
-else
-    profiledata.source(1:length(s))=s;
-    profiledata.priority=p;
 end
 
     %CS: Check for duplicates (script not function)
@@ -81,29 +83,30 @@ try
         if(whattodo~='s')
             if(whattodo=='r')
                 ss='          ';
-                s=num2str(profiledata.nss);
+                s=num2str(pd.nss);
                 ss(1:length(s))=s
-                kcsid=strmatch('CSID',profiledata.surfpcode);
-                profiledata.surfparm(kcsid,:)=ss;
+                kcsid=strmatch('CSID',pd.surfcode);
+                pd.surfparm(kcsid,:)=ss;
                 writekeys=0;
             else
                 writekeys=1;
             end
-            writeMQNCfiles(profiledata,writekeys);
+            writeMQNCfiles(profiledata,pd,writekeys);
         end
     else
-        writeMQNCfiles(profiledata,writekeys);
+        writeMQNCfiles(profiledata,pd,writekeys);
     end
+catch
+    disp('Failed on import')
+    keyboard
 end
 end   %while ~feof
 
-%RC - DON'T NEED unique ID as MA has unique ID. Don't save it, it's just
-%incrementing the uniqueID unnecessarily.
-%This is correct if the MA has a unique ID, but if it doesn't (eg the
+%RC - if the MA doesn't have a unique ID(eg the
 %RAN2007 files), then we need to save it.
 
 % %CS: Save files
-if profiledata.unqiueid_from_file == 0
+if pd.unqiueid_from_file == 0
     if(ispc)
         try
             unique_file=[UNIQUE_ID_PATH_UNIX_FROM_PC 'uniqueid.mat'];
