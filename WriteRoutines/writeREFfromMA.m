@@ -84,7 +84,7 @@ if(length(temp)>4)
     lat = [lat1 lat2];;
     
     %convert 360 degrees to E/W longitude
-    if profiledata.longitude < 180
+    if profiledata.longitude <= 180
         ln = profiledata.longitude;
         londir = 'E';
     else %west
@@ -92,8 +92,8 @@ if(length(temp)>4)
         londir = 'W';
     end
     lon1 = '000';lon2 = '00';
-    llt = num2str(fix(abs(profiledata.longitude)));
-    dec = num2str(round(rem(abs(profiledata.longitude),1)*60));
+    llt = num2str(fix(abs(ln)));
+    dec = num2str(round(rem(abs(ln),1)*60));
     lon1(4-length(llt):end) = llt;
     lon2(3-length(dec):end) = dec;
     lon = [lon1 lon2];
