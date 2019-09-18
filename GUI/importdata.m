@@ -267,7 +267,16 @@ dataforms=get(handles.inputformats,'Value');
                     usethis(i)=0;
                 end
             end
-           
+        case 9 %Mk12 data
+            for i=1:length(suff)
+                isinput=strfind(suff(i),'.EDF');
+                if(~isempty(isinput{1}))
+                    usethis(i)=1;
+                else
+                    usethis(i)=0;
+                end
+            end
+            
     end
 
 kkin=find(usethis==1);
@@ -391,7 +400,8 @@ end
         case 3
             inputMK21(inputdata,outputdata,1)
             
-  
+        case 9
+            inputMK12(inputdata,outputdata)
     end
 %end       
 
