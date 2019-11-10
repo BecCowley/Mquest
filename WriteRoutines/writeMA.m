@@ -69,10 +69,8 @@ if ~isempty(strmatch(' ',profiledata.Uflag))
     profiledata.Uflag = 'U';
 end
 %check the datestr in the PRC and Up_date fields are the correct format. Should be
-%yyyymmdd. THIS IS NOT FOOLPROOF! Will be a problem if the year is 2001 to
-%2012 as these years can be day/month too. For now, just trap for this and
-%deal with it when it happens:
-profiledata.Up_date = reformatdates(profiledata.Up_date')';
+%yyyymmdd. 
+profiledata.Up_date = reformatdates(profiledata.Up_date',pd)';
 %Now PRC
 for i = 1:profiledata.Num_Hists
     profiledata.PRC_Date(:,i) = reformatdates(profiledata.PRC_Date(:,i)')';

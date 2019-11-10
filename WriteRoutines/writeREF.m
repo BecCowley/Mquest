@@ -59,8 +59,11 @@ clear temp2m
 if(length(temp)>4)
     
     depth2m=0:2:d;
-    
+    %interpolate from second value as we can end up with NaN in first depth
+    %if we interpolate across zero which doesn't normally exist in the
+    %data.
     temp2m(2:length(depth2m))=interp1(depth,temp,depth2m(2:end));
+    %set zero value to same temp as 2m depth
     if(length(depth2m)>=2)
         temp2m(1)=temp2m(2);
     end
@@ -194,22 +197,19 @@ if(length(temp)>4)
 %           117117117117117117117116116116116116116116116116116116116116
 %           116116116
 
-    t2m = fix(temp2m*10);
+%     t2m = round(temp2m*10);
     nlines = ceil(endkk/20);
+    tmp = num2str(temp2m*10,'%3.0f');
     mmm = 1;
     for ilines=1:nlines
         tempstr = '          ';
-        for jtem = mmm:mmm+19
-            if jtem>endkk
-                break
-            end
-            tmp = '   ';
-            tp = num2str(t2m(jtem));
-            tmp(4-length(tp):end) = tp;
-            tempstr = [tempstr tmp];
+        if mmm+59 <= length(tmp)
+            tempstr = [tempstr tmp(mmm:mmm+59)];
+        else
+            tempstr = [tempstr tmp(mmm:end)];
         end
         fprintf(fid2,'%s\n',tempstr);
-        mmm = mmm + 20;
+        mmm = mmm + 60;
     end
     
 fclose(fid2);

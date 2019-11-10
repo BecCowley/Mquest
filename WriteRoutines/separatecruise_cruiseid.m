@@ -53,9 +53,10 @@ if ~isempty(kk2)
                         cid = [deblank(b(jj,:)) '_' cid];
                     end
                 case 4
-                    iblank = find(isspace(cid) == 1);
-                    if ~isempty(iblank)
-                        cid = cid(1:iblank(1)-1);
+                    iblank = isspace(cid) == 1;
+                    if sum(iblank)>0
+                        cid = cid(~iblank);
+%                         cid = cid(1:iblank(1)-1);
                     end
             end
             if ~isempty(strmatch(cid,holdcid))

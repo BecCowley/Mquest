@@ -3,14 +3,17 @@
 clear
 latall=[];lonall=[];datall = [];
 figure(1);clf;hold on
-fn = dir('/home/UOT-data/quest/RANdata/RANxbt10/*.MA');
+% fn = dir('/home/UOT/archives/XBT/archiveMA/a3e031985.MA');
+fn = dir('/home/UOT-data/quest/RANdata/RAN2007data/*.MA');
 for b = 1:length(fn)
-    fid = fopen(['/home/UOT-data/quest/RANdata/RANxbt10/' fn(b).name],'r');
+%     fid = fopen(['/home/UOT/archives/XBT/archiveMA/' fn(b).name],'r');
+    fid = fopen(['/home/UOT-data/quest/RANdata/RAN2007data/' fn(b).name],'r');
     [data] = textscan(fid,'%s','Delimiter','|','whitespace','');
     fclose(fid);
     
-    ii = find(cellfun(@isempty,strfind(data{:},'CSID'))==0);
-    lat = []; lon = [];dat = [];
+%     ii = find(cellfun(@isempty,strfind(data{:},'CSID'))==0);
+ii = find(cellfun(@isempty,strfind(data{:},'U'))==0);
+lat = []; lon = [];dat = [];
     for a = 1:length(ii)
         %     profiledata = readMA(fid,uniqueid);
         str = data{1}{ii(a)};
@@ -40,9 +43,12 @@ end
 %% now read in the equivalent datn version:
 % fid = fopen('/home/UOT/archives/XBT/archive2m/VLMQ2007.datn','r');
 data = [];latdall = [];londall = [];datdall = [];
-fn = dir('/home/UOT-data/quest/RANdata/RANxbt10/10*.datn');
+% % fn = dir('/home/UOT/archives/XBT/archive2m/ike160s2000.datn');
+fn = dir('/home/UOT-data/quest/RANdata/RAN2007data/V*.datn');
+% fn = dir('/home/UOT/archives/XBT/archive2m/a3e031985.datn');
 for b = 1:length(fn)
-    fid = fopen(['/home/UOT-data/quest/RANdata/RANxbt10/' fn(b).name],'r');
+fid = fopen(['/home/UOT-data/quest/RANdata/RAN2007data/' fn(b).name],'r');
+% fid = fopen(['/home/UOT/archives/XBT/archive2m/' fn(b).name],'r');
     [data] = textscan(fid,'%s','Delimiter','|');
     fclose(fid);
 
@@ -81,12 +87,19 @@ for a = 1:length(ii)
     end
     ie = ie+iz-1;
     ln = str2num(str(is+1:ie-1))/100;
-    dec = abs(ln - fix(ln));
-    dec = dec*100/60;
-    ln = fix(ln) + dec;
-    if sigl == 1
-        ln = 360-ln;
+    if ln <= 180
+        %only do this if the longitude is within the +/-180,
+        %else assume the value is in 360 degress long
+        dec = abs(ln - fix(ln));
+        dec = dec*100/60;
+        ln = fix(ln) + dec;
+        if sigl == 1
+            ln = 360-ln;
+        end
+    else
+        disp('Longitude >180')
     end
+    
     
     latd = [latd,lt];    
     lond = [lond,ln];
