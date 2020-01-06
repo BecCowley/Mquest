@@ -73,6 +73,7 @@ for i = 1:length(drop)
     %check if the file is binary, if so, skip
     fid=fopen([inputdir drop{i}]);
     d=fgets(fid);
+    fclose(fid);
     if int8(d(1)) < 32
         continue
     end
@@ -88,8 +89,9 @@ for i = 1:length(drop)
         return
     end
     
-    %CS: Create structure
+    %Read the datafile
     [profiledata,pd]=readMK12_NZ([inputdir drop{i}],uniqueid);
+    
     if isempty(pd)
         continue
     end
@@ -99,8 +101,8 @@ for i = 1:length(drop)
     pd.priority=p;
 
     %CS: Check for duplicates (script not function)
+    d=0;
     if(~isempty(keysdata.year))
-            d=0;
         checkforduplicates
     end
     
@@ -131,9 +133,9 @@ for i = 1:length(drop)
     end
       
 
-end   %while ~feof
+end   
 
-%CS: Save files
+%Save files
 if(ispc)
     try
         unique_file=[UNIQUE_ID_PATH_UNIX_FROM_PC 'uniqueid.mat'];
