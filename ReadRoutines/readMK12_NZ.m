@@ -97,10 +97,6 @@ else
     shortname=input('Please enter 10-character ship name: ','s')
     S=writeshipnames(long_shipname,shortname);
 end
-try
-    cc='          '
-    cc(1:length(crc))=crc;
-end
 
 %Bec: Adjust the code so that it checks for 'SHIP' in callsign and looks
 %for the correct callsign. For RAN DATA
@@ -161,6 +157,7 @@ fid=fopen(fname);
 %Get the header data and ouput to both files:
 d=fgets(fid);
 kt = [];tok = {};
+
 while isempty(str2num(d))
     
     if(strmatch('Date',d))
@@ -178,37 +175,63 @@ while isempty(str2num(d))
         profiledata.woce_time = num2str((str2num(d(20:21))*100 + str2num(d(23:24))) *100);
         
     elseif(strmatch('Latitude',d))
+        exp = '\:';
+        ii = regexp(d,exp);
         
-        s=find(upper(d)=='S');
+        s=find(upper(d(ii+1:end))=='S');
         if(isempty(s));
             s=find(d=='N');
-            ss=0;
+            if isempty(s)
+                disp(['N/S latitude designator missing in file: ' fname])
+                disp(['Latitude line reads: ' d])
+                dd = input('Please enter N or S for latitude: ','s');
+                s = find(upper(dd)=='S');
+                if(isempty(s))
+                    ss = 0;
+                else
+                    ss = 1;
+                end
+            end
         else
             ss=1;
         end
         if ~isempty(s)
-            exp = '(\d+).(\d+\.\d+)';
+            exp = '(\d+)';
             l = regexp(d,exp,'tokens');
-            profiledata.latitude=str2num(l{1}{1})+str2num(l{1}{2})/60;
+            ldec = str2num([l{2}{1} '.' l{3}{1}]);
+            profiledata.latitude=str2num(l{1}{1})+ldec/60;
             if(ss);profiledata.latitude=-profiledata.latitude;end
         else
             profiledata.latitude=[];
         end
         
     elseif(strmatch('Longitude',d))
-        
-        e=find(upper(d)=='E');
+        exp = '\:';
+        ii = regexp(d,exp);
+
+        e=find(upper(d(ii+1:end))=='E');
         if(isempty(e))
             e=find(d=='W');
-            ee=0;
+            if isempty(e)
+                disp(['E/W longitude designator missing in file: ' fname])
+                disp(['Longitude line reads: ' d])
+                dd = input('Please enter E or W for longitude: ','s');
+                e = find(upper(dd)=='E');
+                if(isempty(e));
+                    ee = 0;
+                else
+                    ee = 1;
+                end
+            end
         else
             ee=1;
         end
-        space=find(d(18:end)==' ');
+        space=find(d(ii+1:end)==' ');
         if ~isempty(space)
-            exp = '(\d+).(\d+\.\d+)';
-            l = regexp(d,exp,'tokens');
-            profiledata.longitude=str2num(l{1}{1})+str2num(l{1}{2})/60;
+            exp = '(\d{1,3})';
+            l = regexp(d,exp,'tokens');                    
+            ldec = str2num([l{2}{1} '.' l{3}{1}]);
+            profiledata.longitude=str2num(l{1}{1})+ldec/60;
             if(~ee);profiledata.longitude=-profiledata.longitude;end
             %need to multiply longitude by -1 and change to 360 degree long
             if(profiledata.longitude<0)
@@ -221,15 +244,18 @@ while isempty(str2num(d))
     elseif(strmatch('Serial',d))
         
         serno=deblank(d(18:end));
+        if length(serno) > 10
+            serno = 'unknown   ';
+        end
         
     elseif(strmatch('Probe',d))
         
         probetypec=d(23:end);
     elseif(strmatch('Depth Coefficient 1',d))
         coeff1=deblank(d(23:end-1));
-        
+    
     elseif(strmatch('Depth Coefficient 2',d))
-        coeff2=deblank(d(23:end-1));
+        coeff2=deblank(d(23:end-1));    
         
     elseif(strmatch('Depth Coefficient 3',d))
         coeff3=deblank(d(23:end-1));
@@ -239,12 +265,22 @@ while isempty(str2num(d))
         
     elseif(strmatch('// Sound',d))
         soundsal=d(49:58);
+%        exp = 'sound';
+%        tok = regexp(d,exp,'match');
+%        kt = 2;
         
     elseif(strmatch('// depth',d))
         %// depth(M)/temp.(C)
+        sv = 0;
         exp = 'temp';
         tok = regexp(d,exp,'match');
-        kt = 2;
+	if isempty(tok)
+        sv = 1;
+	    exp = 'sound';
+            tok = regexp(d,exp,'match');
+            kt = 2;
+	end
+        
     elseif(strmatch('// temp',d))
         kt = 1;
     end
@@ -258,6 +294,14 @@ if isempty(tok)
     pd = [];
     return
 end
+
+if ~strmatch('Date',d)
+    %no header data
+    disp(['No metadata in ' fname ' not processing'])
+    profiledata = [];
+    pd = [];
+    return
+end
 %start of profile data:
 if ~isempty(strfind(probetypec,'T-4'));
     if (str2num(coeff2)==6.691)
@@ -267,7 +311,22 @@ if ~isempty(strfind(probetypec,'T-4'));
         correctDepths=1;
         %        pause
     end
-elseif ~isempty(strmatch('T-7',probetypec))
+elseif ~isempty(strfind(probetypec,'T-5'));
+    if (str2num(coeff2)==6.691)
+        probetype='011';
+    else
+        probetype='011';
+        %        pause
+    end
+elseif ~isempty(strfind(probetypec,'T-6'));
+    if (str2num(coeff2)==6.691)
+        probetype='002';
+    else
+        probetype='001';
+        correctDepths=1;
+        %        pause
+    end
+elseif ~isempty(strfind(probetypec,'T-7'))
     if(str2num(coeff2)==6.691)
         probetype='042';
     else
@@ -275,7 +334,7 @@ elseif ~isempty(strmatch('T-7',probetypec))
         correctDepths=1;
         %        pause
     end
-elseif ~isempty(strmatch('Deep',probetypec))
+elseif ~isempty(strfind(probetypec,'Deep'))
     if(str2num(coeff2)==6.691)
         probetype='052';
     else
@@ -283,15 +342,14 @@ elseif ~isempty(strmatch('Deep',probetypec))
         correctDepths=1;
         %        pause
     end
-elseif ~isempty(strmatch('XCTD',probetypec));
+elseif ~isempty(strfind(probetypec,'XCTD'));
     probetype='700';
     profiledata.datat='XC';
-elseif ~isempty(strmatch('T-5',probetypec));
-    probetype='011';
-elseif ~isempty(strmatch('T-10',probetypec));
+
+elseif ~isempty(strfind(probetypec,'T-10'));
     probetype='061';
 else
-    disp([probetypec ' probe type found - only Deep Blue, T-7, T-4, T-5 and XCTD probes are coded'])
+    disp([probetypec ' probe type found - only Deep Blue, T-7, T-4, T-5 and XCTD probes are coded hi'])
     keyboard
 end
 
@@ -302,19 +360,43 @@ profiledata.Prof_Type(1,:)='TEMP            ';
 clear data
 m=0;
 while(~feof(fid))
-    m=m+1;
     [d1, d2] = strtok(d);
+    if isempty(d1)
+        break
+    end
+    m=m+1;
     if kt == 1
-        data(m,1) = sscanf(d2, '%f');
-        data(m,2) = sscanf(d1, '%f');
+            
+            data(m,1) = sscanf(d2, '%f');
+            data(m,2) = sscanf(d1, '%f');
     else
-        data(m,1) = sscanf(d1, '%f');
-        data(m,2) = sscanf(d2, '%f');
+        %
+            
+            data(m,1) = sscanf(d1, '%f');
+            data(m,2) = sscanf(d2, '%f');
+        %
+        %    
+        %
     end
     
     d=fgets(fid);
 end
 fclose(fid);
+% convert sound speed to temperature using Mackenzie eqn
+if sv == 1
+    T0=25;
+    for ii=1:size(data,1)
+        D = data(ii,1); %depth
+        SV = data(ii,2);%sound vel
+        f = @(T) -SV+1448.96+4.591*T-5.304*10^-2*T^2+2.374*10^-4*T^3+...
+            1.63*10^-2*D+1.675*10^-7*D^2-7.139*10^-13*D^3*T;
+        data(ii,2)= fzero(f,T0);
+    end	
+     if any(isnan(data))
+         disp('temp error')
+     end
+end
+
 profiledata.Depthpress(:,1)=data(:,1);
 profiledata.DepresQ(1,:,1)='0';
 profiledata.Profparm(1,1,:,1,1)=data(:,2);
@@ -322,9 +404,11 @@ profiledata.ProfQP(1,1,1,:,1,1)='0';
 profiledata.No_Prof=1;
 
 if isempty(profiledata.latitude)
+    disp(['Cannot read Latitude in ' fname])
     profiledata.latitude=input('enter DECIMAL latitude:');
 end
 if isempty(profiledata.longitude)
+    disp(['Cannot read Longitude in ' fname])
     profiledata.longitude=input('enter DECIMAL longitude (360 degree globe):');
 end
 
@@ -366,7 +450,7 @@ nblk = length(str10)-length(coeff1);
 for j = 1:nblk, coeff1=[coeff1 blk]; end
 nblk = length(str10)-length(coeff2);
 for j = 1:nblk, coeff2=[coeff2 blk]; end
-nblk = length(str10)-length(coeff3);
+nblk = length(str10)-length(coeff2);
 for j = 1:nblk, coeff3=[coeff3 blk]; end
 nblk = length(str10)-length(coeff4);
 for j = 1:nblk, coeff4=[coeff4 blk]; end
@@ -388,7 +472,7 @@ varsList = {'uqid','calls','probetype','recordertype', ...
 surfpcode = [];
 surfparm =[];
 surfqparm = [];
-for a = 1:length(surfcodeNames)
+for a = 1:6
     eval(['dat = ' varsList{a} ';'])
     if ~isempty(dat)
         surfpcode = [surfpcode; surfcodeNames{a}];
