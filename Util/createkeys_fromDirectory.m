@@ -11,6 +11,9 @@ if nargin < 1
     disp('function requires a full path to the database structure')
     return
 end
+global DATA_SOURCE
+
+CONFIG
 
 keysfile = [database '_keys.nc'];
 createkeys(keysfile)
@@ -84,14 +87,11 @@ for a = 1:length(pth)
         end
         keysdata.priority(ist) = 1;
         keysdata.datasource(ist,:) = '          ';
+        keysdata.datasource(ist,1:length(DATA_SOURCE)) = DATA_SOURCE;
         keysdata.datatype(ist,:) = ds(3:4);
     end
 end
 
-% keysdata.time = keysdata.time';
-% keysdata.day = keysdata.day';
-% keysdata.month = keysdata.month';
-% keysdata.year = keysdata.year';
 keysdata.obslat = keysdata.obslat';
 keysdata.obslon = keysdata.obslon';
 keysdata.priority = keysdata.priority';
