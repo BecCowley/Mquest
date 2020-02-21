@@ -277,6 +277,16 @@ dataforms=get(handles.inputformats,'Value');
                 end
             end
             
+        case 10 %WOD csv data
+            for i=1:length(suff)
+                isinput=strfind(suff(i),'.csv');
+                if(~isempty(isinput{1}))
+                    usethis(i)=1;
+                else
+                    usethis(i)=0;
+                end
+            end
+            
     end
 
 kkin=find(usethis==1);
@@ -402,6 +412,8 @@ end
             
         case 9
             inputMK12(inputdata,outputdata)
+        case 10
+            inputWODcsv(inputdata,outputdata)
     end
 %end       
 
