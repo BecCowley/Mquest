@@ -3,16 +3,16 @@
 clear
 latall=[];lonall=[];datall = [];
 figure(1);clf;hold on
-% fn = dir('/home/UOT/archives/XBT/archiveMA/a3e031985.MA');
-fn = dir('/home/UOT-data/quest/RANdata/RAN2007data/*.MA');
+fn = dir('/home/UOT/archives/XBT/archiveMA/are5871986.MA');
+% fn = dir('/home/UOT-data/quest/RANdata/RAN2007data/*.MA');
 for b = 1:length(fn)
-%     fid = fopen(['/home/UOT/archives/XBT/archiveMA/' fn(b).name],'r');
-    fid = fopen(['/home/UOT-data/quest/RANdata/RAN2007data/' fn(b).name],'r');
+    fid = fopen(['/home/UOT/archives/XBT/archiveMA/' fn(b).name],'r');
+%     fid = fopen(['/home/UOT-data/quest/RANdata/RAN2007data/' fn(b).name],'r');
     [data] = textscan(fid,'%s','Delimiter','|','whitespace','');
     fclose(fid);
     
-%     ii = find(cellfun(@isempty,strfind(data{:},'CSID'))==0);
-ii = find(cellfun(@isempty,strfind(data{:},'U'))==0);
+    ii = find(cellfun(@isempty,strfind(data{:},'CSID'))==0);
+% ii = find(cellfun(@isempty,strfind(data{:},'U'))==0);
 lat = []; lon = [];dat = [];
     for a = 1:length(ii)
         %     profiledata = readMA(fid,uniqueid);
@@ -43,12 +43,12 @@ end
 %% now read in the equivalent datn version:
 % fid = fopen('/home/UOT/archives/XBT/archive2m/VLMQ2007.datn','r');
 data = [];latdall = [];londall = [];datdall = [];
-% % fn = dir('/home/UOT/archives/XBT/archive2m/ike160s2000.datn');
-fn = dir('/home/UOT-data/quest/RANdata/RAN2007data/V*.datn');
+fn = dir('/home/UOT/archives/XBT/archive2m/are5871986.datn');
+% fn = dir('/home/UOT-data/quest/RANdata/RAN2007data/V*.datn');
 % fn = dir('/home/UOT/archives/XBT/archive2m/a3e031985.datn');
 for b = 1:length(fn)
-fid = fopen(['/home/UOT-data/quest/RANdata/RAN2007data/' fn(b).name],'r');
-% fid = fopen(['/home/UOT/archives/XBT/archive2m/' fn(b).name],'r');
+% fid = fopen(['/home/UOT-data/quest/RANdata/RAN2007data/' fn(b).name],'r');
+fid = fopen(['/home/UOT/archives/XBT/archive2m/' fn(b).name],'r');
     [data] = textscan(fid,'%s','Delimiter','|');
     fclose(fid);
 
@@ -126,5 +126,7 @@ ibad = find(abs(lat(ia)-latd(ib)) > 0.01);
 
 [lat(ia(ibad))' latd(ib(ibad))']
 [lon(ia(ibad))' lond(ib(ibad))']
+
+figure(1)
 
     

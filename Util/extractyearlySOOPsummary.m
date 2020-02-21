@@ -13,7 +13,7 @@ who=input('Which agency: b (Bureau) or c (CSIRO) ','s');
 if who == 'c' 
   agency='CSIRO';
   dirn = '/home/UOT-data/quest/';
-  pref = {'mer/CSIROXBT2018','antarctic/CSIROXBT2018ant'};
+  pref = {['mer/CSIROXBT' num2str(yr)],['antarctic/CSIROXBT' num2str(yr) 'ant']};
   v= [100 200.,-80,20];
   agency_title = ['CSIRO SOOP High Density sampling - ' num2str(yr)];
 

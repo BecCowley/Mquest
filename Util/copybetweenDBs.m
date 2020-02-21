@@ -15,19 +15,19 @@ dirn = '/home/UOT-data/quest/';
   [keysdata]=getkeys(p,m,y,q,a,tw,sstyle);
 
   for a = 1:length(keysdata.stnnum)
-%       raw = 1;
-%     filen=getfilename(num2str(keysdata.stnnum(a)),raw);
+      raw = 1;
+      filen=getfilename(num2str(keysdata.stnnum(a)),raw);
       raw = 0;
-    filene=getfilename(num2str(keysdata.stnnum(a)),raw);
-    for b = 1:length(pref)
-    fn = [dirn pref{b} filene];
-      if exist(fn,'file') == 2
-%           disp(['cp ' fn ' ' prefix '/' filen])
-%           %copy it
-%           system(['cp ' fn ' ' prefix '/' filen])
-          %and repeat for the ed file:
-          system(['cp ' fn ' ' prefix '/' filene])
-          disp(['cp ' fn ' ' prefix '/' filene])
+      filene=getfilename(num2str(keysdata.stnnum(a)),raw);
+      for b = 1:length(pref)
+          fn = [dirn pref{b} filen];
+          if exist(fn,'file') == 2
+              disp(['cp ' fn ' ' prefix '/' filen])
+              %copy it to the raw file
+              system(['cp ' fn ' ' prefix '/' filen])
+%               and repeat for the ed file:
+              system(['cp ' fn ' ' prefix '/' filene])
+              disp(['cp ' fn ' ' prefix '/' filene])
+          end
       end
-    end
   end
