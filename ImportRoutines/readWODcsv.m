@@ -1,549 +1,450 @@
-function profiledata = readWODcsv(inputfile,outputfile,oflags)
+function [profiledata,pd] = readWODcsv(inputfile,uniqueid,oflags)
 % Function to read csv files from the WOD select and search facility and output to MQNC format
 % Inputs:   inputfile - (string) name of file for reading, with extension
-%           outputfile - (string) name for output MQNC file
+%           uniquid - (string) uniqueid of the profile
 %           oflags - 1 to use originators flags, 0 to ignore flags (default
 %           = 0)
 % Rebecca Cowley 20 August 2009, updated Feb 2020
+
+global DATA_QC_SOURCE
+
 if nargin < 2
     error('Not enough input arguments, try again with inputfile and outputfile')
 elseif nargin == 2
     oflags = 0;
 end
+% initialise strings
+str1 = ' ';
+str2 = '  ';
+str4 = '    ';
+str6 = '      ';
+str8 = '        ';
+str10 = '          ';
+str12 = '            ';
 
 %set up probe type equivalents:
-[wpt,gpt]=textread('/home/UOT/programs/matlab_xbtbias/v_5_instrument.csv','%u%u%*s%*s',...
+fid = fopen('v_5_instrument.csv');
+wpt=textscan(fid,'%u%u%*s%*s',...
     'delimiter',',');
+fclose(fid);
 
-% %open the list of stns to re-run
-% [stnlist,prt] = textread('xbnewcorrFALSE.txt','%f%*s%f%*s%*s%*s','delimiter',' ');
-% 
 % load unique id from file, use WOD number
 fid=fopen(inputfile,'r');
-%get data line by line
-while ~feof(fid)
-    a=0;
-    a=a+1;
-    txt =fgetl(fid);
-    %put in break point if can't find feof
-    if ~ischar(txt)
-        break
+%get data 
+c = textscan(fid,'%s','delimiter','|');
+fclose(fid);
+c = c{1};
+
+%get important metadata prepared:
+iprofiles = find(cellfun(@isempty,strfind(c,'CAST'))==0);
+
+%cycle through the file. Allow for multiple profiles in a file:
+for a = 1:length(iprofiles)
+    if a == length(iprofiles)
+        prof = c(iprofiles(a):end);
+    else
+        prof = c(iprofiles(a):iprofiles(a+1)-1);
     end
-    %get header info out:
-    clear profiledata dd
-    next = 0;
     nparms = 0;
     nsurfc = 0;
     bott = 0;
     ndf = -1; %set to unknown
-    while 1
-        ii = strfind(txt,',');
-        if isempty(ii)
-            return
-        end
-        str = txt(1:ii(1)-1); %get the first word
-        if ~isempty(str2num(str))
-            break
-        end
-        if ~isempty(strmatch('#',str(1)))
-            a=a+1;
-            txt =fgetl(fid);
-            continue
-        elseif ~isempty(strmatch('CAST',str))
-            profiledata.nss = '          ';
-            tt = num2str(str2num(txt(ii(2)+1:ii(3)-1)));
-            profiledata.nss(1:length(tt))=tt;
-        elseif ~isempty(strmatch('NODC Cruise ID',str))
-            profiledata.cruiseID='          ';
-            vv = deblank(txt(ii(2)+1:ii(3)-1));
-            profiledata.cruiseID(1:length(vv)) = vv;
-        elseif ~isempty(strmatch('Latitude',str))
-            profiledata.latitude=str2num(txt(ii(2)+1:ii(3)-1));
-        elseif ~isempty(strmatch('Longitude',str))
-            ln = str2num(txt(ii(2)+1:ii(3)-1));
-            kk = find(ln < 0);
-            ln(kk) = ln(kk) + 360;
-            profiledata.longitude=ln;
-        elseif ~isempty(strmatch('Year',str))
-            profiledata.year=str2num(txt(ii(2)+1:ii(3)-1));
-        elseif ~isempty(strmatch('Month',str))
-            profiledata.month=str2num(txt(ii(2)+1:ii(3)-1));
-        elseif ~isempty(strmatch('Day',str))
-            profiledata.day=str2num(txt(ii(2)+1:ii(3)-1));
-        elseif ~isempty(strmatch('Time',str))
-            tt=str2num(txt(ii(2)+1:ii(3)-1));
-            %convert to string:
-            hh = floor(tt);
-            if hh < 10
-                hh = ['0' num2str(hh)];
+    
+     clear profiledata pd
+   %set the unique ID. Use  WOD value if available
+    ii = find(cellfun(@isempty,strfind(prof,'CAST'))==0);
+    txt = prof{ii};
+    ij = strfind(txt,',');
+    pd.nss = str10;
+    tt = num2str(str2num(txt(ij(2)+1:ij(3)-1)));
+    if ~isempty(tt)
+        pd.nss(1:length(tt))=tt;
+    else
+        pd.nss = num2str(uniqueid);
+    end
+    
+    %get the cruiseID
+    ii = find(cellfun(@isempty,strfind(prof,'Originators Cruise ID'))==0);
+    txt = prof{ii};
+    ij = strfind(txt,',');
+    profiledata.Cruise_ID='          ';
+    vv = strtrim(txt(ij(2)+1:ij(3)-1));
+    profiledata.Cruise_ID(1:length(vv)) = vv;
+    
+    %lat and long information
+    ii = find(cellfun(@isempty,strfind(prof,'Latitude'))==0);
+    txt = prof{ii};
+    ij = strfind(txt,',');
+    profiledata.latitude=str2num(txt(ij(2)+1:ij(3)-1));
+    pd.latitude = profiledata.latitude;
+    
+    ii = find(cellfun(@isempty,strfind(prof,'Longitude'))==0);
+    txt = prof{ii};
+    ij = strfind(txt,',');
+    ln = str2num(txt(ij(2)+1:ij(3)-1));
+    kk = find(ln < 0);
+    ln(kk) = ln(kk) + 360;
+    profiledata.longitude=ln;
+    pd.longitude=ln;
+    
+    %date/time information
+%         woce_date: 20160426
+%         woce_time: 142500
+%              time: 42485
+    ii = find(cellfun(@isempty,strfind(prof,'Year'))==0);
+    txt = prof{ii};
+    ij = strfind(txt,',');
+    pd.year=strtrim(txt(ij(2)+1:ij(3)-1));
+    
+    ii = find(cellfun(@isempty,strfind(prof,'Month'))==0);
+    txt = prof{ii};
+    ij = strfind(txt,',');
+    mm=strtrim(txt(ij(2)+1:ij(3)-1));
+    pd.month = sprintf('%02i',str2num(mm));
+
+    ii = find(cellfun(@isempty,strfind(prof,'Day'))==0);
+    txt = prof{ii};
+    ij = strfind(txt,',');
+    dd = strtrim(txt(ij(2)+1:ij(3)-1));
+    pd.day=sprintf('%02i',str2num(dd));
+    
+    %set up woce_date and woce_time variables
+    wd = [pd.year pd.month pd.day];
+    profiledata.woce_date = str2num(strrep(wd,' ','0'));
+    
+    ii = find(cellfun(@isempty,strfind(prof,'Time'))==0);
+    txt = prof{ii};
+    ij = strfind(txt,',');
+    tt=str2num(txt(ij(2)+1:ij(3)-1));
+    units = txt(ij(3)+1:ij(4)-1);
+    h = findstr('hours',units);
+    m = findstr('minutes',units);
+    s = findstr('seconds',units);
+    if ~isempty(h) & ~isempty(m) & ~isempty(s)
+        tfmt = 'HHMMSS';
+        ss = '';
+    elseif ~isempty(h) & ~isempty(m)
+        tfmt = 'HHMM';
+        ss = '00';
+    end
+    ttn = datenum(num2str(tt),tfmt);
+    %need to check for the time and convert to UTC if needed
+    %     NZDT	New Zealand Daylight Time	UTC +13
+    %     NZST	New Zealand Standard Time	UTC +12
+    tstr = {'NZDT','NZST'};
+    for b  = 1:length(tstr)
+        lt = findstr(tstr{b},units);
+        if ~isempty(lt)
+            if b == 1
+                ttn = ttn - 13/24;
             else
-                hh = num2str(hh);
+                ttn = ttn - 12/24;
             end
-            mm = rem(tt,1);
-            mm = mm*60;
-            if mm < 10
-                mm = ['0' num2str(round(mm))];
-            else
-                mm = num2str(round(mm));
-            end
-            ss = '00';
-            profiledata.time=str2num([hh mm ss]);  %woce_time
-        elseif ~isempty(strmatch('Accession Number',str))
-            nsurfc = nsurfc+1;
-            profiledata.surfpcode(nsurfc,:)='ACCS';
-            profiledata.surfparm(nsurfc,:)='          ';
-            vv = num2str(str2num(txt(ii(2)+1:ii(3)-1)));
-            profiledata.surfparm(nsurfc,1:length(vv))=vv;
-            profiledata.surfqparm(nsurfc)='0';
-        elseif ~isempty(strmatch('Platform',str))
-            nsurfc = nsurfc+1;
-            profiledata.surfpcode(nsurfc,:)='PLAT';
-            profiledata.surfparm(nsurfc,:)='          ';
-            vv = num2str(str2num(txt(ii(2)+1:ii(3)-1)));
-%             vv = txt(ii(4)+1:ii(5)-1);
-%             try
-%                 profiledata.surfparm(nsurfc,1:10)=vv(1:10);
-%             catch
-                profiledata.surfparm(nsurfc,1:length(vv))=vv;
-%             end
-            profiledata.surfqparm(nsurfc)='0';
-        elseif ~isempty(strmatch('Institute',str))
-            nsurfc = nsurfc+1;
-            profiledata.surfpcode(nsurfc,:)='INS1';
-            profiledata.surfparm(nsurfc,:)='          ';
-            vv = num2str(str2num(txt(ii(2)+1:ii(3)-1)));
-            profiledata.surfparm(nsurfc,1:length(vv))=vv;
-            profiledata.surfqparm(nsurfc)='0';
-        elseif ~isempty(strmatch('Investigator',str))
-            nsurfc = nsurfc+1;
-            profiledata.surfpcode(nsurfc,:)='PICD';
-            profiledata.surfparm(nsurfc,:)='          ';
-            vv = num2str(str2num(txt(ii(2)+1:ii(3)-1)));
-            profiledata.surfparm(nsurfc,1:length(vv))=vv;
-            profiledata.surfqparm(nsurfc)='0';
-        elseif ~isempty(strmatch('probe_type',str))
-            tt = str2num(txt(ii(2)+1:ii(3)-1));
-            switch tt
-                case 1 %mbt
-                    profiledata.datat='MB';
-                    profiledata.streamident='WAMB';
-                case 2 %xbt
-                    profiledata.datat='XB';
-                    profiledata.streamident='WAXB';
-                case 4 %ctd
-%                     nsurfc = nsurfc+1;
-%                     profiledata.surfpcode(nsurfc,:)='PEQ$';
-%                     profiledata.surfparm(nsurfc,:)='830       ';
-%                     profiledata.surfqparm(nsurfc,:)='1';
-                    profiledata.datat='CT';
-                    profiledata.streamident='WACT';
-                case {5,7} %std/bottle
-                    bott = 1;
-                    nsurfc = nsurfc+1;
-                    profiledata.surfpcode(nsurfc,:)='PEQ$';
-                    profiledata.surfparm(nsurfc,:)='810       ';
-                    profiledata.surfqparm(nsurfc)='1';
-                    profiledata.datat='BO';
-                    profiledata.streamident='WABO';
-                case 6 %xctd
-                    profiledata.datat='XC';
-                    profiledata.streamident='WAXC';
-                otherwise
-                    disp(['Probe type = ' num2str(tt) ',Profile = ' profiledata.nss])
-                    return
-            end
-        elseif ~isempty(strmatch('Recorder',str))
-            nsurfc = nsurfc+1;
-            profiledata.surfpcode(nsurfc,:)='RCT$';
-            profiledata.surfparm(nsurfc,:)='          ';
-            vv = num2str(str2num(txt(ii(2)+1:ii(3)-1)));
-            profiledata.surfparm(nsurfc,1:length(vv))=vv;
-            profiledata.surfqparm(nsurfc)='0';
-           
-        elseif ~isempty(strmatch('Instrument',str))
-            tt = str2num(txt(ii(2)+1:ii(3)-1));
-            ii = find(tt == wpt);
-            ptt = tt;
-            if tt == 4 && bott == 1 %probetype says bottle, instrument says CTD
-                a=a+1;
-                txt =fgetl(fid);
-                continue
-            end
-            nsurfc = nsurfc+1;
-            profiledata.surfpcode(nsurfc,:)='PEQ$';
-            profiledata.surfparm(nsurfc,:)='          ';
-            gp = num2str(gpt(ii));
-            if length(gp) == 2
-                gp = ['0' gp];
-            elseif length(gp) == 1
-                gp = ['00' gp];
-            end
-            profiledata.surfparm(nsurfc,1:3) = gp;
-            profiledata.surfqparm(nsurfc)='1';
-        elseif ~isempty(strmatch('UNITS',str))
-            if ~isempty(strmatch('m',txt(ii(1)+1:ii(2)-1)))
-                profiledata.D_P_Code='D';
-            else
-                profiledata.D_P_Code='P';
-            end
-        elseif ~isempty(strmatch('Needs Depth Fix',str))|~isempty(strmatch('needs_depth_fix',str))
-            ndf = str2num(txt(ii(2)+1:ii(3)-1));
-            if ndf == -1
-                ndf = 1;
-            end
-        elseif ~isempty(strmatch('VARIABLES',str))
-            if isempty(strfind(txt,'Temp'))
-                %cycle through to next profile
-                while 1
-                    if isempty(strfind(txt,'#----------'))
-                        txt =fgetl(fid);
-                    else
-                        break
-                    end
-                end
-                next = 1;
+            tt = num2str(datestr(ttn,tfmt));
                 break
-            end
-                %get the order in which they appear:
-            is(1) = strfind(txt,'Depth');
-            is(2) = strfind(txt,'Temp');
-            try
-                is(3) = strfind(txt,'Salinity');
-            catch
-                is(3) = NaN;
-            end
-            for b = 1:3
-                nn =  find(ii == is(b)-1);
-                if isempty(nn)
-                    ij(b) = NaN;
-                else
-                    ij(b) = nn;
-                end
-            end
-        elseif ~isempty(strmatch('BIOLOGY',str)) %skip all this section
-            while 1
-                if isempty(strfind(txt,'#----------'))
-                    txt =fgetl(fid);
-                else
-                    break
-                end
-                if ~ischar(txt)
-                    break
-                end
-            end
-            next = 1;
-            break
-        else
-            a=a+1;
-            txt =fgetl(fid);
-            continue
         end
-        a=a+1;
-        txt =fgetl(fid);
     end
-    if next
-        continue
+    
+    profiledata.woce_time=str2num([tt ss]);  %woce_time
+    wt=profiledata.woce_time;
+    wt=floor(wt/100);
+    wt2=sprintf('%4i',wt);
+    jk=strfind(wt2,' ');
+    if(~isempty(jk))
+        wt2(jk)='0';
     end
-    if ~isfield(profiledata,'time')
-        profiledata.time = 0;
+    pd.time=[wt2(1:2) ':' wt2(3:4)];
+    %add in some more stuff to profiledata
+    ju=julian([str2num(pd.year) str2num(pd.month) str2num(pd.day) ...
+        floor(wt/100) rem(wt,100) 0])-2415020.5;
+    profiledata.time = ju;
+  
+    %surface code information
+    %profiledata
+    %       SRFC_Code: [30x4 char]
+    %       SRFC_Parm: [30x10 char]
+    %     SRFC_Q_Parm: [30x1 char] 
+    %       Nsurfc: 13
+    %pd:
+    %          surfcode: [30x4 char]
+    %          surfparm: [30x10 char]
+    %         surfqparm: [30x1 char]
+    %            nsurfc: 13    
+    
+    ii = find(cellfun(@isempty,strfind(prof,'Accession Number'))==0);
+    txt = prof{ii};
+    ij = strfind(txt,',');
+    vv = num2str(str2num(txt(ij(2)+1:ij(3)-1)));
+    if ~isempty(vv)
+        nsurfc = nsurfc+1;
+        profiledata.SRFC_Code(nsurfc,:)='ACCS';
+        profiledata.SRFC_Parm(nsurfc,:)='          ';
+        profiledata.SRFC_Parm(nsurfc,1:length(vv))=vv;
+        profiledata.SRFC_Q_Parm(nsurfc)='0';
     end
-    %setup output files:
-    %read the profile data into variables:
-    while 1
-        ii = strfind(txt,',');
-        if isempty(ii)
-            break
-        end
-        str = txt(1:ii(1)-1); %get the first word
-        if isempty(str2num(str))
-            break
-        end
-        a = str2num(txt(1:ii(1)-1));
+    
+    ii = find(cellfun(@isempty,strfind(prof,'Platform'))==0);
+    txt = prof{ii};
+    ij = strfind(txt,',');
+    vv = num2str(str2num(txt(ij(2)+1:ij(3)-1)));
+    shipname = txt(ij(4)+1:ij(5)-1);
+    [callsign,m] =regexp(txt,'\w*call sign (\w+);.*','tokens','match');
+    callsign = char(callsign{:});
+    ibr = strfind(shipname,'(');
+    if ~isempty(ibr)
+        shipname = shipname(1:ibr-1);
+    else
+        shipname = shipname(1:10);
+    end
+    if ~isempty(vv)
+        nsurfc = nsurfc+1;
+        profiledata.SRFC_Code(nsurfc,:)='PLAT';
+        profiledata.SRFC_Parm(nsurfc,:)=str10;
+        profiledata.SRFC_Parm(nsurfc,1:length(vv))=vv;
+        profiledata.SRFC_Q_Parm(nsurfc)='0';
+        %shipname
+        nsurfc = nsurfc+1;
+        profiledata.SRFC_Code(nsurfc,:)='SHP#';
+        profiledata.SRFC_Parm(nsurfc,:)=str10;
+        profiledata.SRFC_Parm(nsurfc,1:length(shipname))=shipname;
+        profiledata.SRFC_Q_Parm(nsurfc)='0';
+        %callsign
+        nsurfc = nsurfc+1;
+        profiledata.SRFC_Code(nsurfc,:)='GCLL';
+        profiledata.SRFC_Parm(nsurfc,:)=str10;
+        profiledata.SRFC_Parm(nsurfc,1:length(callsign))=callsign;
+        profiledata.SRFC_Q_Parm(nsurfc)='0';
+    end
+
+    ii = find(cellfun(@isempty,strfind(prof,'Institute'))==0);
+    txt = prof{ii};
+    ij = strfind(txt,',');
+    vv = num2str(str2num(txt(ij(2)+1:ij(3)-1)));
+    if ~isempty(vv)
+        nsurfc = nsurfc+1;
+        profiledata.SRFC_Code(nsurfc,:)='INS1';
+        profiledata.SRFC_Parm(nsurfc,:)=str10;
+        profiledata.SRFC_Parm(nsurfc,1:length(vv))=vv;
+        profiledata.SRFC_Q_Parm(nsurfc)='0';
+    end
+
+    ii = find(cellfun(@isempty,strfind(prof,'probe_type'))==0);
+    if ~isempty(ii)
+        txt = prof{ii};
+        ij = strfind(txt,',');
+        tt = strtrim(txt(ij(2)+1:ij(3)-1));
         
-        for b = 1:length(ii)-1
-            nn = str2num(txt(ii(b)+1:ii(b+1)-1));
-            if isempty(nn)
-                dd(a,b) = NaN;
-            else
-                dd(a,b) = nn;
-            end
+        switch tt(1)
+            case '1' %mbt
+                profiledata.Data_Type='MB';
+                profiledata.Stream_Ident=[DATA_QC_SOURCE 'MB'];
+            case '2' %xbt
+                profiledata.Data_Type='XB';
+                profiledata.Stream_Ident=[DATA_QC_SOURCE 'XB'];
+            case '4' %ctd
+                profiledata.Data_Type='CT';
+                profiledata.Stream_Ident=[DATA_QC_SOURCE 'CT'];
+            case {'5','7'} %std/bottle
+                profiledata.Data_Type='BO';
+                profiledata.Stream_Ident=[DATA_QC_SOURCE 'BO'];
+            case '6' %xctd
+                pd.Data_Type='XC';
+                pd.Stream_Ident=[DATA_QC_SOURCE 'XC'];
+            otherwise
+                disp(['Probe type = ' num2str(tt) ',Profile = ' profiledata.nss])
+                return
         end
-        txt =fgetl(fid);
-        
     end
-    
-%     igo = find(stnlist == str2num(profiledata.nss));
-%     if isempty(igo)
-%         continue
-%     end
-%     gp = num2str(prt(igo));
-%     if length(gp) == 2
-%         gp = ['0' gp];
-%     elseif length(gp) == 1
-%         gp = ['00' gp];
-%     end
-%     ip = strmatch('PEQ$',profiledata.surfpcode);
-%     if isempty(ip)
-%         nsurfc = nsurfc+1;
-%         profiledata.surfpcode(nsurfc,:)='PEQ$';
-%         profiledata.surfparm(nsurfc,:)='          ';
-%         profiledata.surfparm(nsurfc,1:3) = gp;
-%         profiledata.surfqparm(nsurfc)='1';
-%     else
-%         profiledata.surfparm(ip,1:3) = gp;
-%     end
-% 
-    dd = change(dd,'>',99990,NaN);
-    nprof = length(find(~isnan(ij)))-1;
-    ndep = a;
-    profiledata.ndep = a;
-    
-    profiledata.lat=profiledata.latitude;
-    profiledata.lon=profiledata.longitude;
-    
-    profiledata.mky='        ';
-    profiledata.onedegsq='        ';
-    profiledata.iumsgno='            ';
-    profiledata.streamsource=' ';
-    profiledata.uflag=' ';
-    profiledata.medssta='        ';
-    profiledata.qpos='1';
-    profiledata.qdatetime='1'; 
-    profiledata.qrec=' ';
-    profiledata.update=datestr(datenum(date),'yyyymmdd');
-    profiledata.bultime='            ';
-    profiledata.bulheader='      ';
-    profiledata.sourceID='    ';
-    profiledata.QCversion='    ';
-    profiledata.dataavail='A';
-    
-    profiledata.nprof=nprof;
-    profiledata.nhists=0;
-    
-    for i=1:profiledata.nprof
-        profiledata.nosseg(i)=1;
-        if i==1
-            profiledata.prof_type(i,1:4)='TEMP';
-            profiledata.standard(i)='1';
-        elseif i==2
-            profiledata.prof_type(i,1:4)='PSAL';
-            profiledata.standard(i)='2';
-        end
-        profiledata.prof_type(i,5:16)='            ';
-        profiledata.dup_flag(i)='N';
-        profiledata.digit_code(i)='0';
-    end
-    nsurfc = nsurfc + 1;
-    profiledata.surfpcode(nsurfc,1:4)='WAID';
-    profiledata.surfparm(nsurfc,:) = '          ';
-    profiledata.surfparm(nsurfc,1:length(num2str(profiledata.nss)))=num2str(profiledata.nss);
-    profiledata.surfqparm(nsurfc)='1';
-    
-    profiledata.identcode='';
-    profiledata.PRCcode='';
-    profiledata.Version='';
-    profiledata.PRCdate='';
-    profiledata.Actcode='';
-    profiledata.Actparm='';
-    profiledata.AuxID=0;
-    profiledata.PreviousVal='';
-    profiledata.flagseverity=0;
-    
-    profiledata.profile_type='';
-    for b=1:profiledata.nprof
-        %get the depth temp pairs etc out of the file,
-        %then read the next segment if relevant:
-        profiledata.nodepths(b)=ndep;
-        if b==1
-            profiledata.profile_type(1,1,1:4)='TEMP';
-            profiledata.profparm(b,1,:)=dd(:,ij(2));
-            if oflags %use originators flags
-                flg = dd(:,ij(2)+2);
-                flg = change(flg,'==',NaN,0);
-                flg = num2str(flg);
-                profiledata.profQparm(b,1,1:ndep) = flg;
-            else
-                profiledata.profQparm(b,1,1:ndep)='0';
-            end
             
-        elseif b==2
-            profiledata.profile_type(1,1,1:4)='PSAL';
-            profiledata.profparm(b,1,:)=dd(:,ij(3));
-            if oflags %use originators flags
-                flg = dd(:,ij(2)+2);
-                flg = change(flg,'==',NaN,0);
-                flg = num2str(flg);
-                profiledata.profQparm(b,1,1:ndep) = flg;
-            else
-                profiledata.profQparm(b,1,1:ndep)='0';
-            end
+    ii = find(cellfun(@isempty,strfind(prof,'Recorder'))==0);
+    if ~isempty(ii)
+        txt = prof{ii};
+        ij = strfind(txt,',');
+        vv = num2str(str2num(txt(ij(2)+1:ij(3)-1)));
+        if ~isempty(vv)
+            nsurfc = nsurfc+1;
+            profiledata.SRFC_Code(nsurfc,:)='RCT$';
+            profiledata.SRFC_Parm(nsurfc,:)=str10;
+            profiledata.SRFC_Parm(nsurfc,1:length(vv))=vv;
+            profiledata.SRFC_Q_Parm(nsurfc)='0';
         end
-        
-        %NOTE THAT DPC$ IS NOT WORKING PROPERLY - DPC IS BEING INSERTED
-        %WHERE NO DEPTH CORR IS DONE - EG FOR T5s
-        %NEEDS FIXING - RC 1/12/2009.
-%DPC$ = 01, known, needs correction
-%       02, known, no correction required
-%       03, Unknown type, leave as is
-%       04, Known type, correction done
-%       05, unknown type, correction done
-        if ndf <= 0 && ~isempty(strmatch(profiledata.datat,'XB'));
-            profiledata.depth(b,1,:)=dd(:,ij(1));
-            if b == 1 && ptt == 2
-                nsurfc = nsurfc + 1;
-                profiledata.surfpcode(nsurfc,:)='DPC$';
-                profiledata.surfparm(nsurfc,:)='        03';
-                profiledata.surfqparm(nsurfc)=' ';
-            elseif b == 1 && ptt ~=2
-                nsurfc = nsurfc + 1;
-                profiledata.surfpcode(nsurfc,:)='DPC$';
-                profiledata.surfparm(nsurfc,:)='        02';
-                profiledata.surfqparm(nsurfc)=' ';                
-            end
-             do = dd(:,ij(1));
-       elseif (ndf == 1 || ndf == 2) && ptt ~= 2 %Hanawa correction:
-            do = dd(:,ij(1));
-            %             dn = (1.0417*do)-(75.906*(1-((1-(0.0002063*do)))^0.5));
-            do = 1.0336*do;
-            profiledata.depth(b,1,:)=do;
-            if b == 1
-                nsurfc = nsurfc + 1;
-                profiledata.surfpcode(nsurfc,:)='DPC$';
-                profiledata.surfparm(nsurfc,:)='        04';
-                profiledata.surfqparm(nsurfc)=' ';
-                nsurfc = nsurfc + 1;
-                profiledata.surfpcode(nsurfc,:)='FRA$';
-                profiledata.surfparm(nsurfc,:)='1.0336    ';
-                profiledata.surfqparm(nsurfc)=' ';
-            end
-%         elseif ndf == 2  && ptt ~= 2 %Kizu correction:
-%             profiledata.depth(b,1,:)=dd(:,ij(1));
-%             
-%             if b == 1
-%                 nsurfc = nsurfc + 1;
-%                 profiledata.surfpcode(nsurfc,:)='DPC$';
-%                 profiledata.surfparm(nsurfc,:)='        01';
-%                 profiledata.surfqparm(nsurfc)=' ';
-%                 nsurfc = nsurfc + 1;
-%                 profiledata.surfpcode(nsurfc,:)='FRA$';
-%                 profiledata.surfparm(nsurfc,:)='KIZU2005  ';
-%                 profiledata.surfqparm(nsurfc)=' ';
-%                 disp('KIZU correction!')
-%                 pause
-%             end
-        elseif ndf == 1 || ndf == 2 && ptt == 2 %unknown, needs fix:
-            do = dd(:,ij(1));
-            %             dn = (1.0417*do)-(75.906*(1-((1-(0.0002063*do)))^0.5));
-            dn = 1.0336*do;
-            profiledata.depth(b,1,:)=dn;
-            if b == 1
-                nsurfc = nsurfc + 1;
-                profiledata.surfpcode(nsurfc,:)='DPC$';
-                profiledata.surfparm(nsurfc,:)='        05';
-                profiledata.surfqparm(nsurfc)=' ';
-                nsurfc = nsurfc + 1;
-                profiledata.surfpcode(nsurfc,:)='FRA$';
-                profiledata.surfparm(nsurfc,:)='1.0336    ';
-                profiledata.surfqparm(nsurfc)=' ';
-            end
-        else
-            profiledata.depth(b,1,:)=dd(:,ij(1));
-            do = dd(:,ij(1));
+    end
+           
+    ii = find(cellfun(@isempty,strfind(prof,'Instrument'))==0);
+    txt = c{ii(1)};
+    ij = strfind(txt,',');
+    tt = str2num(txt(ij(2)+1:ij(3)-1));
+    if ~isempty(tt)
+        ii = find(tt == wpt{1});
+        ptt = tt;
+        gp = num2str(wpt{2}(ii));
+        if length(gp) == 2
+            gp = ['0' gp];
+        elseif length(gp) == 1
+            gp = ['00' gp];
         end
-        profiledata.depresQ(b,1,1:ndep)='1';
-        
+        nsurfc = nsurfc+1;
+        profiledata.SRFC_Code(nsurfc,:)='PEQ$';
+        profiledata.SRFC_Parm(nsurfc,:)=str10;
+        profiledata.SRFC_Parm(nsurfc,1:length(gp))=gp;
+        profiledata.SRFC_Q_Parm(nsurfc)='0';
     end
-    for b=1:profiledata.nprof
-        profiledata.deep_depth(b)=max(do);
+
+    ii = find(cellfun(@isempty,strfind(prof,'UNITS'))==0);
+    txt = prof{ii};
+    ij = strfind(txt,',');
+    vv = txt(ij(1)+1:ij(2)-1);
+    if ~isempty(strmatch('m',vv))
+        profiledata.D_P_Code='D';
+    else
+        profiledata.D_P_Code='P';
     end
-    no_depths='';
-    profiledata.nparms=nparms;
-    profiledata.nsurfc=nsurfc;
     
-    profiledata.autoqc=0;
-    writekeys=1;
-    profiledata.outputfile = {outputfile};
-    profiledata.source = 'WOD2005   ';
-    profiledata.priority = 2;
-        
-    writeMQNCfiles(profiledata,writekeys);
+    ii = find(cellfun(@isempty,strfind(upper(prof),'NEEDS DEPTH FIX'))==0);
+    if ~isempty(ii)
+        txt = prof{ii};
+        ij = strfind(txt,',');
+        vv = str2num(txt(ij(2)+1:ij(3)-1));
+        if ndf == -1
+            ndf = 1;
+        end
+    end
    
-%    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%     %TEMPORARY ALTERATION TO UPDATE HEADER INFO IN WORKING FILES
-%     % 1/12/2009 RC
-%     
-% 
-% %fix the working files with the correct header info:
-% clear filenam
-%     filenam=outputfile;
-%     n=str2num(profiledata.nss);
-%     nss=num2str(n);
-%     
-% for j=1:2:length(nss);
-%     
-%     if(j+1>length(nss))
-%         if(ispc)
-%             filenam=[filenam '\' nss(j)];
-%         else
-%             filenam=[filenam '/' nss(j)];
-%         end
-%     else
-%         if(ispc)
-%             filenam=[filenam '\' nss(j:j+1)];
-%         else
-%             filenam=[filenam '/' nss(j:j+1)];
-%         end
-%     end
-% end
-% 
-% filenam1=[filenam 'ed.nc']
-% filenam2=[filenam 'raw.nc'];
-% 
-% nc = netcdf(filenam1,'write');
-% ncr = netcdf(filenam2,'write');
-% 
-% np = nc{'Nparms'}(:);
-% if np ~= 0
-% 
-% nc{'Pcode'}(1:np,:) = repmat('    ',[np,1]);
-% ncr{'Pcode'}(1:np,:) = repmat('    ',[np,1]);
-% nc{'Parm'}(1:np,:) = repmat('          ',[np,1]);
-% ncr{'Parm'}(1:np,:) = repmat('          ',[np,1]);
-% nc{'Q_Parm'}(1:np,:) = repmat(' ',[np,1]);
-% ncr{'Q_Parm'}(1:np,:) = repmat(' ',[np,1]);
-% end
-% pp = nc{'SRFC_Code'}(:);
-% ppr = ncr{'SRFC_Code'}(:);
-% ppp = nc{'SRFC_Parm'}(:);
-% pppr = ncr{'SRFC_Parm'}(:);
-% 
-% ipp = strmatch('DPC$',pp);
-% ippr = strmatch('DPC$',ppr);
-% 
-% nc{'SRFC_Code'}(1:nsurfc,:) = profiledata.surfpcode;
-% ncr{'SRFC_Code'}(1:nsurfc,:) = profiledata.surfpcode;
-% nc{'SRFC_Parm'}(1:nsurfc,:) = profiledata.surfparm;
-% ncr{'SRFC_Parm'}(1:nsurfc,:) = profiledata.surfparm;
-% nc{'SRFC_Q_Parm'}(1:nsurfc,:) = profiledata.surfqparm;
-% ncr{'SRFC_Q_Parm'}(1:nsurfc,:) = profiledata.surfqparm;
-% 
-% iold = strmatch('DPC$',nc{'SRFC_Code'}(1:nsurfc,:));
-% if ~isempty(iold) && ~isempty(ipp)
-% nc{'SRFC_Parm'}(iold,:) = ppp(ipp(1),:);
-% iold = strmatch('DPC$',ncr{'SRFC_Code'}(1:nsurfc,:));
-% ncr{'SRFC_Parm'}(iold,:) = pppr(ippr(1),:);
-% end
-% 
-% nc{'Nparms'}(:) = nparms;
-% ncr{'Nparms'}(:) = nparms;
-% nc{'Nsurfc'}(:) = nsurfc;
-% ncr{'Nsurfc'}(:) = nsurfc;
-% 
-% close(nc)
-% close(ncr)
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %Now the actual profile data
+    ii = find(cellfun(@isempty,strfind(upper(prof),'VARIABLES'))==0);
+    if ~isempty(ii)
+        %get the order in which they appear:
+        txt = prof{ii};
+        ij = strfind(txt,',');
+        fmt = repmat('%s',1,length(ij));
+        headers = textscan(txt,fmt,'delimiter',',');
+        idep = find(cellfun(@isempty,strfind(upper([headers{:}]),'DEPTH'))==0);
+        itmp = find(cellfun(@isempty,strfind(upper([headers{:}]),'TEMP'))==0);
+        isal = find(cellfun(@isempty,strfind(upper([headers{:}]),'SALINITY'))==0);
+    end
+       
+    %read the profile data into variables:
+    ii = ii+2;
+    dat = NaN*ones(size(prof,1)-ii,3);
+    txt = prof{ii+1};
+    ij = strfind(txt,',');
+    fmt = repmat('%f',1,length(ij));
+    for b = 1:size(dat,1)
+        txt = prof{ii+b};
+        ln = textscan(txt,fmt,'delimiter',',');
+        dat(b,:) = [ln{idep},ln{itmp},ln{isal}];
+    end
+    
+    dat = change(dat,'>',99990,NaN);
+    
+    nprof = length(find(~isnan(nansum(dat))))-1;
+    ndep = repmat(size(dat,1),1,size(dat,2)-1);
+    profiledata.No_Depths = ndep;
+    profiledata.D_P_Code=repmat(profiledata.D_P_Code,1,size(dat,2)-1);
+    
+    profiledata.Data_Type = profiledata.Data_Type';
+    profiledata.Mky=str8';
+    profiledata.One_Deg_Sq=str8';
+    profiledata.Iumsgno=str12';
+    profiledata.Stream_Source=str1;
+    profiledata.Uflag=str1;
+    profiledata.MEDS_Sta=str8';
+    profiledata.Q_Pos='1';
+    profiledata.Q_Date_Time='1'; 
+    profiledata.Q_Record='1';
+    profiledata.Up_date=(datestr(now,'yyyymmdd'))';
+    profiledata.Bul_Time=str12';
+    profiledata.Bul_Header=str6';
+    profiledata.Source_ID=str4';
+    profiledata.QC_Version=str4';
+    profiledata.Data_Avail='A';
+    profiledata.Ident_Code=repmat(str1,2,100);
+    profiledata.PRC_Code=repmat(str1,4,100);
+    profiledata.Version=repmat(str1,4,100);
+    profiledata.PRC_Date=repmat(str1,8,100);
+    profiledata.Act_Code=repmat(str1,2,100);
+    profiledata.Act_Parm=repmat(str1,4,100);
+    profiledata.Aux_ID=double.empty(100,0);
+    profiledata.Previous_Val=repmat(str1,4,100);
+    profiledata.Flag_severity=double.empty(100,0);
+    
+    profiledata.No_Prof=nprof;
+    profiledata.Num_Hists=0;
+    
+    if ~isempty(itmp)
+        profiledata.Prof_Type(1,5:16)='            ';
+        profiledata.Prof_Type(1,1:4)='TEMP';
+        profiledata.Standard(1)='1';
+        %put the data in
+        profiledata.Depthpress(1,1:ndep) = dat(:,1);
+        profiledata.DepresQ(1,1:ndep,1)='0';
+        profiledata.Profparm(1,1,1:ndep,1,1) = dat(:,2);
+        profiledata.ProfQP(1,1,1,1:ndep,1,1)='0';
+        profiledata.Dup_Flag(1)='N';
+        profiledata.Digit_Code(1)='0';
+    end
+    if ~isempty(isal)
+        profiledata.Prof_Type(2,5:16)='            ';
+        profiledata.Prof_Type(2,1:4)='PSAL';
+        profiledata.Standard(2)='2';
+        %put the data in
+        profiledata.Depthpress(2,1:ndep) = dat(:,1);
+        profiledata.DepresQ(1,1:ndep,2)='0';
+        profiledata.Profparm(1,1,1:ndep,1,2) = dat(:,3);
+        profiledata.ProfQP(1,1,1,1:ndep,1,2)='0';
+        profiledata.Dup_Flag(2)='N';
+        profiledata.Digit_Code(2)='0';
+    end
+    
+    
+    %add the uniqueid information
+    nsurfc = nsurfc + 1;
+    profiledata.SRFC_Code(nsurfc,1:4)=[DATA_QC_SOURCE 'ID'];
+    profiledata.SRFC_Parm(nsurfc,:) = '          ';
+    profiledata.SRFC_Parm(nsurfc,1:length(num2str(pd.nss)))=num2str(pd.nss);
+    profiledata.SRFC_Q_Parm(nsurfc)='1';
+    
+    for b=1:profiledata.No_Prof
+        inan = isnan(dat(:,b));
+        profiledata.Deep_Depth(b)=max(dat(~inan,1));
+    end
+    pd.deep_depth = profiledata.Deep_Depth;
+    
+    profiledata.Nparms=nparms;
+    profiledata.Nsurfc=nsurfc;
+    profiledata.SRFC_Code=profiledata.SRFC_Code';
+    profiledata.SRFC_Parm=profiledata.SRFC_Parm';
+    profiledata.Cruise_ID=profiledata.Cruise_ID';
+    profiledata.Prof_Type=profiledata.Prof_Type';
+    profiledata.Depthpress = profiledata.Depthpress';
+    profiledata.DepresQ = profiledata.DepresQ;
+    profiledata.Pcode=str4';
+    profiledata.Parm=str10';
+    profiledata.Q_Parm=str1;
+    
+    %add in more for pd
+    pd.ndep = ndep;
+    pd.depth = profiledata.Depthpress;
+    pd.qc = squeeze(profiledata.ProfQP);
+    pd.depth_qc = profiledata.DepresQ;
+    pd.temp = squeeze(profiledata.Profparm);
+    pd.Flag_severity = profiledata.Flag_severity;
+    pd.numhists = profiledata.Num_Hists;
+    pd.nparms = profiledata.Nparms;
+    pd.QC_code = profiledata.Act_Code';
+    pd.QC_depth = profiledata.Aux_ID;
+    pd.PRC_Date = profiledata.PRC_Date';
+    pd.PRC_Code = profiledata.PRC_Code';
+    pd.Version = profiledata.Version';
+    pd.Act_Parm = profiledata.Act_Parm;
+    pd.Previous_Val = profiledata.Previous_Val;
+    pd.Ident_Code = profiledata.Ident_Code;
+    pd.surfcode = profiledata.SRFC_Code';
+    pd.surfparm = profiledata.SRFC_Parm';
+    pd.surfqparm = profiledata.SRFC_Q_Parm';
+    pd.nsurfc = profiledata.Nsurfc;
+    pd.ptype = profiledata.Prof_Type';
+
 end
-disp('*** Transfer of WOD csv files complete ***')
-fclose(fid)
 end
 

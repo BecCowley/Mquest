@@ -1,4 +1,3 @@
-
 function inputWODcsv(inputdir,outputfile)
 
 %inputWODcsv - reads WOD csv files and outputs them to profiledata structure
@@ -8,22 +7,11 @@ function inputWODcsv(inputdir,outputfile)
 % Rebecca Cowley, Feb, 2020
 
 DECLAREGLOBALS
-d=0.;
+
 disp('*** INPUTTING WOD CSV DATA ***')
 
 s=DATA_SOURCE;
 p=DATA_PRIORITY;
-
-%make these global so they can be seen by the reading routine:
-global calls
-global cruiseID
-global shipname
-
-calls=input('enter the callsign of the ship:','s')
-cid=input('enter the voyage number:','s')
-cruiseID = '          ';
-cruiseID(1:length(cid)) = cid;
-shipname=input('enter the full ship name:','s')
 
 %get the existing keys for comparison and identification of dupes:
 prefix={outputfile};
@@ -64,13 +52,6 @@ alreadychecked=0;
 drop = pref(kk);
 
 for i = 1:length(drop)
-    %check if the file is binary, if so, skip
-    fid=fopen([inputdir drop{i}]);
-    d=fgets(fid);
-    fclose(fid);
-    if int8(d(1)) < 32
-        continue
-    end
     
     %CS: Increment uniqueid
     uniqueid=uniqueid+1;
@@ -84,7 +65,19 @@ for i = 1:length(drop)
     end
     
     %Read the datafile
-    [profiledata,pd]=readWODcsv([inputdir drop{i}],uniqueid);
+    try
+        [profiledata,pd]=readWODcsv([inputdir drop{i}],uniqueid);
+    catch Me
+        %exit nicely
+        disp(['Error on import of CSV file ' inputdir ])
+        for jk = 1:length(Me.stack)
+            disp(Me.stack(jk).file)
+            disp(['Line: ' num2str(Me.stack(jk).line)])
+        end
+        uniqueid=uniqueid-1;
+        save (unique_file,'uniqueid');
+        return
+    end
     
     if isempty(pd)
         continue
@@ -93,7 +86,22 @@ for i = 1:length(drop)
     pd.outputfile=prefix;
     pd.source(1:length(s))=s;
     pd.priority=p;
-
+    
+    % if the lat and long are out of range, give error message and SKIP...
+    
+    if(pd.latitude>90 | pd.latitude <-90 | ...
+            pd.longitude<-360 | pd.longitude>360)
+        %        errordlg('error - latitude or longitude out of range')
+        pd.datafile=drop{i};
+        [profiledatan]=bad_lat_long('UserData',{[pd]});
+        
+        if(~isempty(profiledatan))
+            pd=profiledatan;
+            profiledata.longitude = pd.longitude;
+            profiledata.latitude = pd.latitude;
+        end
+    end
+    
     %CS: Check for duplicates (script not function)
     d=0;
     if(~isempty(keysdata.year))
@@ -112,37 +120,48 @@ for i = 1:length(drop)
             if(whattodo=='r')
                 ss='          ';
                 ssn=num2str(pd.nss);
-                ss(1:length(ssn))=ssn
-                kcsid=strmatch('CSID',pd.surfcode);
+                ss(1:length(ssn))=ssn;
+                kcsid=strmatch([DATA_QC_SOURCE 'ID'],pd.surfcode);
                 pd.surfparm(kcsid,:)=ss;
                 profiledata.SRFC_Parm = pd.surfparm';
                 writekeys=0;
             else
                 writekeys=1;
             end
-            writeMQNCfiles(profiledata,pd,writekeys);
+            try
+                writeMQNCfiles(profiledata,pd,writekeys);
+            catch Me
+                %exit nicely
+                disp(['Error on writing of csv file ' inputdir ])
+                disp(['May need to remove this file from the keys file and database: ' num2str(uniqueid)])
+                for jk = 1:length(Me.stack)
+                    logerr(5,Me.stack(jk).file)
+                    logerr(5,['Line: ' num2str(Me.stack(jk).line)])
+                end
+                save (unique_file,'uniqueid');
+                return
+            end
         end
     else
-        writeMQNCfiles(profiledata,pd,writekeys);
+        try
+            writeMQNCfiles(profiledata,pd,writekeys);
+        catch Me
+            %exit nicely
+            disp(['Error on writing of csv file ' inputdir ])
+            disp(['May need to remove this file from the keys file and database: ' num2str(uniqueid)])
+            for jk = 1:length(Me.stack)
+                logerr(5,Me.stack(jk).file)
+                logerr(5,['Line: ' num2str(Me.stack(jk).line)])
+            end
+            save (unique_file,'uniqueid');
+            return
+        end
     end
-      
-
-end   
-
-%Save files
-if(ispc)
-    try
-        unique_file=[UNIQUE_ID_PATH_UNIX_FROM_PC 'uniqueid.mat'];
-        save (unique_file,'uniqueid');
-    catch
-        unique_file=[UNIQUE_ID_PATH_PC 'uniqueid.mat'];
-        save (unique_file,'uniqueid');
-    end
-else
-    unique_file=[UNIQUE_ID_PATH_UNIX 'uniqueid.mat'];
-    save (unique_file,'uniqueid');
+    
+  %save uniqueid after every profile import in case of crash.
+  save (unique_file,'uniqueid');
 end
 
-disp('*** INPUT MK12 DATA COMPLETE ***')
+disp('*** INPUT WOD csv DATA COMPLETE ***')
 
 return

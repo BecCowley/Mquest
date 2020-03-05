@@ -35,8 +35,14 @@ for a = 1:length(finf.Variables)
     %get the field name
     nn = finf.Variables(a).Name;
     %get the data:
-    dat = ncread(fn,nn);    
-    eval(['s.' nn '= dat;'])
+    try
+        dat = ncread(fn,nn);
+        eval(['s.' nn '= dat;'])
+    catch me
+        disp(nn)
+        disp(me)
+        continue
+    end
 end
 
 ncdat = s;

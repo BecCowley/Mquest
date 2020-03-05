@@ -175,7 +175,7 @@ if(writekeys)
     keysfile=[pd.outputfile{1} '_keys.nc'];
     if exist(keysfile,'file') ~= 2
         %create keys file...
-        createkeys
+        createkeys(keysfile)
     end
 
     %fill keys file:
