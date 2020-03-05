@@ -46,26 +46,26 @@ else
     load (unique_file);
 end
 
-    whattodo='a';
-    alreadychecked=0;
-    
+whattodo='a';
+alreadychecked=0;
+
 %CS: Write drops to file so can cycle through them
 %if(ispc)
-   b=dirc(inputdir);
-   suff2=b(:,1);
-   [m,n]=size(b);
-   
-    for i=1:m
-        cksuff=suff2{i};
-        isdrop{1}=strfind(cksuff(max(1,end-2):end),'.nc');
-        doubledot=strfind(suff2(i),'.');
-        if(~isempty(isdrop{1}) & length(doubledot{1})==1)
-            isdrop2(i)=1;
-        else
-            isdrop2(i)=0;
-        end
+b=dirc(inputdir);
+suff2=b(:,1);
+[m,n]=size(b);
+
+for i=1:m
+    cksuff=suff2{i};
+    isdrop{1}=strfind(cksuff(max(1,end-2):end),'.nc');
+    doubledot=strfind(suff2(i),'.');
+    if(~isempty(isdrop{1}) & length(doubledot{1})==1)
+        isdrop2(i)=1;
+    else
+        isdrop2(i)=0;
     end
-    kk=find(isdrop2==1);
+end
+kk=find(isdrop2==1);
 
 %end
 
@@ -77,7 +77,7 @@ if(isempty(kk) | length(kk)<1)
 end
 
 for i=1:length(kk)
-drop = [drop; suff2(kk(i),1)];
+    drop = [drop; suff2(kk(i),1)];
 end
 
 clear call_voy line_voy crid_voy
@@ -177,56 +177,73 @@ for i = 1:length(drop)
         profiledata.Cruise_ID(1:length(crid_voy)) = crid_voy';
     end
     
-%     
-     pd.source='          ';
-     pd.outputfile=prefix;
-     pd.source(1:length(source))=source;
-     pd.priority=p;
-     pd.surfqparm(1)=num2str(p);    
-
+    %
+    pd.source='          ';
+    pd.outputfile=prefix;
+    pd.source(1:length(source))=source;
+    pd.priority=p;
+    pd.surfqparm(1)=num2str(p);
+    
     % if the lat and long are out of range, give error message and SKIP...
     
-  if(pd.latitude>90 | pd.latitude <-90 | ...
+    if(pd.latitude>90 | pd.latitude <-90 | ...
             pd.longitude<-360 | pd.longitude>360)
-%        errordlg('error - latitude or longitude out of range')
+        %        errordlg('error - latitude or longitude out of range')
         pd.datafile=drop{i};
         [profiledatan]=bad_lat_long('UserData',{[pd]});
-      
+        
         if(~isempty(profiledatan))
             pd=profiledatan;
             profiledata.longitude = pd.longitude;
             profiledata.latitude = pd.latitude;
         end
-  end
-  
-  if(pd.latitude>90 | pd.latitude <-90 | ...
+    end
+    
+    if(pd.latitude>90 | pd.latitude <-90 | ...
             pd.longitude<-360 | pd.longitude>360)
         disp('error - latitude or longitude out of range')
         pause
-  else
-    %CS: Check for duplicates (script not function)
-    if(~isempty(keysdata.year))
-        kk=[];
-        checkforduplicates
-    end
-    %CS: To use as a function, use line below
-    %[pd,uniqueid]=checkforduplicates_function(keysdata,...
-    %pd,uniqueid,whattodo,alreadychecked)
-
-    writekeys=1;
-
-    %CS: Create file
-        if(whattodo~='s' | isempty(kk))
-            if(whattodo=='r')
-                  ss='          ';
-                  s=num2str(pd.nss); 
-                  ss(1:length(s))=s
-                  kcsid=strmatch('CSID',pd.surfcode);
-                  pd.surfparm(kcsid,:)=ss;
-                  writekeys=0;
-            else
-                writekeys=1;
+    else
+        %CS: Check for duplicates (script not function)
+        if(~isempty(keysdata.year))
+            kk=[];
+            checkforduplicates
+        end
+        %CS: To use as a function, use line below
+        %[pd,uniqueid]=checkforduplicates_function(keysdata,...
+        %pd,uniqueid,whattodo,alreadychecked)
+        
+        writekeys=1;
+        
+        %CS: Create file
+        if(d)
+            if(whattodo~='s')
+                if(whattodo=='r')
+                    ss='          ';
+                    s=num2str(pd.nss);
+                    ss(1:length(s))=s;
+                    kcsid=strmatch([DATA_QC_SOURCE 'ID'],pd.surfcode);
+                    pd.surfparm(kcsid,:)=ss;
+                    profiledata.SRFC_Parm = pd.surfparm';
+                    writekeys=0;
+                else
+                    writekeys=1;
+                end
+                try
+                    writeMQNCfiles(profiledata,pd,writekeys);
+                catch Me
+                    %exit nicely
+                    disp(['Error on writing of Devil file ' inputdir ])
+                    disp(['May need to remove this file from the keys file and database: ' num2str(uniqueid)])
+                    for jk = 1:length(Me.stack)
+                        logerr(5,Me.stack(jk).file)
+                        logerr(5,['Line: ' num2str(Me.stack(jk).line)])
+                    end
+                    save (unique_file,'uniqueid');
+                    return
+                end
             end
+        else
             try
                 writeMQNCfiles(profiledata,pd,writekeys);
             catch Me
@@ -241,10 +258,11 @@ for i = 1:length(drop)
                 return
             end
         end
-  end
-  %save uniqueid after every profile import in case of crash.
-  save (unique_file,'uniqueid');
-end 
+        
+    end
+    %save uniqueid after every profile import in case of crash.
+    save (unique_file,'uniqueid');
+end
 
 disp(['*** INPUT DEVIL DATA COMPLETE  - ' num2str(length(drop)) ' - files imported ***'])
 
