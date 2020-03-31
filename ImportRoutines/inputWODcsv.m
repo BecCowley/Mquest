@@ -70,6 +70,7 @@ for i = 1:length(drop)
     catch Me
         %exit nicely
         disp(['Error on import of CSV file ' inputdir ])
+        disp(Me.message)
         for jk = 1:length(Me.stack)
             disp(Me.stack(jk).file)
             disp(['Line: ' num2str(Me.stack(jk).line)])
