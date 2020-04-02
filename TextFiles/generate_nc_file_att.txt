@@ -1,0 +1,140 @@
+[global_attributes]
+Conventions                  = CF-1.6,IMOS-1.4
+acknowledgement              = Any users of IMOS data are required to clearly acknowledge the source of the material derived from IMOS in the format: "Data was sourced from the Integrated Marine Observing System (IMOS) - IMOS is a national collaborative research infrastructure, supported by the Australian Government." If relevant, also credit other organisations involved in collection of this particular datastream (as listed in "credit" in the metadata record). 
+author                       = Besnard, Laurent
+author_email                 = laurent.besnard@utas.edu.au
+citation                     = The citation in a list of references is: "IMOS [year-of-data-download], [Title], [data-access-url], accessed [date-of-access]"
+data_centre                  = Australian Ocean Data Network (AODN)
+data_centre_email            = info@aodn.org.au
+disclaimer                   = Data, products and services from IMOS are provided "as is" without any warranty as to fitness for a particular purpose.
+distribution_statement       = Data may be re-used, provided that related metadata explaining the data has been reviewed by the user, and the data is appropriately acknowledged. Data, products and services from IMOS are provided "as is" without any warranty as to fitness for a particular purpose.
+featureType                  = profile
+file_version                 = Level 1 - Quality Controlled Data
+file_version_quality_control = Data in this file has been through a quality control procedure. Every data point in this file has an associated quality flag
+geospatial_vertical_positive = down
+geospatial_vertical_units    = metres
+institution                  = SOOP XBT
+institution_references       = http://www.imos.org.au/soop.html
+keywords                     = Oceans>Ocean Temperature>Sea Water Temperature; Oceans>Bathymetry/Seafloor Topography>Water Depth; Bathythermographs>Expendable Bathythermographs (XBT)
+license                      = http://creativecommons.org/licenses/by/4.0/
+naming_authority             = IMOS
+principal_investigator       = Cowley, Rebecca; CSIRO
+project                      = Integrated Marine Observing System (IMOS)
+quality_control_set          = 1.0
+references                   = http://www.meds-sdmm.dfo-mpo.gc.ca/meds/Databases/OCEAN/wmocodes_e.htm; http://www.meds-sdmm.dfo-mpo.gc.ca/meds/Databases/OCEAN/GTSPPcodes_e.htm; http://woce.nodc.noaa.gov/woce_v3/wocedata_1/woce-uot/overview.htm; https://www.nodc.noaa.gov/GTSPP/document/codetbls/gtsppcode.html
+source                       = Expendable Bathythermograph (XBT)
+standard_name_vocabulary     = NetCDF Climate and Forecast (CF) Metadata Convention Standard Name Table 27
+
+
+
+[TIME]
+calendar            = gregorian
+units               = days since 1950-01-01 00:00:00 UTC
+ancillary_variables = TIME_quality_control
+axis                = T
+
+[TIME_quality_control]
+long_name                   = quality flags for time
+standard_name               = time status_flag
+quality_control_conventions = IMOS standard flags
+
+[LATITUDE]
+reference_datum     = geographical coordinates, WGS84 projection
+ancillary_variables = LATITUDE_quality_control
+axis                = Y
+
+[LATITUDE_quality_control]
+standard_name               = latitude status_flag
+long_name                   = quality flags for latitude
+quality_control_conventions = IMOS standard flags
+
+[LONGITUDE]
+reference_datum     = geographical coordinates, WGS84 projection
+ancillary_variables = LONGITUDE_quality_control
+axis                = X
+
+[LONGITUDE_quality_control]
+standard_name               = longitude status_flag
+long_name                   = quality flags for longitude
+quality_control_conventions = IMOS standard flags
+
+[DEPTH]
+reference_datum     = sea surface
+ancillary_variables = DEPTH_quality_control
+axis                = Z
+positive            = down
+
+[DEPTH_quality_control]
+long_name                   = quality flags for depth
+standard_name               = depth status_flag
+quality_control_conventions = IMOS standard flags
+
+[DEPTH_ADJUSTED]
+reference_datum     = sea surface
+ancillary_variables = DEPTH_ADJUSTED_quality_control
+axis                = Z
+positive            = down
+
+[DEPTH_ADJUSTED_quality_control]
+long_name                   = quality flags for depth_adjusted
+standard_name               = depth status_flag
+quality_control_conventions = IMOS standard flags
+
+[TEMP]
+long_name                 = sea_water_temperature
+coordinates               = TIME LATITUDE LONGITUDE DEPTH
+ancillary_variables       = TEMP_quality_control
+
+[TEMP_quality_control]
+long_name                   = quality flag for sea_water_temperature
+standard_name               = sea_water_temperature status_flag
+quality_control_conventions = IMOS standard flags
+
+[TEMP_ADJUSTED]
+long_name                 = sea_water_temperature
+coordinates               = TIME LATITUDE LONGITUDE DEPTH
+ancillary_variables       = TEMP_ADJUSTED_quality_control
+
+[TEMP_ADJUSTED_quality_control]
+long_name                   = quality flag for sea_water_temperature
+standard_name               = sea_water_temperature status_flag
+quality_control_conventions = IMOS standard flags
+
+[HISTORY_INSTITUTION]
+long_name		= Institution which performed the action
+conventions		= GTSPP IDENT_CODE table
+
+[HISTORY_STEP]
+long_name		= Step in data processing
+conventions		= GTSPP PRC_CODE table
+
+[HISTORY_SOFTWARE_RELEASE]
+long_name		= Version/Release of software which performed action
+conventions		= Institution dependent
+
+[HISTORY_DATE]
+long_name		= Date the history record was created
+conventions		= yyyymmddHHMMSS
+
+[HISTORY_ACTION]
+long_name		= Parameter that action is performed on
+conventions		= GTSPP PC_PROF table
+
+[HISTORY_START_DEPTH]
+long_name		= Start depth action applied to
+units			= m
+
+[HISTORY_STOP_DEPTH]
+long_name		= End depth action applied to
+units			= m
+
+[HISTORY_PREVIOUS_VALUE]
+long_name		= Parameter/Flag previous value before action
+
+[HISTORY_QC_TEST]
+long_name		= QC test performed
+conventions		= GTSPP ACT_CODE table and CSIRO XBT Cookbook
+
+[HISTORY_QC_FLAG]
+long_name		= Quality of the HISTORY_
+conventions		= GTSPP ACT_CODE table and CSIRO XBT Cookbook
