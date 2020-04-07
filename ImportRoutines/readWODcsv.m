@@ -115,7 +115,7 @@ for a = 1:length(iprofiles)
     ii = find(cellfun(@isempty,strfind(prof,'Time'))==0);
     txt = prof{ii};
     ij = strfind(txt,',');
-    tt=str2num(txt(ij(2)+1:ij(3)-1));
+    tt=sprintf('%04i',str2num(txt(ij(2)+1:ij(3)-1)));
     units = txt(ij(3)+1:ij(4)-1);
     h = findstr('hours',units);
     m = findstr('minutes',units);
@@ -127,7 +127,7 @@ for a = 1:length(iprofiles)
         tfmt = 'HHMM';
         ss = '00';
     end
-    ttn = datenum(num2str(tt),tfmt);
+    ttn = datenum([pd.year pd.month pd.day num2str(tt)],['yyyymmdd' tfmt]);
     %need to check for the time and convert to UTC if needed
     %     NZDT	New Zealand Daylight Time	UTC +13
     %     NZST	New Zealand Standard Time	UTC +12
@@ -141,6 +141,11 @@ for a = 1:length(iprofiles)
                 ttn = ttn - 12/24;
             end
             tt = num2str(datestr(ttn,tfmt));
+            %update pd and profile data date information:
+            pd.year = datestr(ttn,'yyyy');
+            pd.month = datestr(ttn,'mm');
+            pd.day = datestr(ttn,'dd');
+            profiledata.woce_date = datestr(ttn,'yyyymmdd');
                 break
         end
     end
@@ -153,7 +158,7 @@ for a = 1:length(iprofiles)
     if(~isempty(jk))
         wt2(jk)='0';
     end
-    pd.time=[wt2(1:2) ':' wt2(3:4)];
+    pd.time=datestr(ttn,'HH:MM');
     %add in some more stuff to profiledata
     ju=julian([str2num(pd.year) str2num(pd.month) str2num(pd.day) ...
         floor(wt/100) rem(wt,100) 0])-2415020.5;
