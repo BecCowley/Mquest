@@ -120,14 +120,20 @@ for a = 1:length(iprofiles)
     h = findstr('hours',units);
     m = findstr('minutes',units);
     s = findstr('seconds',units);
+    dh = findstr('decimal hours',units);
     if ~isempty(h) & ~isempty(m) & ~isempty(s)
         tfmt = 'HHMMSS';
         ss = '';
     elseif ~isempty(h) & ~isempty(m)
         tfmt = 'HHMM';
         ss = '00';
+    elseif ~isempty(dh)
+        %decimal hours
+        tt = [num2str(floor(str2num(tt))) num2str( rem(str2num(tt),1)*100)];
+        tfmt = 'HHMM';
+        ss = '00';
     end
-    ttn = datenum([pd.year pd.month pd.day num2str(tt)],['yyyymmdd' tfmt]);
+    ttn = datenum([pd.year pd.month pd.day tt],['yyyymmdd' tfmt]);
     %need to check for the time and convert to UTC if needed
     %     NZDT	New Zealand Daylight Time	UTC +13
     %     NZST	New Zealand Standard Time	UTC +12
@@ -194,6 +200,9 @@ for a = 1:length(iprofiles)
     vv = num2str(str2num(txt(ij(2)+1:ij(3)-1)));
     shipname = txt(ij(4)+1:ij(5)-1);
     [callsign,m] =regexp(txt,'\w*call sign (\w+);.*','tokens','match');
+    if isempty(callsign)
+        [callsign,m] =regexp(txt,'\w*c.s.(\w+);.*','tokens','match');
+    end  
     callsign = char(callsign{:});
     ibr = strfind(shipname,'(');
     if ~isempty(ibr)
@@ -211,7 +220,11 @@ for a = 1:length(iprofiles)
         nsurfc = nsurfc+1;
         profiledata.SRFC_Code(nsurfc,:)='SHP#';
         profiledata.SRFC_Parm(nsurfc,:)=str10;
-        profiledata.SRFC_Parm(nsurfc,1:length(shipname))=shipname;
+        if length(shipname) <=10
+            profiledata.SRFC_Parm(nsurfc,1:length(shipname))=shipname;
+        else
+            profiledata.SRFC_Parm(nsurfc,:)=shipname(1:10);
+        end
         profiledata.SRFC_Q_Parm(nsurfc)='0';
         %callsign
         nsurfc = nsurfc+1;
@@ -276,23 +289,25 @@ for a = 1:length(iprofiles)
     end
            
     ii = find(cellfun(@isempty,strfind(prof,'Instrument'))==0);
-    txt = c{ii(1)};
-    ij = strfind(txt,',');
-    tt = str2num(txt(ij(2)+1:ij(3)-1));
-    if ~isempty(tt)
-        ii = find(tt == wpt{1});
-        ptt = tt;
-        gp = num2str(wpt{2}(ii));
-        if length(gp) == 2
-            gp = ['0' gp];
-        elseif length(gp) == 1
-            gp = ['00' gp];
+    if ~isempty(ii)
+        txt = c{ii(1)};
+        ij = strfind(txt,',');
+        tt = str2num(txt(ij(2)+1:ij(3)-1));
+        if ~isempty(tt)
+            ii = find(tt == wpt{1});
+            ptt = tt;
+            gp = num2str(wpt{2}(ii));
+            if length(gp) == 2
+                gp = ['0' gp];
+            elseif length(gp) == 1
+                gp = ['00' gp];
+            end
+            nsurfc = nsurfc+1;
+            profiledata.SRFC_Code(nsurfc,:)='PEQ$';
+            profiledata.SRFC_Parm(nsurfc,:)=str10;
+            profiledata.SRFC_Parm(nsurfc,1:length(gp))=gp;
+            profiledata.SRFC_Q_Parm(nsurfc)='0';
         end
-        nsurfc = nsurfc+1;
-        profiledata.SRFC_Code(nsurfc,:)='PEQ$';
-        profiledata.SRFC_Parm(nsurfc,:)=str10;
-        profiledata.SRFC_Parm(nsurfc,1:length(gp))=gp;
-        profiledata.SRFC_Q_Parm(nsurfc)='0';
     end
 
     ii = find(cellfun(@isempty,strfind(prof,'UNITS'))==0);
