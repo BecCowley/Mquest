@@ -205,10 +205,7 @@ for i = 1:length(drop)
         pause
     else
         %CS: Check for duplicates (script not function)
-        if(~isempty(keysdata.year))
-            kk=[];
-            checkforduplicates
-        end
+        checkforduplicates
         %CS: To use as a function, use line below
         %[pd,uniqueid]=checkforduplicates_function(keysdata,...
         %pd,uniqueid,whattodo,alreadychecked)

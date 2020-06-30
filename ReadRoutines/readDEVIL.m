@@ -183,10 +183,13 @@ profiledata.Parm=str10';
 profiledata.Q_Parm=str1;
 
 %RC: Get global attributes
+%NOT TRANSFERRED TO MQ files YET: UIVERSION, INTERFACETYPE, CASENO
 namesList = {'CallSign','Code','Voyage','InterfaceType','InterfaceCode', ...
+    'ReleaseVersion','UIVersion','HardwareVersion','HardwareSerialNo','FirmwareVersion',...
     'SerialNo','BatchDate','DropHeight','CaseNo','Scale','Offset','CRC', ...
     'LineNo','Ship','PreDropComments','PostDropComments'};
 varsList = {'gcll','probetype','cruiseID','cardtype','recordertype', ...
+    'releaseVers','uiVers','hardwareVers','hardwareSerial','firmwareVers',...
     'serno','mfd','dropheight','caseno','scale','offset','crc','lineno', ...
     'shipname','profiledata.PreDropComments','profiledata.PostDropComments'};
 
@@ -364,16 +367,16 @@ if isempty(strmatch('AD',DATA_QC_SOURCE))
         mfd = datestr(dt,'yyyymmdd');
     end
     surfcodeNames = {'CSID','GCLL','PEQ$','RCT$','OFFS','SCAL',...
-        'SER#','MFD#','HTL$','CRC$','TWI#','SHP#'};
+        'SER#','MFD#','HTL$','CRC$','TWI#','SHP#','VERS','FVRS','HVRS','SER1'};
     varsList = {'pd.nss','gcll','probetype','recordertype', ...
         'offset','scale','serno','mfd','dropheight','crc','lineno', ...
-        'shortname'};
+        'shortname','releaseVers','firmwareVers','hardwareVers','hardwareSerial'};
 else
     surfcodeNames = {'CSID','GCLL','PEQ$','RCT$','OFFS','SCAL',...
-        'SER#','CRC$','SHP#'};
+        'SER#','CRC$','SHP#','VERS','FVRS','HVRS','SER1'};
     varsList = {'pd.nss','gcll','probetype','recordertype', ...
         'offset','scale','serno','crc', ...
-        'shortname'};
+        'shortname','releaseVers','firmwareVers','hardwareVers','hardwareSerial'};
     
 end
 
@@ -388,6 +391,11 @@ for a = 1:length(surfcodeNames)
     if ~isempty(dat)
         surfpcode = [surfpcode; surfcodeNames{a}];
         d = str10;
+        if length(dat) > 10 & a == 13 %for the releaseVers which has 'Version:' in it. 
+            [tok,matches] = regexp(dat,'Version: (.*)','tokens','match');
+            dat = char(tok{1});
+        end
+            
         d(1:length(dat)) = dat;
         surfparm =[surfparm; d];
         surfqparm = [surfqparm; '0'];
