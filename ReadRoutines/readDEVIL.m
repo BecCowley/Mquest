@@ -183,7 +183,7 @@ profiledata.Parm=str10';
 profiledata.Q_Parm=str1;
 
 %RC: Get global attributes
-%NOT TRANSFERRED TO MQ files YET: UIVERSION, INTERFACETYPE, CASENO
+%NOT TRANSFERRED TO MQ files YET: INTERFACETYPE, CASENO
 namesList = {'CallSign','Code','Voyage','InterfaceType','InterfaceCode', ...
     'ReleaseVersion','UIVersion','HardwareVersion','HardwareSerialNo','FirmwareVersion',...
     'SerialNo','BatchDate','DropHeight','CaseNo','Scale','Offset','CRC', ...
@@ -367,16 +367,16 @@ if isempty(strmatch('AD',DATA_QC_SOURCE))
         mfd = datestr(dt,'yyyymmdd');
     end
     surfcodeNames = {'CSID','GCLL','PEQ$','RCT$','OFFS','SCAL',...
-        'SER#','MFD#','HTL$','CRC$','TWI#','SHP#','VERS','FVRS','HVRS','SER1'};
+        'SER#','MFD#','HTL$','CRC$','TWI#','SHP#','VERS','FVRS','HVRS','SER1','UVRS'};
     varsList = {'pd.nss','gcll','probetype','recordertype', ...
         'offset','scale','serno','mfd','dropheight','crc','lineno', ...
-        'shortname','releaseVers','firmwareVers','hardwareVers','hardwareSerial'};
+        'shortname','releaseVers','firmwareVers','hardwareVers','hardwareSerial','uiVers'};
 else
     surfcodeNames = {'CSID','GCLL','PEQ$','RCT$','OFFS','SCAL',...
-        'SER#','CRC$','SHP#','VERS','FVRS','HVRS','SER1'};
+        'SER#','CRC$','SHP#','VERS','FVRS','HVRS','SER1','UVRS'};
     varsList = {'pd.nss','gcll','probetype','recordertype', ...
         'offset','scale','serno','crc', ...
-        'shortname','releaseVers','firmwareVers','hardwareVers','hardwareSerial'};
+        'shortname','releaseVers','firmwareVers','hardwareVers','hardwareSerial','uiVers'};
     
 end
 
