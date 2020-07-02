@@ -391,7 +391,7 @@ for a = 1:length(surfcodeNames)
     if ~isempty(dat)
         surfpcode = [surfpcode; surfcodeNames{a}];
         d = str10;
-        if length(dat) > 10 & a == 13 %for the releaseVers which has 'Version:' in it. 
+        if length(dat) > 10 & strcmp('VERS',surfcodeNames{a}) %for the releaseVers which has 'Version:' in it. 
             [tok,matches] = regexp(dat,'Version: (.*)','tokens','match');
             dat = char(tok{1});
         end
