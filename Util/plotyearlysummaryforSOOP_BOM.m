@@ -5,7 +5,7 @@
 % find *.sbd -newermt "01 Jan 2015" ! -newerct "31 Dec 2015" -ls | wc
 
 clear
-yr = 2016;
+yr = 2019;
 dirn = '/home/UOT-data/quest/';
 pref = {'mer/GTSPPmer2016MQNC'};
 
