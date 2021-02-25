@@ -6,9 +6,9 @@
 % find *.sbd -newermt "01 Jan 2015" ! -newerct "31 Dec 2015" -ls | wc
 
 clear
-yr = 2019;
+yr = 2020;
 dirn = '/home/UOT-data/quest/';
-pref = {'mer/CSIROXBT2019','antarctic/CSIROXBT2019ant','BOM/BOM2019'};
+pref = {'mer/CSIROXBT2019','antarctic/CSIROXBT2020ant'};
 
 %% 1 first, set up the  databases - assume using quest...  This cell runs
 %first.
