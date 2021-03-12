@@ -63,10 +63,10 @@ if(length(temp)>4)
     %if we interpolate across zero which doesn't normally exist in the
     %data.
     temp2m(2:length(depth2m))=interp1(depth,temp,depth2m(2:end));
-    %set zero value to same temp as 2m depth
-    if(length(depth2m)>=2)
-        temp2m(1)=temp2m(2);
-    end
+    %set zero value to same temp as first depth with non-NaN data
+    inan = find(isnan(temp2m));
+    temp2m(1:inan(end))=temp2m(inan(end)+1);
+    
     endkk=length(depth2m);
     headerstring=[];
     %construct the header:

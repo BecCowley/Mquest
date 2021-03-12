@@ -29,6 +29,7 @@ handles.changed='Y';
 %     update=[clo(1:2) clo(4:5) clo(7:10)];
 %As of August, 2014, the format has been changed to yyyymmdd to agree with
 %NOAA formats. Bec Cowley
+% 2021-02-25, RC. update CSA Handling to flag 3 and not replace with 99.99 temperatures
 update = datestr(now,'yyyymmdd');
 
 %extra handling here!  (chopping, filtering, etc).
@@ -42,7 +43,7 @@ switch qualflag
         else
             kk=find(pd.depth<=3.6);
         end
-        pd.qc(kk)='5';
+        pd.qc(kk)='3';
         nn=pd.numhists:pd.numhists+length(kk);
         for i=1:length(kk)
             histd=pd.depth(kk(i));
@@ -50,11 +51,10 @@ switch qualflag
             oldt=num2str(pd.temp(kk(i)));
             addhistories
         end
-        pd.temp(kk)=99.99;
         
         if(strmatch('XC',handles.keys.datatype(handles.currentprofile,:)))
             kk=find(pd.depth<=2.9);
-            pd.salqc(kk)='5';
+            pd.salqc(kk)='3';
             nn=pd.numhists:pd.numhists+length(kk);
             for i=1:length(kk)
                 histd=pd.depth(kk(i));
@@ -62,7 +62,6 @@ switch qualflag
                 oldt=num2str(pd.sal(kk(i)));
                 addhistories
             end
-            pd.sal(kk)=99.99;
         end
         
         

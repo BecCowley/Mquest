@@ -27,7 +27,7 @@ global DATA_QC_SOURCE
     pd.Act_Parm(numh,1:4)=actparm;
     pd.PRC_Date(numh,1:8)=update;
     pd.PRC_Code(numh,1:4)='CSCB';
-    pd.Version(numh,1:4)=' 1.0';
+    pd.Version(numh,1:4)=' 2.0';
     
     pd.Previous_Val(numh,1:length(oldt))=oldt;
     pd.Ident_Code(numh,1:2)=DATA_QC_SOURCE;   %'CS';  
