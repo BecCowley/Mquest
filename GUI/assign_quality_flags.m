@@ -27,7 +27,7 @@ if(pd.numhists>0)
         
         if(strmatch('CS',pd.QC_code(i,:)))
             kk=find(pd.depth>=pdqcd-0.008);  % & pqd~='5');
-            pd.qc(kk(1))='5';
+            pd.qc(kk(1))='3';
         elseif((strmatch('SP',pd.QC_code(i,:)) | ...
                 strmatch('IP',pd.QC_code(i,:))) & ...
                 pd.Flag_severity(i)<3 & oldqual<3 )
@@ -58,20 +58,6 @@ if(pd.numhists>0)
 else
     %if there has been no QC done, the quality is "0"
     pd.qc(1:pd.ndep)=num2str(0);
-end
-%            pd.qc(kkold)='5';
-
-% ensure CSA flags have a '5' quality and haven't been overwritten by
-% another. Bec Cowley, August, 2012
-kk = strmatch('CS',pd.QC_code);
-if ~isempty(kk)
-    dd = pd.QC_depth(kk);
-    for i = 1:length(dd)
-        jj = find(pd.depth >= dd(i)-0.008);
-        %check that the flags are 5
-        pd.qc(jj(1)) = '5';
-    end
-    
 end
 
 
