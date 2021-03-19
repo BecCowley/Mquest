@@ -449,9 +449,11 @@ histd=histdepth;
 
 if(strmatch(qualflag(1:3),'PER'))
     actparm='LALO';
+    pd.pos_qc=num2str(severity);
     addhistories
     
 elseif(strmatch(qualflag(1:3),'TER'))
+    pd.juld_qc=num2str(severity);
     actparm='DATI';
     addhistories;
     

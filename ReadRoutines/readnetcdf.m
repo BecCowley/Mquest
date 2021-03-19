@@ -61,6 +61,8 @@ pd.year=wd(1:4);
 pd.month=wd(5:6);
 pd.day=wd(7:8);
 pd.ndep = profiledata.No_Depths(1);
+pd.pos_qc = profiledata.Q_Pos;
+pd.juld_qc = profiledata.Q_Date_Time;
 
 wt=profiledata.woce_time;
 wt=floor(wt/100);

@@ -151,10 +151,6 @@ qcstring= [pd.QC_code(kk,:) num2str(pd.QC_depth(kk),' \t%9.2f')];
         updatekeys('obslat',keysdata.masterrecno(handles.currentprofile),...
                 pd.latitude,keysdata.prefix);
        
-           
- % no!       ????????????????????
-
-%     c= mod(720-pd.longitude,360);
     c=pd.longitude;
     
        updatekeys('c360long',keysdata.masterrecno(handles.currentprofile),...
