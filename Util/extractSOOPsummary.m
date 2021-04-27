@@ -11,6 +11,12 @@ function [dat,alldat] = extractSOOPsummary(yr,pref,kd);
 % dat.count_good
 % Bec Cowley, March 2014
 
+% load up the SOTID-CALLSIGN list (to be updated when we get a new ship or
+% when we code in the recording of the SOTID.
+fid = fopen('calls_sotid.csv');
+c = textscan(fid,'%s%s%s','delimiter',',','headerlines',1);
+fclose(fid);
+
 %ship callsigns for each line, number of drops for each ship for this year
 ti = datenum(kd.year,kd.month,kd.day,...
     floor(kd.time/100),rem(kd.time/100,1)*100,repmat(0,length(kd.year),1));
@@ -39,13 +45,13 @@ end
 alldat.source = kd.datasource;
 alldat.ti = ti(iyr);
 
-[alldat.calls,alldat.line,alldat.crid,alldat.ship,alldat.probet,alldat.rct,alldat.rctn,alldat.serial,alldat.mfd] ...
+[alldat.sotid,alldat.calls,alldat.line,alldat.crid,alldat.ship,alldat.probet,alldat.rct,alldat.rctn,alldat.serial,alldat.mfd] ...
     = deal(repmat('          ',length(alldat.ti),1));
 [alldat.good,alldat.bad,dup_test,alldat.max,alldat.height] = deal(zeros(length(alldat.ti),1)); 
 [alldat.lat,alldat.lon,alldat.ac,alldat.bc] = deal(NaN*zeros(length(alldat.ti),1));
 
 for a = 1:length(alldat.ti)
-    a
+    %a
     %only XBTs
     if isempty(strmatch('XB',kd.datatype(a,:)))
         continue
@@ -91,6 +97,10 @@ for a = 1:length(alldat.ti)
     %record the information:
     if ~isempty(kk)
         alldat.calls(a,:) = srfcparm(kk,:);
+        isotid = find(cellfun(@isempty,strfind(c{3},strtrim(srfcparm(kk,:))))==0);
+        if ~isempty(isotid)
+            alldat.sotid(a,1:length(c{1}{isotid})) = c{1}{isotid};
+        end
     end
     if ~isempty(mm)
         alldat.line(a,:) = srfcparm(mm,:);
@@ -151,8 +161,9 @@ for a = 1:length(alldat.ti)
 %         alldat.bad(a) = 1;
 %         alldat.max(a) = 0;
 %     else
-        %check for good data to at least 100m
-        ibad = (qflags > 2 &  qflags < 5) & deps < 100;
+        %check for good data to at least 100m, account for the CSA flag now
+        %being flag 3
+        ibad = (qflags(6:end) > 2 &  qflags(6:end) < 5) & deps(6:end) < 100;
         if sum(ibad)~=0
             alldat.bad(a) = 1;
             alldat.good(a) = 0;

@@ -2,7 +2,7 @@
 % extracts information for JCOMMOPS for a year
 % LK: Updated for Bureau use. 26/2/2019
 
-clear
+% clear
 
 % Enter year of report:
 yr=input('Enter the year for this SOOP metadata report: ');
@@ -12,8 +12,9 @@ who=input('Which agency: b (Bureau) or c (CSIRO) ','s');
 % CSIRO set up
 if who == 'c' 
   agency='CSIRO';
-  dirn = '/home/UOT-data/quest/';
-  pref = {['mer/CSIROXBT' num2str(yr)],['antarctic/CSIROXBT' num2str(yr) 'ant']};
+  dirn = '/home/cow074/UOT-data/quest/';
+%   pref = {['mer/CSIROXBT' num2str(yr)],['antarctic/CSIROXBT' num2str(yr) 'ant']};
+  pref = {['mer/CSIROXBT2019'],['antarctic/CSIROXBT' num2str(yr) 'ant']};
   v= [100 200.,-80,20];
   agency_title = ['CSIRO SOOP High Density sampling - ' num2str(yr)];
 
@@ -31,6 +32,7 @@ end
 lat = [];
 lon = [];
 calls = [];
+sotid = [];
 trans = yr*10000 + 100;
 
 %% Open metadata text file
@@ -38,7 +40,7 @@ outputf = [dirn 'SOOP_' agency '_XBT_' num2str(yr) '_metadata.txt']
 fid = fopen(outputf,'w'); %starts a new file.
 
 % write header row.
-fprintf(fid,'%s\n',['line,cruiseid,transect#,Date,Time,callsign,latitude,longitude,operator,telecom type,' ...
+fprintf(fid,'%s\n',['line,cruiseid,transect#,Date,Time,SOT_ID,callsign,latitude,longitude,operator,telecom type,' ...
     'probetype,recordertype,fallratecoeffA,fallratecoeffB,software,software version,'...
     'Firmware version,launcher model,installation date, deinstallation'...
     'date,deployment height,serial number, batch date,' ...
@@ -72,6 +74,7 @@ for aa = 1:length(pref)
   lat = [lat;alldat.lat];
   lon = [lon;alldat.lon];
   calls = [calls;alldat.calls];
+  sotid = [sotid;alldat.sotid];
     
   % display dataset line summary 
   disp(' ')
@@ -117,15 +120,13 @@ for aa = 1:length(pref)
     else
       gb = ' bad';
     end
-    if ~isempty(strfind(alldat.source(a,:),'BOM'))
-      comms = 'ARGOS/IRIDUM';
-    else
-      comms = 'IRIDIUM';
-    end
+
+    comms = 'IRIDIUM';
+
          
     fprintf(fid,'%s\n',[alldat.line(a,:) ',' strtrim(alldat.source(a,:)) alldat.crid(a,:) ',' ...
       num2str(alldat.trans(a)) ',' datestr(alldat.ti(a),'yyyymmdd') ',' datestr(alldat.ti(a),'HHMM') ','...
-      alldat.calls(a,:) ',' num2str(alldat.lat(a),'%8.2f') ',' num2str(alldat.lon(a),'%9.2f') ...
+      alldat.sotid(a,:) ',' alldat.calls(a,:) ',' num2str(alldat.lat(a),'%8.2f') ',' num2str(alldat.lon(a),'%9.2f') ...
       ',' strtrim(alldat.source(a,:)) ',' comms ',' alldat.probet(a,:) ',' alldat.rct(a,:) ',' ...
       num2str(alldat.ac(a)) ',' num2str(alldat.bc(a)) ',' strtrim(alldat.source(a,:)) ' ' alldat.rctn(a,:) ',,,2,' ...
       alldat.date_start(a,:) ',' alldat.date_end(a,:)  ',' ...
