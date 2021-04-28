@@ -233,8 +233,8 @@ for i = 1:length(drop)
                     disp(['Error on writing of Devil file ' inputdir ])
                     disp(['May need to remove this file from the keys file and database: ' num2str(uniqueid)])
                     for jk = 1:length(Me.stack)
-                        logerr(5,Me.stack(jk).file)
-                        logerr(5,['Line: ' num2str(Me.stack(jk).line)])
+                        disp(Me.stack(jk).file)
+                        disp(['Line: ' num2str(Me.stack(jk).line)])
                     end
                     save (unique_file,'uniqueid');
                     return
@@ -248,8 +248,8 @@ for i = 1:length(drop)
                 disp(['Error on writing of Devil file ' inputdir ])
                 disp(['May need to remove this file from the keys file and database: ' num2str(uniqueid)])
                 for jk = 1:length(Me.stack)
-                    logerr(5,Me.stack(jk).file)
-                    logerr(5,['Line: ' num2str(Me.stack(jk).line)])
+                    disp(Me.stack(jk).file)
+                    disp(['Line: ' num2str(Me.stack(jk).line)])
                 end
                 save (unique_file,'uniqueid');
                 return
