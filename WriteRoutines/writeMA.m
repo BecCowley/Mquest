@@ -70,11 +70,8 @@ if ~isempty(strmatch(' ',profiledata.Uflag))
 end
 %check the datestr in the PRC and Up_date fields are the correct format. Should be
 %yyyymmdd. 
-profiledata.Up_date = reformatdates(profiledata.Up_date',pd)';
-%Now PRC
-for i = 1:profiledata.Num_Hists
-    profiledata.PRC_Date(:,i) = reformatdates(profiledata.PRC_Date(:,i)')';
-end
+[profiledata, pd] = reformatdates(profiledata,pd);
+
 % start the sort key (Mky) at 1. Format is ssssssrr where ssssss is the sequential
 % station number in the MA file, and rr is the parameter record number. If
 % more the 1500 records, we add another record #. 00 is the first, header,
