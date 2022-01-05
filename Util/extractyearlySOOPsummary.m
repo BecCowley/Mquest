@@ -11,10 +11,13 @@ who=input('Which agency: b (Bureau) or c (CSIRO) ','s');
 
 % CSIRO set up
 if who == 'c' 
-  agency='CSIRO';
-  dirn = '/home/cow074/UOT-data/quest/';
+%   agency='CSIRO';
+ agency='AU';
+  dirn = '/home/cow074/ocean_obs/UOT-data/quest/';
 %   pref = {['mer/CSIROXBT' num2str(yr)],['antarctic/CSIROXBT' num2str(yr) 'ant']};
-  pref = {['mer/CSIROXBT2019'],['antarctic/CSIROXBT' num2str(yr) 'ant']};
+%   pref = {['mer/CSIROXBT2019'],['antarctic/CSIROXBT' num2str(yr) 'ant']};
+%   pref = {['mer/CSIROXBT2019'],['antarctic/CSIROXBT' num2str(yr) 'ant'],['BOM/BOM' num2str(yr)]};
+  pref = {['BOM/BOM' num2str(yr)]};
   v= [100 200.,-80,20];
   agency_title = ['CSIRO SOOP High Density sampling - ' num2str(yr)];
 

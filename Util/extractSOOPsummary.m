@@ -198,7 +198,7 @@ end
 % start summarizing:
 
 %get unique callsigns:
-[callsign,ii,jj] = unique(alldat.calls,'rows');
+[callsign,ii,jj] = unique(upper(alldat.calls),'rows');
 dat.callsign = [];
 dat.line = [];dat.sections = [];
 dat.ship = [];dat.count_total = [];
@@ -207,8 +207,8 @@ dat.count_good = [];
 for b = 1:length(ii)
     %how many sections in each line for each ship?
     iship = find(jj == b);
-    uship = unique(alldat.ship(iship,:),'rows');
-    [uline,ia,ib] =  unique(alldat.line(iship,:),'rows');
+    uship = unique(upper(alldat.ship(iship,:)),'rows');
+    [uline,ia,ib] =  unique(upper(alldat.line(iship,:)),'rows');
     calls = callsign(b,:);
     
     %quick fix for missing lines. Will fall over if two different lines are

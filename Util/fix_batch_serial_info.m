@@ -40,8 +40,8 @@ plot(batch,serial,'ko')
 %% 20xx dates - which cruise?
 %adjust this to suit each fix
 
-ii = find(batch > datenum('01/02/2011','dd/mm/yyyy') & batch < datenum('01/01/2012','dd/mm/yyyy'));%serial > 1000000);% & serial < 1285000)% & b% 
-
+% ii = find(batch > datenum('01/02/2011','dd/mm/yyyy') & batch < datenum('01/01/2012','dd/mm/yyyy'));%serial > 1000000);% & serial < 1285000)% & b% 
+ii = find(stnnum == 89013822);
 stnnum(ii)
 for a = 1:length(ii)
     disp(stnnum(ii(a)))
@@ -63,7 +63,7 @@ for a = 1:length(ii)
 end
 %%
 %write back to file:
-for aa=1:length(stnnum)
+for aa=ii:length(stnnum)
     for bb = 1:2;
         raw= bb -1;
         filen=getfilename(num2str(stnnum(aa)),raw);

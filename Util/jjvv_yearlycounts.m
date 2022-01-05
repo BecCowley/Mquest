@@ -2,9 +2,9 @@
 % find *.sbd -newermt "01 Jan 2015" ! -newerct "31 Dec 2015" -ls | wc
 
 clear
-datapath = '/home/UOT/programs/xbt2gts_programs/SBDmessages_processed/';
 
-yr = '2019';
+yr = '2020';
+datapath = ['/home/cow074/UOT/archives/XBT/realtime/SBDmessages_processed/' yr '/'];
 %%
 % get the directory listing
 d=dir([datapath '*sbd']);
