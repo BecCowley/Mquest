@@ -32,24 +32,38 @@ else
     return
 end
 
+%good data
 g=find(pd.qc(1:ndep,pno)=='0' | pd.qc(1:ndep,pno)=='1' ...
     | pd.qc(1:ndep,pno)=='2' | pd.qc(1:ndep,pno)=='5');
-if isempty(g)
+if isempty(g) %no good temp data in the profile, don't write it into datn file
     return
 end
+
+%now handle the surface data. For these datn files, we don't keep the
+%surface data. Three versions of how the data is QC'd:
+%1. the temperature data is replaced with 99.99 and flag of 5
+%2. the temperature data is left with a flag of 3
+%3. the data comes from somewhere else and is flag 1 (eg Scripps)
+%We need to treat all the data the same for these datn files only. So,
+%let's remove all the data and interp to the surface.
+
+%should not have any nans, but sometimes there are some in the data
 gg = find(~isnan(temp(g).*pd.depth(g,pno)));
 
-g = g(gg);
+g = g(gg); %just the good data, excludes the surface flagged 3 or 5
 
-d=fix(pd.depth(max(g),pno));
+d=fix(pd.depth(max(g),pno)); %why fix?
 temp=temp(g);
 depth=pd.depth(g,pno);
-kktmp=find(temp>99 & depth<5);
+% kktmp=find(temp>99 & depth<5);
+% let's remove all the surface data less than 5m
+kktmp=find(depth<5);
 
-if length(kktmp) == length(temp)
+if length(kktmp) == length(temp) %short record
     return
 end
 
+%set the surface to the reliable temperature below
 if ~isempty(kktmp)
     temp(kktmp)=temp(kktmp(end)+1);
 end
@@ -59,15 +73,17 @@ clear temp2m
 if(length(temp)>4)
     
     depth2m=0:2:d;
-    %interpolate from second value as we can end up with NaN in first depth
-    %if we interpolate across zero which doesn't normally exist in the
-    %data.
-    temp2m(2:length(depth2m))=interp1(depth,temp,depth2m(2:end));
-    %set zero value to same temp as first depth
-    if length(depth2m)>2
+    %interpolate entire profile, will end up with NaNs at surface
+    temp2m=interp1(depth,temp,depth2m);
+    %set zero value to same temp as first depth if there is a zero
+    if temp2m(1) == 0
         temp2m(1) = temp2m(2);
     end
-    
+
+    %replace surface NaNs with next good temperature
+    inan = find(isnan(temp2m(depth2m<6)));
+    temp2m(inan) = temp2m(inan(end)+1);
+
     endkk=length(depth2m);
     headerstring=[];
     %construct the header:
