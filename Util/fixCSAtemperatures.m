@@ -12,7 +12,7 @@ for bb = 1:length(stn)
     stnn = stn(bb);
     for cc = 1:2
         raw=cc-1;
-        filen=getfilename(num2str(stnn(bb)),raw);
+        filen=getfilename(num2str(stnn),raw);
         filenam=[prefix '/' filen];
 
         %find the CSA flags in the Act_Code field
