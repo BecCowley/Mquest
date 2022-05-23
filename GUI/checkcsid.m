@@ -10,9 +10,9 @@ sp=str2num(srfcp(kcsid,:));
 stnn=ss;
 if(sp~=stnn)
     errordlg(['these stations numbers do not match!:' srfcp(kcsid,:) ' ' num2str(ss)...
-        ' enter <cr> to continue - with caution!!!!'])
+        ' Nothing is being done to rectify this, need to investigate'])
 %%% warning - remove this when done with chilean data!!!
-fixcsid
+% fixcsid
 %Can't find this code, June, 2016.
 
  % and put this back in:   

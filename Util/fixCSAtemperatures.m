@@ -12,19 +12,19 @@ for bb = 1:length(stn)
     stnn = stn(bb);
     for cc = 1:2
         raw=cc-1;
-        filen=getfilename(num2str(stnn(bb)),raw);
+        filen=getfilename(num2str(stnn),raw);
         filenam=[prefix '/' filen];
 
         %find the CSA flags in the Act_Code field
         actc = ncread(filenam,'Act_Code');
-        ii = find(contains(string(actc'),'CS'));
+        ii = strmatch('CS',actc');
         if isempty(ii)
             continue
         end
 
         %if the version of the CSA is already 2.0, skip
         vers = ncread(filenam, 'Version');
-        ij = find(contains(string(vers(:,ii)'),' 2.0'));
+        ij = strmatch(' 2.0',vers(:,ii)');
         if length(ij) == length(ii)
             continue
         end
@@ -36,6 +36,13 @@ for bb = 1:length(stn)
         prev = ncread(filenam, 'Previous_Val');
         temp = ncread(filenam,'Profparm');
         flag = ncread(filenam,'ProfQP');
+        
+        % if CSA is applied twice or more, there will be 99.99 values in
+        % previous value field. Let's ignore these.
+        ibad = str2num(prev(:,ii)') == 99.99;
+        if any(ibad)
+            ii = ii(~ibad);
+        end
         
         %find the matching depths in the depth array
         deps = ncread(filenam,'Depthpress');
