@@ -28,7 +28,11 @@ for b = 1:2 %for up_date and PRC_date fields
         dat = datenum(datestring,'yyyymmdd');
         datyr = str2num(datestring(1:4));
         datyr2 = str2num(datestring(5:8));
-        if dat < 719529 | dat > now+1 %ie, before 1/1/1970 or after current date allowing for one day
+        %possible that date is within the range when it is swapped,
+        %let's check again:
+        yrnum = datenum(num2str(datyr),'yyyy');
+        yrnum2 = datenum(num2str(datyr2),'yyyy');
+        if (dat < 719529 | dat > now+1) | (yrnum < 719529 | yrnum > now+1) %ie, before 1/1/1970 or after current date allowing for one day
             dat = datenum(datestring,'ddmmyyyy');
             if dat < 719529 | dat > now+1
                 disp(['The update field is incorrect: ' datestring])
