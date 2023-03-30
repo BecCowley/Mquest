@@ -57,7 +57,7 @@ title('Launch Height')
 % ii = find(stnnum == 89013822);
 % stnnum(ii)
 % ii = 1:length(stnnum);
-ij = find(serial(ii) > 1310000);
+ij = find(serial(ii) > 1360000);
 for a = 1:length(ii)
     disp(stnnum(ii(a)))
     disp(serial(ii(a)))
@@ -87,7 +87,7 @@ end
 %%
 %write back to file:
 for aa=1:length(stnnum)
-    for bb = 1:2;
+    for bb = 1:2
         raw= bb -1;
         filen=getfilename(num2str(stnnum(aa)),raw);
         filenam=[prefix '/' filen];
@@ -106,12 +106,12 @@ for aa=1:length(stnnum)
             srfcparm(:,kk) = '          ';
             srfcparm(1:length(ser),kk)=ser;
         end
-        kk=strmatch('HTL$',srfccodes');
-        if(~isempty(kk))
-            heig = num2str(hh(aa))';
-            srfcparm(:,kk) = '          ';
-            srfcparm(1:length(heig),kk)=heig;
-        end
+%         kk=strmatch('HTL$',srfccodes');
+%         if(~isempty(kk))
+%             heig = num2str(hh(aa))';
+%             srfcparm(:,kk) = '          ';
+%             srfcparm(1:length(heig),kk)=heig;
+%         end
         ncwrite(filenam,'SRFC_Code',srfccodes)
         ncwrite(filenam,'SRFC_Parm',srfcparm)
     end

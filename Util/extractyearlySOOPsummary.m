@@ -159,3 +159,8 @@ axis(v)
 
 print('-dpng',[dirn 'SOOP_' agency '_XBT_' num2str(yr) '_locations.png']);
 disp(['Created ' dirn 'SOOP_' agency '_XBT_' num2str(yr) '_locations.png'])
+
+%% to figure out the number of SBD messages sent:
+% cd ~/UOT/archives/XBT/realtime/gts_messages/2022
+% ls IOSS*XEK*.bin |wc
+
