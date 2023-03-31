@@ -146,10 +146,14 @@ list=list';
 %--------------------------------------------------------------------------
 
 %% Insert columns for ITEM NAME and ITEM EXTENSION.
+%AW FIX - MATLAB 2018 vs MATLAB 2015  has extra field named 'folder' in struct returned
+%from dir() call, adjust array slices (indexes)
 
-list(:,7:9)=list(:,2:4);
-list(:,2:4)='';
+%list(:,7:9)=list(:,2:4);
+%list(:,2:4)='';
 
+list(:,8:10)=list(:,3:5);
+list(:,2:5)='';
 %--------------------------------------------------------------------------
 
 %% If PARSE_ITEM_NAMES is enabled, parse and store FULL ITEM NAME into ITEM

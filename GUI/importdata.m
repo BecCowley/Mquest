@@ -64,40 +64,35 @@ handles.databaseprefix=inputdata{1};
 handles.usecurrentdatabase=0;
 %quotaquest=inputdata{3};
 currdir=handles.currentdir;
-a=dirc(currdir);
+a=dir(currdir);
 handles.databasedir=currdir;
 
-suff=a(:,1);
-for i=1:length(a)
-    ll(i)=a{i,6};
-    isdatabase=strfind(suff(i),'keys.nc');
-    if(~isempty(isdatabase{1}))
-        isdatabase2(i)=1;
-    else
-        isdatabase2(i)=0;
-    end
-end
-
-kk=find(isdatabase2==1);
-
-jkk=find(ll==1);
+%grab the keys files and directories in this current directory
+ii = 2;
 directorylist(1)={'new'};
-for i=2:length(jkk)+1
-    if(ispc)
-        a2=[suff{jkk(i-1)} '\'];
-    else
-        a2=[suff{jkk(i-1)} '/'];
+for i=1:size(a,1)
+    %keys files
+    isinput=strfind(a(i).name,'.MA');
+    isdatabase=strfind(a(i).name,'keys.nc');
+    if(~isempty(isdatabase)) 
+        directorylist{ii} = a(i).name;
+        isdir(ii) = 0;
+        ii = ii+1;
+    elseif ~isempty(isinput)
+        %ma files
+        directorylist{ii}=a(i).name;
+        isdir(ii)=0;
+        ii = ii+1;
+    elseif a(i).isdir
+        if(ispc)
+            directorylist{ii}=[a(i).name '\'];
+        else
+            directorylist{ii}=[a(i).name '/'];
+        end
+        isdir(ii)=1;
+        ii = ii+1;
     end
-    suff{jkk(i-1)}=a2;
-    directorylist(i)=suff(jkk(i-1));
-    isdir(i)=1;
-end
-
-ii=i;
-for j=1:length(kk)
-    i=i+1;
-    directorylist(i)=suff(kk(j));
-    isdir(i)=0;
+    suff{i} = a(i).name;
 end
 
 handles.isdir=isdir;
@@ -105,28 +100,9 @@ handles.isdir=isdir;
 handles.suff=suff;
 handles.inputdatadir=pwd;
 
-for i=1:length(a)
-    isinput=strfind(suff(i),'.MA');
-    if(~isempty(isinput{1}))
-        usethis(i)=1;
-    else
-        usethis(i)=0;
-    end
-end
-
-
-kkin=find(usethis==1);
-
-for j=1:length(kkin)
-    ii=ii+1;
-    inputfiles(ii)=suff(kkin(j));
-    isdir(ii)=0;
-end
-
 inputfiles=directorylist;
 inputfiles(1)={'   '};
 handles.directorylength=length(directorylist);
-
 
 set(handles.inputdata,'String',inputfiles,'Value',1);
 
