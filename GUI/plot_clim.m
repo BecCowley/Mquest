@@ -4,10 +4,11 @@
 %retrieveguidata
 
 keysdata=handles.keys;
+
 try
-    clim=handles.clim;
+    clima=handles.clim;
 end
-if(~exist('clim'))
+if(~exist('clima'))
     
     base=[floor(range(keysdata.obslon)) floor(max(keysdata.obslon+1))];
     lo=min(base):max(base);
@@ -36,13 +37,13 @@ if(~exist('clim'))
         std(:,:,jj)=quest_get_clim_casts('t',lon,lat,deps,midd,'Argo_2006_Jan2019',1,9);
     end
     
-    clim.mean=meant;
-    clim.std=std;
-    clim.lat=lat;
-    clim.lon=lon;
-    clim.deps=deps;
+    clima.mean=meant;
+    clima.std=std;
+    clima.lat=lat;
+    clima.lon=lon;
+    clima.deps=deps;
     
-    handles.clim=clim;
+    handles.clim=clima;
     
     %saveguidata
     
@@ -50,22 +51,22 @@ if(~exist('clim'))
     %    getclimatology;
 end
 
-clim=handles.clim;
+clima=handles.clim;
 
 clear lat
 clear lon
-deps=clim.deps;
+deps=clima.deps;
 lat=pd.latitude;
 lon=pd.longitude;
 if(pd.longitude<0)
     lon=rem(720-pd.longitude,360);
 end
 %dd=clim.lat-lat;
-dd=clim.lat-floor(lat);
+dd=clima.lat-floor(lat);
 latindex=find(dd==min(abs(dd)));
 
 %dd=clim.lon-lon;
-dd=clim.lon-floor(lon);
+dd=clima.lon-floor(lon);
 lonindex=find(dd==min(abs(dd)));
 
 meanprofile=intersect(latindex,lonindex);
@@ -78,8 +79,8 @@ if(~isempty(meanprofile))
     %    [mo,days,midday]=names_of_months(mn);
     %    meant=atday(midday,clim.temp(1:56,latindex,lonindex),clim.anominput(1:56,latindex,lonindex);
     
-    meantp=clim.mean(:,meanprofile,timeindex);
-    std=clim.std(:,meanprofile,timeindex);
+    meantp=clima.mean(:,meanprofile,timeindex);
+    std=clima.std(:,meanprofile,timeindex);
     
     leftline=meantp-(3*std);
     rightline=meantp+(3*std);
