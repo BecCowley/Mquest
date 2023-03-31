@@ -68,7 +68,6 @@ guidata(handles.editbuddyfiles,handles);
 % Populate the listbox
 handles.currentdir=pwd;
 
-a=dirc(handles.buddypath);
 handles.databasedir=handles.currentdir;
 
 loadbuddylist
@@ -112,79 +111,35 @@ function varargout = choosebuddies_Callback(h, eventdata, handles)
 %get(handles.editbuddyfiles,'SelectionType');
 %if strcmp(get(handles.editbuddyfiles,'SelectionType'),'open')
 %if strcmp(get(handles.editbuddyfiles,'SelectionType'),'open') % If double click
-	index_selected = get(handles.choosebuddies,'Value');
-	file_list = get(handles.choosebuddies,'String');	
-	filename = [file_list{index_selected}];
+index_selected = get(handles.choosebuddies,'Value');
+file_list = get(handles.choosebuddies,'String');
+filename = [file_list{index_selected}];
+
+if  handles.isdir(index_selected)
     
-	if  handles.isdir(index_selected)
-
-        a=dirc(filename);
-        suff=a(:,1);
-        handles.suff=suff;
-        clear directorylist
-        [m,n]=size(a);
-
-        for i=1:m
-            ll(i)=a{i,6};
-            isdatabase=strfind(suff(i),'keys.nc');
-            if(~isempty(isdatabase{1}))
-                isdatabase2(i)=1;
-            else
-                isdatabase2(i)=0;
-            end
-        end
-
-        kk=find(isdatabase2==1);
-
-        jkk=find(ll==1);
-        
-        for i=2:length(jkk)
-            if(ispc)
-                a2=[suff{jkk(i)} '\'];
-            else
-                a2=[suff{jkk(i)} '/'];
-            end
-            suff{jkk(i-1)}=a2;
-            directorylist{i}=[ filename suff{jkk(i-1)}];
-            isdir(i)=1;
-        end
-    
-        clear inputfiles
-        handles.isdir=isdir;
-        inputfiles=directorylist;
-        ii=i;
-
-        for j=1:length(kk)
-            i=i+1;
-            directorylist{i}=[filename suff{kk(j)}];
-            isdir(i)=0;
-        end
-
-        handles.isdir=isdir;
-        set(handles.choosebuddies,'String',directorylist,'Value',1);
-
-    else
-       s=strfind(filename,'_')-1;
-       if(isempty(s))
-           s=length(filename-1);
-       end
-%       if(ispc)
-           newbuddy=filename(1:s);
-           save addedbuddy.mat newbuddy;
-           handles.output=newbuddy;
-%       else
-%           newbuddy=[relpath '/' name(1:s)];
-%           save addedbuddy.mat newbuddy;
-%           handles.output=newbuddy;
-%       end
-       guidata(handles.editbuddyfiles,handles)  ;
-       uiresume;
-       varargout{1} = handles.output;
-       close(handles.editbuddyfiles);
-       return   
+    loadbuddylist
+else
+    s=strfind(filename,'_')-1;
+    if(isempty(s))
+        s=length(filename-1);
     end
-               guidata(handles.editbuddyfiles,handles)  ;
-   return
+    %       if(ispc)
+    newbuddy=filename(1:s);
+    save addedbuddy.mat newbuddy;
+    handles.output=newbuddy;
+    %       else
+    %           newbuddy=[relpath '/' name(1:s)];
+    %           save addedbuddy.mat newbuddy;
+    %           handles.output=newbuddy;
+    %       end
+    guidata(handles.editbuddyfiles,handles)  ;
+    uiresume;
+    varargout{1} = handles.output;
+    close(handles.editbuddyfiles);
+    return
+end
+guidata(handles.editbuddyfiles,handles)  ;
+return
 %end
 
 % --- Executes during object creation, after setting all properties.

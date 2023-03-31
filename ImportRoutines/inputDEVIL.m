@@ -51,15 +51,13 @@ alreadychecked=0;
 
 %CS: Write drops to file so can cycle through them
 %if(ispc)
-b=dirc(inputdir);
-suff2=b(:,1);
-[m,n]=size(b);
+b=dir(inputdir);
 
-for i=1:m
-    cksuff=suff2{i};
-    isdrop{1}=strfind(cksuff(max(1,end-2):end),'.nc');
-    doubledot=strfind(suff2(i),'.');
-    if(~isempty(isdrop{1}) & length(doubledot{1})==1)
+for i=1:size(b,1)
+    cksuff=b(i).name;
+    isdrop=strfind(cksuff(max(1,end-2):end),'.nc');
+    doubledot=strfind(b(i).name,'.');
+    if(~isempty(isdrop) & length(doubledot)==1)
         isdrop2(i)=1;
     else
         isdrop2(i)=0;
@@ -70,14 +68,14 @@ kk=find(isdrop2==1);
 %end
 
 %CS: matrix to hold drop filenames
-drop = [];
+
 if(isempty(kk) | length(kk)<1)
     disp('**** there are no data files in this directory ****');
     return
 end
 
 for i=1:length(kk)
-    drop = [drop; suff2(kk(i),1)];
+    drop{i} = b(kk(i)).name;
 end
 
 clear call_voy line_voy crid_voy

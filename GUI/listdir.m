@@ -2,36 +2,33 @@
 
 %function listdir(inputdir,handles)  - doesn't need to be function...
 
-a=dirc(filename);
-suff=a(:,1);
-handles.suff=suff;
+a=dir(filename);
+% suff=a(:,1);
+% handles.suff=suff;
 clear directorylist
-[m,n]=size(a);
+
 dataforms=get(handles.inputformats,'Value');
-for i=1:m
-    ll(i)=a{i,6};
-    isdatabase=strfind(suff(i),'keys.nc');
-    if(~isempty(isdatabase{1}))
-        isdatabase2(i)=1;
-    else
-        isdatabase2(i)=0;
+
+%grab the keys files and directories in this current directory
+ii = 1;
+for i=1:size(a,1)
+    %keys files
+    isdatabase=strfind(a(i).name,'keys.nc');
+    if(~isempty(isdatabase)) 
+        directorylist{ii} = a(i).name;
+        isdir(ii) = 0;
+        ii = ii+1;
+    elseif a(i).isdir
+        if(ispc)
+            directorylist{ii}=[a(i).name '\'];
+        else
+            directorylist{ii}=[a(i).name '/'];
+        end
+        isdir(ii)=1;
+        ii = ii+1;
     end
 end
 
-kk=find(isdatabase2==1);
-
-jkk=find(ll==1);
-directorylist(1)={'new'};
-for i=2:length(jkk)
-    if(ispc)
-        a2=[suff{jkk(i)} '\'];
-    else
-        a2=[suff{jkk(i)} '/'];
-    end
-    suff{jkk(i-1)}=a2;
-    directorylist{i}=[ filename suff{jkk(i-1)}];
-    isdir(i)=1;
-end
 clear inputfiles
 handles.isdir=isdir;
 if(input)
@@ -40,6 +37,8 @@ if(input)
 end
 
 if(~input)
+    %RC, 2023: should never get here as there is no call with input == 0
+    %leave here for now, it will break if something does get here
     for j=1:length(kk)
         i=i+1;
         directorylist{i}=[filename suff{kk(j)}];
