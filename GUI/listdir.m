@@ -5,10 +5,10 @@
 a=dir(filename);
 % suff=a(:,1);
 % handles.suff=suff;
-clear directorylist
+directorylist = {};
 
 dataforms=get(handles.inputformats,'Value');
-
+isdir = [];
 %grab the keys files and directories in this current directory
 ii = 1;
 for i=1:size(a,1)
@@ -29,8 +29,12 @@ for i=1:size(a,1)
     end
 end
 
+if isempty(isdir)
+    disp('No files for import, select Cancel and try again.')
+end
+
 clear inputfiles
-handles.isdir=isdir;
+
 if(input)
     inputfiles=directorylist;
     ii=i;
