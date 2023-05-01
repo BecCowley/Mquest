@@ -151,13 +151,12 @@ if strcmp(get(handles.importdata,'SelectionType'),'open') % If double click
     file_list = get(handles.inputdata,'String');
     filename =[ file_list{index_selected} ]; % Item selected in list box
     if  handles.isdir(index_selected) % If directory
-%        cd (filename)
+        handles.inputdatadir=[handles.inputdatadir '/' filename];
+    %cd (filename)
         input=1;
         listdir % Load list box with new directory
     end
 end
-
-% handles.inputdatadir=pwd;
 
 try
     guidata(gcbo,handles);
