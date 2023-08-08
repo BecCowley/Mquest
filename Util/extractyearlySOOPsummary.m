@@ -11,12 +11,13 @@ who=input('Which agency: b (Bureau) or c (CSIRO) ','s');
 
 % CSIRO set up
 if who == 'c' 
-%   agency='CSIRO';
- agency='AU';
+  agency='CSIRO';
+%  agency='AU';
   dirn = '/home/cow074/ocean_obs/UOT-data/quest/';
   pref = {['mer/CSIROXBT' num2str(yr)],['antarctic/CSIROXBT' num2str(yr) 'ant']};
 %   pref = {['mer/CSIROXBT2019'],['antarctic/CSIROXBT' num2str(yr) 'ant']};
 %   pref = {['mer/CSIROXBT2019'],['antarctic/CSIROXBT' num2str(yr) 'ant'],['BOM/BOM' num2str(yr)]};
+%   pref = {['mer/GTSPPmer2017MQNC'],['antarctic/CSIROXBT2016ant']};
   v= [100 200.,-80,20];
   agency_title = ['CSIRO SOOP High and Low Density sampling - ' num2str(yr)];
 
@@ -137,6 +138,7 @@ for aa = 1:length(pref)
         
   end
  fclose(fid);
+ 
 end
 
 %%
@@ -155,6 +157,7 @@ x=xlabel('Longitude');
 set(x,'FontWeight','bold')
 set(x,'FontSize',12)
 axis(v)
+text(170, -60, ['Total deployments: ' num2str(length(lat))], 'fontsize',14)
 %axis equal
 
 print('-dpng',[dirn 'SOOP_' agency '_XBT_' num2str(yr) '_locations.png']);

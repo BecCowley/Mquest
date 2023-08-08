@@ -116,3 +116,14 @@ for aa=1:length(stnnum)
         ncwrite(filenam,'SRFC_Parm',srfcparm)
     end
 end
+
+%% just write back a cruise ID that has been updated
+for aa = 1:length(ii)
+    for bb = 1:2
+        raw= bb -1;
+        filen=getfilename(num2str(stnnum(ii(aa))),raw);
+        filenam=[prefix '/' filen];
+        ncwrite(filenam,'Cruise_ID','MS3401    ')
+
+    end
+end
