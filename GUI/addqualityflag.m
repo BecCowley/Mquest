@@ -213,8 +213,7 @@ switch qualflag
         
         handles.lastprofile=handles.currentprofile;
         histd=max(pd.depth(1),0.0);
-        severity=5;
-        pd.pos_qc=num2str(severity);
+        pd.pos_qc=num2str(5);
         difflat=abs(outputs.origlat-outputs.newlat);
         %        if(outputs.origlat~=outputs.newlat)
         if(difflat>0.002)
@@ -292,8 +291,7 @@ switch qualflag
         keysdata=handles.keys;
         handles.lastprofile=handles.currentprofile;
         histd=max(pd.depth(1),0.0);
-        severity=5;
-        pd.juld_qc=num2str(severity);
+        pd.juld_qc=num2str(5);
         olddate=(str2num(pd.year)*10000)+(str2num(pd.month)*100)...
             +str2num(pd.day);
         newdate=(str2num(outputs.newyear)*10000)+(str2num(outputs.newmonth)*100)...

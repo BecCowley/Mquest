@@ -492,7 +492,7 @@ qcstring= [pd.QC_code(kk,:) num2str(pd.QC_depth(kk),' \t%9.2f')];
     case 't'   %change date and/or time  
         axes(handles.profile);
         qualf='TEA';
-        addqualityflag(qualf,0,1);  
+        addqualityflag(qualf,0,2);  
         drawnow
         %close(hw2);
         return
