@@ -3,7 +3,7 @@
 
 clear
 % foldn = '/Users/cow074/CSIRO/XBT SOOP Team - General/Ships/Seatrade Red/September 2020/XBT Data Return/SR3001/';
-foldn = '/home/cow074/UOT-data/quest/InvestigatorXBT/IN2021_V03/xbt/IN2021_AutoLauncher_Trial/';
+foldn = '/oa-decadal-climate/work/observations/oceanobs_data/UOT-data/quest/antarctic/LA2401A/';
 files = dir([foldn '*.nc']);
 %% Update the metadata in each file
 
@@ -14,7 +14,7 @@ for a = 1:length(files)
 %     ncwriteatt(filenam,'/','CallSign','D5LR9');
 %     ncwriteatt(filenam,'/','DropHeight','4.0');
 %     ncwriteatt(filenam,'/','BatchDate','04/15/2015');
-%     ncwriteatt(filenam,'/','Voyage','SR3001');
+    ncwriteatt(filenam,'/','Voyage','LA2307A');
 %      ncwriteatt(filenam,'/','IMO', '9616888');
     sn = ncreadatt(filenam,'/','SerialNo');
     bd = ncreadatt(filenam,'/','BatchDate');
