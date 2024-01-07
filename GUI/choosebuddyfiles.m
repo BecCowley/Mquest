@@ -67,7 +67,7 @@ guidata(handles.editbuddyfiles,handles);
 
 % Populate the listbox
 handles.currentdir=pwd;
-
+a = dir(handles.buddypath);
 handles.databasedir=handles.currentdir;
 
 loadbuddylist

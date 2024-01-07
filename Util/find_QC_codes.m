@@ -3,7 +3,7 @@
 clear
 nms = dir('*keys.nc');
 %%
-for bb = 5%1:length(nms);
+for bb = 1:length(nms);
     prefix=nms(bb).name(1:end-8);
     stnnum = str2num(ncread(nms(bb).name,'stn_num')');
     disp(prefix)
@@ -22,10 +22,17 @@ for bb = 5%1:length(nms);
             continue
         end
         qc=ncread(filenam,'Act_Code');
-        kk=strmatch('PS',qc');
+        kk=strmatch('PE',qc');
         if isempty(kk)
             continue
         end
+        parm = ncread(filenam,'Act_Parm');
+        % kk = strmatch('LA',parm');
+        % if isempty(kk)
+        %     continue
+        % end
+        pv = ncread(filenam,'Previous_Val');
+
         depth=squeeze(ncread(filenam,'Depthpress'));
         temp = squeeze(ncread(filenam,'Profparm'));
         depqc=ncread(filenam,'Aux_ID');
@@ -42,11 +49,13 @@ for bb = 5%1:length(nms);
 %             if any(flags(ii) < 3)%accepts
                 disp(stnnum(aa))
                 disp(qc(:,1:15)')
+                disp(parm(:,1:15)')
+                disp(pv(:,1:15)')
                 
-                %plot them for a quick check
-                figure(1);clf
-                plot(temp,depth,'k-')
-                axis ij
+                % %plot them for a quick check
+                % figure(1);clf
+                % plot(temp,depth,'k-')
+                % axis ij
                 pause
 %             end
 %         else

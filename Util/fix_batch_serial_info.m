@@ -16,7 +16,7 @@ for aa=1:length(stnnum)
     filenam=[prefix '/' filen];
     srfccodes=ncread(filenam,'SRFC_Code');
     srfcparm=ncread(filenam,'SRFC_Parm');
-    crid{aa} = ncread(filenam,'Cruise_ID')';
+    crid{aa} = ncread(filenam,'Cruise_ID')'
     
     kk=strmatch('MFD#',srfccodes');
     if(~isempty(kk))
@@ -86,7 +86,7 @@ for a = 1:length(ii)
 end
 %%
 %write back to file:
-for aa=1:length(stnnum)
+for aa=ii%1:length(stnnum)
     for bb = 1:2
         raw= bb -1;
         filen=getfilename(num2str(stnnum(aa)),raw);
@@ -114,10 +114,12 @@ for aa=1:length(stnnum)
 %         end
         ncwrite(filenam,'SRFC_Code',srfccodes)
         ncwrite(filenam,'SRFC_Parm',srfcparm)
+        % ncwrite(filenam,'Cruise_ID',crid{aa})
     end
 end
 
 %% just write back a cruise ID that has been updated
+% CARE!! CHECK BEFORE RUNNING.
 for aa = 1:length(ii)
     for bb = 1:2
         raw= bb -1;
