@@ -199,6 +199,45 @@ switch qualflag
         handles.Qkey='N';
         return
         
+    case 'PRA'
+        % change the probe type, we will elect just to recalculate depths
+        %get the old probe type and ask for a new one
+        ii = strmatch('PEQ$', pd.surfcode);
+        prt = pd.surfparm(ii,:);
+        nprt = input('Enter new probe type as number from WMO 1770 probe type table: [default 52] ','s');
+        if isempty(nprt)
+            nprt = 52;
+        else
+            nprt = str2num(nprt);
+        end
+        pd.surfparm(ii,1:3) = num2str(nprt,'%03i');
+        [~,dd] = change_probetype(str2num(prt), nprt,pd.temp,[],[],[],[],[]);
+        % no change to temperatures in this situation, just have a new set of depths
+        pd.depth = dd;
+        tqc = str2num(pd.qc);
+        ii = tqc<2; %downgrade any class 1 QC value to class 2
+        pd.qc(ii) = '2';
+        %update the Aux_ID values
+        for iupdate = 1:pd.numhists
+            [~,im] = min(abs(pd.QC_depth(iupdate) - dd));
+            pd.QC_depth(iupdate) = dd(im);
+        end
+        %update Deep_depth
+        pd.deep_depth = max(dd);
+        histd = min(pd.depth);
+        actparm='DEPH';
+        oldt='99.99'; %original probe type is still present in raw file
+        severity=2;
+        addhistories
+        handles.pd=pd;
+
+        setdepth_tempbox;
+        sortandsave;
+        re_plotprofile;
+        setprofileinfo;
+        handles.Qkey='N';
+        return
+
     case 'PEA'
         %        changeposition - launch the gui to allow input of the new
         %        position:
