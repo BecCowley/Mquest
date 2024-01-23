@@ -16,7 +16,7 @@ for aa=1:length(stnnum)
     filenam=[prefix '/' filen];
     srfccodes=ncread(filenam,'SRFC_Code');
     srfcparm=ncread(filenam,'SRFC_Parm');
-    crid{aa} = ncread(filenam,'Cruise_ID')'
+    crid{aa} = ncread(filenam,'Cruise_ID')';
     
     kk=strmatch('MFD#',srfccodes');
     if(~isempty(kk))
