@@ -82,7 +82,9 @@ if(length(temp)>4)
 
     %replace surface NaNs with next good temperature
     inan = find(isnan(temp2m(depth2m<6)));
-    temp2m(inan) = temp2m(inan(end)+1);
+    if ~isempty(inan)
+        temp2m(inan) = temp2m(inan(end)+1);
+    end
 
     endkk=length(depth2m);
     headerstring=[];
