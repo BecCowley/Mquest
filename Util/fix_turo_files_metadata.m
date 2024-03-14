@@ -3,25 +3,25 @@
 
 clear
 % foldn = '/Users/cow074/CSIRO/XBT SOOP Team - General/Ships/Seatrade Red/September 2020/XBT Data Return/SR3001/';
-foldn = '/oa-decadal-climate/work/observations/oceanobs_data/UOT-data/quest/antarctic/LA2401A/';
+foldn = '/oa-decadal-climate/work/observations/oceanobs_data/UOT-data/quest/mer/PE3401/';
 files = dir([foldn '*.nc']);
 %% Update the metadata in each file
 
 for a = 1:length(files)
     filenam = [foldn files(a).name];
-%     ncwriteatt(filenam,'/','LineNo','IX28');
+    ncwriteatt(filenam,'/','LineNo','PX32');
 %     ncwriteatt(filenam,'/','Ship','Seatrade Red');
 %     ncwriteatt(filenam,'/','CallSign','D5LR9');
 %     ncwriteatt(filenam,'/','DropHeight','4.0');
 %     ncwriteatt(filenam,'/','BatchDate','04/15/2015');
-    ncwriteatt(filenam,'/','Voyage','LA2307A');
+    ncwriteatt(filenam,'/','Voyage','PE3201');
 %      ncwriteatt(filenam,'/','IMO', '9616888');
-    sn = ncreadatt(filenam,'/','SerialNo');
-    bd = ncreadatt(filenam,'/','BatchDate');
-    lat = ncread(filenam,'latitude');
-    lon = ncread(filenam,'longitude');
+    % sn = ncreadatt(filenam,'/','SerialNo');
+    % bd = ncreadatt(filenam,'/','BatchDate');
+    % lat = ncread(filenam,'latitude');
+    % lon = ncread(filenam,'longitude');
     
-    disp([filenam ', ' sn ', ' bd ', ' num2str(lat) ', ' num2str(lon)])
+    % disp([filenam ', ' sn ', ' bd ', ' num2str(lat) ', ' num2str(lon)])
 %     str = input('Update? ','s');
 %     if str == 'y'
 %         str = input('Serial: ','s');
