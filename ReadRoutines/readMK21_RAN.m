@@ -516,9 +516,9 @@ pd.ptype = profiledata.Prof_Type;
 
 profiledata.Prof_Type = profiledata.Prof_Type';
 %add in some more stuff to profiledata
-ju=julian([str2num(pd.year) str2num(pd.month) str2num(pd.day) ...
-    floor(profiledata.woce_time/100) rem(profiledata.woce_time,100) 0])-2415020.5;
-profiledata.time = ju;
+ti = datenum([profiledata.woce_date ' ' wt],...
+    'yyyymmdd HHMMSS') - datenum('1900-01-01 00:00:00');
+profiledata.time = ti;
 profiledata.woce_time = int32(profiledata.woce_time);
 profiledata.woce_date = int32(str2double(profiledata.woce_date));
 
