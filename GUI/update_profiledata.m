@@ -15,10 +15,10 @@ wd(5:6) = pd.month;
 wd(7:8)= pd.day;
 wt=pd.time;
 profiledata_updated.woce_date = str2num(wd);
-profiledata_updated.woce_time = str2double([wt(1:2) wt(4:5)])*100;
-ju=julian([str2num(pd.year) str2num(pd.month) str2num(pd.day) ...
-    floor(wt/100) rem(wt,100) 0])-2415020.5;
-profiledata_updated.time = ju;
+profiledata_updated.woce_time = str2double([wt(1:2) wt(4:5)]);
+ti = datenum([profiledata.woce_date ' ' profiledata.woce_time],...
+    'yyyymmdd HHMMSS') - datenum('1900-01-01 00:00:00');
+profiledata.time = ti;
 
 vars_in = {'latitude','longitude','pos_qc','juld_qc','ndep','depth','deep_depth','qc','depth_qc',...
     'temp','Flag_severity','numhists','nparms','QC_code','QC_depth','PRC_Date',...

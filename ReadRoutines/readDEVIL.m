@@ -125,7 +125,7 @@ rawdata = nc2struct(fname);
 profiledata.woce_date = num2str(rawdata.woce_date);
 %CS: profile time - get rid of milliseconds
 time = rawdata.woce_time;
-profiledata.woce_time = floor(time/100)*100;
+profiledata.woce_time = time;
 profiledata.latitude = rawdata.latitude;
 %CS: need to multiply lon by -1 so same convention as MA
 profiledata.longitude = rawdata.longitude;
@@ -426,14 +426,9 @@ pd.year=profiledata.woce_date(1:4);
 pd.month=profiledata.woce_date(5:6);
 pd.day=profiledata.woce_date(7:8);
 pd.ndep=profiledata.No_Depths;
-wt=profiledata.woce_time;
-wt=floor(wt/100);
-wt2=sprintf('%4i',wt);
-jk=strfind(wt2,' ');
-if(~isempty(jk))
-    wt2(jk)='0';
-end
-pd.time=[wt2(1:2) ':' wt2(3:4)];
+wt=sprintf('%06d',profiledata.woce_time);
+
+pd.time=[wt(1:2) ':' wt(3:4) ':' wt(5:6)];
 pd.depth = depths;
 pd.deep_depth = profiledata.Deep_Depth;
 pd.qc = squeeze(profiledata.ProfQP);
@@ -457,9 +452,9 @@ pd.nsurfc = profiledata.Nsurfc;
 pd.ptype = profiledata.Prof_Type';
 
 %add in some more stuff to profiledata
-ju=julian([str2num(pd.year) str2num(pd.month) str2num(pd.day) ...
-    floor(wt/100) rem(wt,100) 0])-2415020.5;
-profiledata.time = ju;
+ti = datenum([profiledata.woce_date ' ' wt],...
+    'yyyymmdd HHMMSS') - datenum('1900-01-01 00:00:00');
+profiledata.time = ti;
 profiledata.woce_time = int32(profiledata.woce_time);
 profiledata.woce_date = int32(str2double(profiledata.woce_date));
 

@@ -90,7 +90,7 @@ for i = 1:length(drop)
     
     %CS: Create structure
     if ran == 0
-        profiledata=readMK21([inputdir drop{i}],uniqueid);
+        [profiledata,pd]=readMK21([inputdir drop{i}],uniqueid);
     else
         [profiledata,pd]=readMK21_RAN([inputdir drop{i}],uniqueid);
     end

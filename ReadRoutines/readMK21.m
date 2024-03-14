@@ -1,4 +1,4 @@
-function [profiledata,pd]=readMK21_new(fname,uniqueid)
+function [profiledata,pd]=readMK21(fname,uniqueid)
 %this function reads a single profile from a Sippican Mk21 file and creates the
 %structure "profiledata" containing all the variables necessary to either
 %plot or write the data into another format.
@@ -125,7 +125,7 @@ else
     S=writeshipnames(long_shipname,shortname);
 end
 try
-    cc='          '
+    cc='          ';
     cc(1:length(crc))=crc;
 end
 
@@ -183,33 +183,40 @@ profiledata.D_P_Code='D';
 profiledata.Prof_Type='';
 
 correctDepths=0;
+proftypes = []; ind = [];
 
 fid=fopen(fname);
 %Get the header data and ouput to both files:
 d=fgets(fid);
 
-while isempty(strmatch('Depth (m)',d))
+while isempty(strmatch('// Data',strtrim(d),'exact'))
     
     if(strmatch('Date',d))
         
-        pd.year=d(24:27);
-        pd.day=d(21:22);
-        pd.month=d(18:19);
+        pd.year=d(27:30);
+        pd.day=d(24:25);
+        pd.month=d(21:22);
         %set up woce_date and woce_time variables
-        wd = [d(24:27) d(18:19) d(21:22)];
+        wd = [pd.year pd.month pd.day];
         profiledata.woce_date = strrep(wd,' ','0');
 
     elseif(strmatch('Time',d))
         
         %change time to decimal:
-        pd.time = d(18:22);
-        profiledata.woce_time = num2str((str2num(d(18:19))*100 + str2num(d(21:22))) *100);
-        
+        pd.time = d(21:28);
+        tt = strsplit(d(21:28),':');
+        profiledata.woce_time = num2str(str2num(tt{1})*10000 ...
+            + str2num(tt{2})*100 + str2num(tt{3}));        
     elseif(strmatch('Latitude',d))
         
         s=find(d=='S');
         if(isempty(s));
             s=find(d=='N');
+            if isempty(s)
+                profiledata.latitude=[];
+                d=fgets(fid);
+                continue
+            end
             ss=0;
         else
             ss=1;
@@ -228,6 +235,11 @@ while isempty(strmatch('Depth (m)',d))
         e=find(d=='E');
         if(isempty(e))
             e=find(d=='W');
+            if isempty(e)
+                profiledata.longitude=[];
+                d=fgets(fid);
+                continue
+            end
             ee=0;
         else
             ee=1;
@@ -248,7 +260,7 @@ while isempty(strmatch('Depth (m)',d))
         
     elseif(strmatch('Serial',d))
         
-        serno=deblank(d(18:end));
+        serno=deblank(d(21:end));
         
     elseif(strmatch('Probe',d))
         
@@ -265,12 +277,22 @@ while isempty(strmatch('Depth (m)',d))
     elseif(strmatch('Depth Coeff. 4',d))
         coeff4=deblank(d(21:end-1));
         
-    elseif(strmatch('// Sound',d))
-        soundsal=d(49:58);
+    elseif(strmatch('Salinity',d))
+        soundsal=d(21:26);
         
+    elseif startsWith(d,'Field')
+        proftypes = [proftypes;{deblank(d(21:end-1))}];
+        ind = [ind;str2num(d(6:7))];
     end
     d=fgets(fid);
 end
+%add in some more stuff to profiledata
+ti = datenum([profiledata.woce_date ' ' profiledata.woce_time],...
+    'yyyymmdd HHMMSS') - datenum('1900-01-01 00:00:00');
+profiledata.time = ti;
+profiledata.woce_time = int32(str2double(profiledata.woce_time));
+profiledata.woce_date = int32(str2double(profiledata.woce_date));
+disp([profiledata.woce_date profiledata.woce_time])
 
 %start of profile data:
 if ~isempty(strmatch('T-4',probetypec));
@@ -309,95 +331,54 @@ else
     keyboard
 end
 
-
-profiledata.No_Depths=0;
-
-proftypes=d;
-kk=find(proftypes=='-');
-profiledata.No_Prof=length(kk);
-
-kt=strfind(proftypes,'Temp');
-ks=strfind(proftypes,'Sal');
-ksv=strfind(proftypes,'Sound');
-kd=strfind(proftypes,'Dens');
-kc=strfind(proftypes,'Cond');
-
-if(~isempty(kt))
-    kindt=find(kk<kt);
-    profiledata.Prof_Type(kindt(end),:)='TEMP            ';
+profs = ['TEMP            ';
+    'PSAL            ';
+    'SVEL            ';
+    'DENS            ';
+    'COND            '];
+names = {'Temp','Sal','Sound','Dens','Cond'};
+datind = [];count = 0;
+for a = 1:length(names)
+    ii = find(cellfun(@isempty,strfind(proftypes,names{a}))==0);
+    if ~isempty(ii)
+        count = count+1;
+        profiledata.Prof_Type(count,:) = profs(count,:);
+        datind(count) = ind(ii);
+    end
 end
-if(~isempty(ks))
-    kinds=find(kk<ks);
-    profiledata.Prof_Type(kinds(end),:)='PSAL            ';
-end
-if(~isempty(ksv))
-    kindsv=find(kk<ksv);
-    profiledata.Prof_Type(kindsv(end),:)='SVEL            ';
-end
-if(~isempty(kd))
-    kindd=find(kk<kd);
-    profiledata.Prof_Type(kindd(end),:)='DENS            ';
-end
-if(~isempty(kc))
-    kindc=find(kk<kc);
-    profiledata.Prof_Type(kindc(end),:)='COND            ';
-end
+%just do temperature
+profiledata.No_Prof=1;
+profiledata.Prof_Type(2:end,:) = [];
+depind = find(cellfun(@isempty,strfind(proftypes,'Depth'))==0);
 
 m=0;
 d=fgets(fid);
 
+nd=0;
+clear data
 while(~feof(fid))
-    finished=0;
-    nd=0;
-    clear data
-    while ~finished
-        [tt, d] = strtok(d);
-        if isempty(d)
-            finished = 1;
-        else
-            nd = nd + 1;
-            data(nd) = sscanf(tt, '%f');
-        end
-    end
-    
-    m=m+1;
-    
-    for j=2:length(data)
-        profiledata.Depthpress(m,j-1)=data(1);
-        profiledata.DepresQ(1,m,j-1)='0';
-        profiledata.Profparm(1,1,m,1,j-1)=data(j);
-        profiledata.ProfQP(1,1,1,m,1,j-1)='0';
-    end
+    dd = str2num(d);
+    nd = nd + 1;
+    data(nd,:) = dd(datind);
+    dep(nd) = dd(depind);
+
     d=fgets(fid);
-    
 end
 fclose(fid);
 
-%convert last point:
-finished=0;
-nd=0;
-data = [];
-while ~finished
-    [tt, d] = strtok(d);
-    if isempty(d)
-        finished = 1;
-    else
-        nd = nd + 1;
-        data(nd) = sscanf(tt, '%f');
-    end
-end
+% clean up data where temperature is out of range
+ibad = data(:,1) < -5 | data(:,1) > 40;
+data(ibad,:) = [];
+dep(ibad) = [];
 
-if ~isempty(data)
-    
-    m=m+size(data,1);
-end
-
-for j=2:length(data)
-    profiledata.Depthpress(m,j-1)=data(1);
-    profiledata.DepresQ(1,m,j-1)='0';
-    profiledata.Profparm(1,1,m,1,j-1)=data(j);
-    profiledata.ProfQP(1,1,1,m,1,j-1)='0';
-end
+% just keep temperature as the writing of the other variables isn't working
+% and I don't have time to handle this.
+profiledata.No_Depths=size(data,1);
+profiledata.Deep_Depth = max(dep(:,1));
+profiledata.Depthpress=dep';
+profiledata.DepresQ(1,1:length(dep))='0';
+profiledata.Profparm(1,1,:,:)=data(:,1);
+profiledata.ProfQP(1,1,1,1:size(data,1))='0';
 
 if isempty(profiledata.latitude)
     profiledata.latitude=input('enter DECIMAL latitude:');
@@ -408,22 +389,11 @@ end
 
 if correctDepths
     disp('Old coefficients used, updating to new')
-    profiledata = calc_depths(probetype,profiledata);    
+    [profiledata] = calc_depths(probetype,profiledata);    
     probetype(3:3)='2';
     coeff2='6.691';
     coeff3='-0.00225';
 end
-
-
-for i=1:profiledata.No_Prof
-    profiledata.Dup_Flag(i)='N';
-    profiledata.Digit_Code(i)='7';
-    profiledata.Standard(i)='2';
-    profiledata.No_Depths(i)=m;
-    profiledata.D_P_Code(i)='D';
-    profiledata.Deep_Depth(i)=profiledata.Depthpress(m,i);
-end
-
 
 
 %convert the extra bits in the file:
@@ -521,11 +491,5 @@ pd.nsurfc = profiledata.Nsurfc;
 pd.ptype = profiledata.Prof_Type;
 
 profiledata.Prof_Type = profiledata.Prof_Type';
-%add in some more stuff to profiledata
-ju=julian([str2num(pd.year) str2num(pd.month) str2num(pd.day) ...
-    floor(profiledata.woce_time/100) rem(profiledata.woce_time,100) 0])-2415020.5;
-profiledata.time = ju;
-profiledata.woce_time = int32(profiledata.woce_time);
-profiledata.woce_date = int32(str2double(profiledata.woce_date));
 
 return
