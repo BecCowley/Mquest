@@ -65,13 +65,8 @@ pd.pos_qc = profiledata.Q_Pos;
 pd.juld_qc = profiledata.Q_Date_Time;
 
 wt=profiledata.woce_time;
-wt=floor(wt/100);
-wt2=sprintf('%4i',wt);
-jk=strfind(wt2,' ');
-if(~isempty(jk))
-    wt2(jk)='0';
-end
-pd.time=[wt2(1:2) ':' wt2(3:4)];
+wt2=sprintf('%06i',wt);
+pd.time=[wt2(1:2) ':' wt2(3:4) ':' wt2(5:6)];
 
 pt=strmatch('TEMP',profiledata.Prof_Type');
 ps=strmatch('PSAL',profiledata.Prof_Type');

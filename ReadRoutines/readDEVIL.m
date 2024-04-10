@@ -123,9 +123,22 @@ rawdata = nc2struct(fname);
 
 %CS: profile date
 profiledata.woce_date = num2str(rawdata.woce_date);
-%CS: profile time - get rid of milliseconds
-time = rawdata.woce_time;
-profiledata.woce_time = time;
+%let's get time from rawdata.time and check against woce_time/woce_date
+tiunits = ncreadatt(fname,'time','units');
+time = rawdata.time;
+[time,timezone]=cdfdate2num(tiunits,'gregorian',time);
+wt = rawdata.woce_time;
+%woce_time format in the turo file should be padded to the left
+wt = sprintf('%06d',wt);
+wdt = datenum([profiledata.woce_date wt],'yyyymmddHHMMSS');
+% time and wdt should be within 1 second of each other
+if abs(time-wdt) > 2/60/60/24
+    disp(['woce date/time = ' datestr(wdt)])
+    disp(['time           = ' datestr(time)])
+    keyboard
+end
+% passed this, so let's fill in the profiledata time fields 
+profiledata.woce_time = str2num(wt);
 profiledata.latitude = rawdata.latitude;
 %CS: need to multiply lon by -1 so same convention as MA
 profiledata.longitude = rawdata.longitude;
@@ -422,13 +435,11 @@ profiledata.ProfQP(1,1,1,1:ndepths)='0';
 %make the pd structure for plotting and adding QC
 pd.latitude=profiledata.latitude;
 pd.longitude=profiledata.longitude;
-pd.year=profiledata.woce_date(1:4);
-pd.month=profiledata.woce_date(5:6);
-pd.day=profiledata.woce_date(7:8);
+pd.year=datestr(wdt,'yyyy');
+pd.month=datestr(wdt,'mm');
+pd.day=datestr(wdt,'dd');
 pd.ndep=profiledata.No_Depths;
-wt=sprintf('%06d',profiledata.woce_time);
-
-pd.time=[wt(1:2) ':' wt(3:4) ':' wt(5:6)];
+pd.time=datestr(wdt,'HH:MM:SS');
 pd.depth = depths;
 pd.deep_depth = profiledata.Deep_Depth;
 pd.qc = squeeze(profiledata.ProfQP);
@@ -452,8 +463,7 @@ pd.nsurfc = profiledata.Nsurfc;
 pd.ptype = profiledata.Prof_Type';
 
 %add in some more stuff to profiledata
-ti = datenum([profiledata.woce_date ' ' wt],...
-    'yyyymmdd HHMMSS') - datenum('1900-01-01 00:00:00');
+ti = wdt - datenum('1900-01-01 00:00:00');
 profiledata.time = ti;
 profiledata.woce_time = int32(profiledata.woce_time);
 profiledata.woce_date = int32(str2double(profiledata.woce_date));
