@@ -374,7 +374,7 @@ switch qualflag
             %saveguidata
             
             updatekeys('obs_t',keysdata.masterrecno(handles.currentprofile),...
-                keytime,keysdata.prefix);
+                keytime(1:4),keysdata.prefix);
         end
         
         diffdate=abs(olddate-newdate);
