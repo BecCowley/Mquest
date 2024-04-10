@@ -136,6 +136,13 @@ for a = 1:length(flds)
     if ~isempty(profiledata.(flds{a}))
         %     write edited file
         ncwrite(filenam,flds{a},profiledata.(flds{a}));
+        % write data_min and data_max values for latitude/longitude/woce_date/woce_time/time
+        if contains('latitude',flds{a}) | contains('longitude',flds{a}) ...
+                | contains('woce_date',flds{a}) | contains('woce_time',flds{a}) ...
+                | contains('time',flds{a})
+            ncwriteatt(filenam,flds{a},'data_min',profiledata.(flds{a}));
+            ncwriteatt(filenam,flds{a},'data_max',profiledata.(flds{a}));
+        end      
     end
     catch
         disp(['writenetcdf: Unable to write item: ' num2str(a) ' ' flds{a}])
