@@ -16,7 +16,7 @@ i=handles.currentprofile;
 ylimit=get(handles.profile,'Ylim');
 xlimit=get(handles.profile,'Xlim');
 
-col=['gbyrg'];
+col=['gbyrb'];
 % remove this because otherwise resetting from zoom leaves the zoomed
 % quality bar at the side - caution this might slow it down...
 %if(handles.displaybuddy~='Y')

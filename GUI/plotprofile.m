@@ -9,7 +9,7 @@ tt=title([ 'Database prefix: ' keysdata.prefix '(' num2str(length(keysdata.stnnu
 i=handles.currentprofile;
 currentp=i
 
-col=['gbyrg'];
+col=['gbyrb'];
 readnetcdf;
 pd = handles.pd;
 handles.changed='N';

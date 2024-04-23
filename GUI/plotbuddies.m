@@ -22,7 +22,7 @@ keysdata=handles.keys;
 currentlat=keysdata.obslat(i);
 currentlon=keysdata.obslon(i);
 currentmonth=keysdata.month(i);
-col=['gbyrg'];
+col=['gbyrb'];
 handles.displaybuddy='Y';   
 
 %saveguidata
