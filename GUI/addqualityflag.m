@@ -37,7 +37,7 @@ update = datestr(now,'yyyymmdd');
 switch qualflag
     
     case 'CSA'
-        
+
         if(strmatch('XC',handles.keys.datatype(handles.currentprofile,:)))
             kk=find(pd.depth<=1.9);
         else
@@ -144,7 +144,7 @@ switch qualflag
         histd=pd.depth(startpoint);
         actparm='TEMP';
         oldt='99.99';
-        severity=2;
+        severity=5;
         addhistories
         handles.pd=pd;
         
@@ -365,8 +365,8 @@ switch qualflag
             actparm='TIME';
             addhistories
             %you must also change the keys file!!!
-            
-            keysdata.time(handles.currentprofile)=newtime;
+            % HHMM format for keys
+            keysdata.time(handles.currentprofile)=str2num(keytime(1:4));
             
             handles.pd=pd;
             handles.keys=keysdata;

@@ -147,7 +147,7 @@ qcstring= [pd.QC_code(kk,:) num2str(pd.QC_depth(kk),' \t%9.2f')];
         updatekeys('obs_d',keysdata.masterrecno(handles.currentprofile),...
                 pd.day,keysdata.prefix);
         updatekeys('obs_t',keysdata.masterrecno(handles.currentprofile),...
-                t,keysdata.prefix);
+                t(1:4),keysdata.prefix);
         updatekeys('obslat',keysdata.masterrecno(handles.currentprofile),...
                 pd.latitude,keysdata.prefix);
        
@@ -161,7 +161,7 @@ qcstring= [pd.QC_code(kk,:) num2str(pd.QC_depth(kk),' \t%9.2f')];
         keysdata.year(handles.currentprofile)=str2num(pd.year);
         keysdata.month(handles.currentprofile)=str2num(pd.month);
         keysdata.day(handles.currentprofile)=str2num(pd.day);
-        keysdata.time(handles.currentprofile)=str2num(t);
+        keysdata.time(handles.currentprofile)=str2num(t(1:4));
         keysdata.obslon(handles.currentprofile)=c;
         keysdata.obslat(handles.currentprofile)=pd.latitude;
         
