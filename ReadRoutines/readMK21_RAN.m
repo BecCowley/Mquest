@@ -196,8 +196,13 @@ while isempty(strmatch('Depth (m)',d))
     elseif(strmatch('Time',d))
         
         %change time to decimal:
-        pd.time = d(18:22);
-        profiledata.woce_time = num2str((str2num(d(18:19))*100 + str2num(d(21:22))) *100);
+        %AW fix - add seconds
+        %pd.time = d(18:22);
+        %profiledata.woce_time = num2str((str2num(d(18:19))*100 + str2num(d(21:22))) *100);
+        pd.time = d(18:25)
+        tt = strsplit(d(18:25),':');
+        profiledata.woce_time = num2str(str2num(tt{1})*10000 ...
+        + str2num(tt{2})*100 + str2num(tt{3}));
         
     elseif(strmatch('Latitude',d))
         
@@ -516,10 +521,17 @@ pd.ptype = profiledata.Prof_Type;
 
 profiledata.Prof_Type = profiledata.Prof_Type';
 %add in some more stuff to profiledata
+
+%AW Fix wt has not been set - should be profiledata.woce_time (integer)
+%but as a six char string in format HHMMSS e.g 00:48:17 -> 4817 -> 004817
+%ti = datenum([profiledata.woce_date ' ' wt],...
+%    'yyyymmdd HHMMSS') - datenum('1900-01-01 00:00:00');
+wt = sprintf('%06d',profiledata.woce_time)
 ti = datenum([profiledata.woce_date ' ' wt],...
     'yyyymmdd HHMMSS') - datenum('1900-01-01 00:00:00');
+
 profiledata.time = ti;
-profiledata.woce_time = int32(profiledata.woce_time);
-profiledata.woce_date = int32(str2double(profiledata.woce_date));
+profiledata.woce_time = int32(profiledata.woce_time)
+profiledata.woce_date = int32(str2double(profiledata.woce_date))
 
 return

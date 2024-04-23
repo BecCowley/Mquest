@@ -152,6 +152,8 @@ if strcmp(get(handles.importdata,'SelectionType'),'open') % If double click
     filename =[ file_list{index_selected} ]; % Item selected in list box
     if  handles.isdir(index_selected) % If directory
         handles.inputdatadir=[handles.inputdatadir '/' filename];
+        %AW Add -  set filename to full path - this way listdir call has the full path
+        filename=handles.inputdatadir;
     %cd (filename)
         input=1;
         listdir % Load list box with new directory
