@@ -33,7 +33,7 @@ for i=nn+1:nn+abs(startpoint-endpoint)+1
     pd.QC_depth(i)=pd.depth(cind);
     pd.PRC_Date(i,1:8)=update;
     pd.PRC_Code(i,1:4)='CSCB';
-    pd.Version(i,1:4)=' 1.0';
+    pd.Version(i,1:4)=' 2.0';
     pd.Act_Parm(i,1:4)='TEMP';
     oldt=num2str(pd.temp(cind));
     pd.Previous_Val(i,1:length(oldt))=oldt;
@@ -53,7 +53,7 @@ if(isfield(pd,'sal'))
         pd.QC_depth(i)=pd.depthsal(cind);
         pd.PRC_Date(i,1:8)=update;
         pd.PRC_Code(i,1:4)='CSCB';
-        pd.Version(i,1:4)=' 1.0';
+        pd.Version(i,1:4)=' 2.0';
         pd.Act_Parm(i,1:4)='PSAL';
         oldt=num2str(pd.sal(cind));
         pd.Previous_Val(i,1:length(oldt))=oldt;

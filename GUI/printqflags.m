@@ -21,7 +21,7 @@ set(g,'LineWidth',2);
 
 
 
-col=['gbyrg'];
+col=['gbyrb'];
 
 %plot colored line of profile quality
 clear xc

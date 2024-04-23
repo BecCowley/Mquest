@@ -5,7 +5,7 @@
 
 i=handles.currentprofile;
 
-col=['gbyrg'];
+col=['gbyrb'];
 plot_clim;
 isn=find(~isnan(pd.temp) & pd.temp<99.);
 

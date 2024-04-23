@@ -25,10 +25,13 @@ for kk=s1:s2
     if(~isempty(llk))
         temptemp(kk)=median(tt(llk));
     else
-%retain original value 
+        %retain original value
     end
 end
-
+%assign qc values to temp here as this is where the start and endpoints
+%exist
+pd.qc(s1:s2) = '5';
+pd.qc(s2+1:end) = '2';
 pd.temp=temptemp;
 handles.pd=pd;
 %saveguidata
