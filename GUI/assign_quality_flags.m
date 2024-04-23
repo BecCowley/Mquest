@@ -12,49 +12,55 @@
 
 global DATA_QC_SOURCE
 
-%set quality to 0 so new qualities overwrite the original quality (bad
-%qualities are coming in with some data sets)...
-oldqc=pd.qc;
-%kkold=find(oldqc=='5');
+%retain existing QC values 
+oldqc = str2num(pd.qc);
+%set quality to 0 so new qualities overwrite the original quality 
 pd.qc(1:pd.ndep)=num2str(0);
 
 if(pd.numhists>0)
-    oldqual=0;
-    jj=0;
-    for i=1:pd.numhists
-        %the depth of this QC flag:
+
+% make an array of QC values for each flag applied
+qcarr = zeros(length(pd.depth),pd.numhists);
+    for i=1:pd.numhists        
         pdqcd=pd.QC_depth(i);
-        
+        idepth = find(pd.depth >= pdqcd-0.008);
         if(strmatch('CS',pd.QC_code(i,:)))
-            kk=find(pd.depth>=pdqcd-0.008);  % & pqd~='5');
-            pd.qc(kk(1))='3';
-        elseif((strmatch('SP',pd.QC_code(i,:)) | ...
-                strmatch('IP',pd.QC_code(i,:))) & ...
-                pd.Flag_severity(i)<3 & oldqual<3 )
-            kk=find(pd.depth>=pdqcd-0.008);  % & pqd~='5');
-            pd.qc(kk(1))='5';
-        elseif(pd.Flag_severity(i)>oldqual & pd.Flag_severity(i)~=5)
-            pqd=pd.qc';
-            %find all depths greater than the QC flag depth and assign the
-            %quality flag to those depths - but ONLY if the new quality is
-            %greater than the old quality and NOT equal to "5" (i.e., the
-            %data has been changed - these remain at 5, regardless of the
-            %new flag's severity)...
-            %        try
-            %            kk=find(pd.depth>=pdqcd-0.001);   % & pqd~='5');
-            %        catch
-            %            pqd=pqd';
-            kkl=find(pd.depth>=pdqcd-0.008);  % & pqd~='5');
-            if(pd.Flag_severity(i)<3)
-                kk=find(pqd(kkl)~='5');
-            else
-                kk=1:length(kkl);
-            end
-            %        end
-            pd.qc(kkl(kk))=num2str(pd.Flag_severity(i));
-            oldqual=pd.Flag_severity(i);
+            qcarr(idepth(1),i)=3;
+        elseif (~isempty(strmatch('SP',pd.QC_code(i,:))) | ...
+                ~isempty(strmatch('IP',pd.QC_code(i,:)))) & ...
+                pd.Flag_severity(i)<3  
+            qcarr(idepth(1),i)=5;
+            qcarr(idepth(2):end,i) = 2;
+        elseif ~isempty(strmatch('HF',pd.QC_code(i,:))) 
+            % HF is different, code is only on first point, but temp qc
+            % needs to be 5 for interpolated parts. medianfilter.m writes
+            % the QC codes for HF, therefore,
+            % need to use the 'oldqc' to retain quality
+            % for HF
+            imatch = oldqc(idepth) == 5;
+            qcarr(idepth(imatch),i)=5;
+            imatch = oldqc(idepth) == 2;            
+            qcarr(idepth(imatch),i) = 2;
+            
+        else
+            qcarr(idepth(1):end,i)=pd.Flag_severity(i);
         end
     end
+    % compare the arrays and don't overwrite bad flags (3, 4) with a changed
+    % flag (5)
+    allqcarr = qcarr;
+    i5 = qcarr == 5;
+    % change the 5 for 0 for now
+    qcarr(i5) = 0;
+    % find the worst data without the changed flags
+    newqc=max(qcarr,[],2);
+    % now put in the changed flags where quality is 1 or 2
+    irep = newqc <= 2 & max(allqcarr,[],2) == 5;
+    newqc(irep) = 5;
+    % and if there are NaNs in the temperature (eg from PLA), replace QC with
+    % zeros
+    newqc(isnan(pd.temp)) = 0;
+    pd.qc = num2str(newqc);
 else
     %if there has been no QC done, the quality is "0"
     pd.qc(1:pd.ndep)=num2str(0);
