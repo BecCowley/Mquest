@@ -131,11 +131,7 @@ switch qualflag
             end
         else
             ptemp=pd.qc;
-            gg=strfind(ptemp','5');
-            if(isempty(gg))
-                gg=0;
-            end
-            startpoint=gg(end)+1;
+            startpoint=1;
             endpoint=pd.ndep;
         end
         
@@ -144,7 +140,6 @@ switch qualflag
         histd=pd.depth(startpoint);
         actparm='TEMP';
         oldt='99.99';
-        severity=5;
         addhistories
         handles.pd=pd;
         
