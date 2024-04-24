@@ -20,6 +20,7 @@ obst = ncread([prefix '_keys.nc'],'obs_t');
 %% let's extract the date/time information from the original files
 turof = dir([orig '/*.nc']);
 [tlat, tlon, turot] = deal(NaN*ones(length(turof),1));
+tcruid = "";
 for a = 1:length(turof)
     filn = [turof(a).folder '/' turof(a).name];
     %let's get time from rawdata.time and check against woce_time/woce_date
@@ -29,6 +30,7 @@ for a = 1:length(turof)
     %get the lat/lon for confirmation too
     tlat(a) = ncread(filn, 'latitude');
     tlon(a) = ncread(filn, 'longitude');
+    tcruid(a) = ncreadatt(filn, '/','Voyage');
 end
 
 %%
@@ -48,7 +50,7 @@ for aa=1:length(stnnum)
             disp('This file has a TIME change QC code, not handled in this code.')
             disp('Suggest ''kill'' the QC for this profile and re-run this code, then re-qc')
             disp(filenamed)
-            return
+%             return
         end
     end
     
@@ -79,11 +81,26 @@ for aa=1:length(stnnum)
     %location
     lated = ncread(filenamed,'latitude');
     loned = ncread(filenamed,'longitude');
+    % cruiseid
+    cruid = strtrim(ncread(filenamed, 'Cruise_ID'));
     
     % checking again for ed/raw differences
     if lat~=lated | lon ~= loned | ti ~= tied
-        disp('Different lat/lon/date/time in ed and raw files')
-        return
+        % if no PE in flags, stop
+        ok = 0;
+        for bb = 1:nhists
+            if matches('PE',qc(bb,:))
+                ok = 1;
+            end
+            if matches('TE',qc(bb,:))
+                ok = 1;
+            end
+        end
+        if ~ok
+            disp('Different lat/lon/date/time in ed and raw files for:')
+            disp(filenamed)
+            return
+        end
     end
 %     if ~matches(wt, wted)
 %         disp('Different woce_times in ed and raw files')
@@ -93,24 +110,27 @@ for aa=1:length(stnnum)
 %     end
     datet = datestr(ti,'yyyymmdd');
 
-    if matches(obstt,wted(1:4)) & matches('000000',tiied)
-        % woce_time is correct, pre-bug situation
-        % let's take the opportunity to fix the time variable anyway
+    % let's take the opportunity to fix the time variable for everything
+    wd = ncread(filenamraw, 'woce_date');
+    if ti ~= datenum([num2str(wd) wt],'yyyymmddHHMMSS')
         if ~matches(tii(1:4),wt(1:4))
-            wd = ncread(filenamraw, 'woce_date');
             if matches(num2str(wd),datet)
                 % we can proceed to updating the time field, dates
                 % match
+                disp(['fixing time variable for: ' filenamed])
                 wdt = datenum([num2str(wd) wt],'yyyymmddHHMMSS');
                 tim = wdt - datenum('1900-01-01 00:00:00');
                 ncwrite(filenamraw, 'time', tim);
                 ncwrite(filenamed, 'time', tim);
+                %assign the new time
+                ti = wdt;
             else
                 disp('Dates dont match, not updating time field')
                 return
             end
         end
-    else
+    end
+    if ~matches(obstt,wted(1:4)) & (matches('000000',tiied) | ~matches(wt,wted))
         % post-bug situation, need to update woce_time and time variables
         % from original TURO files.
         % find the closest date/time information (within 1.5 minutes)
@@ -118,11 +138,15 @@ for aa=1:length(stnnum)
         %lat/lon confirmation
         [cc,jj] = min(abs(lat - tlat));
         [cc,kk] = min(abs(lon - tlon));
-        if jj ~= kk | c > 3/60/24 %lat/lon should be same index, time within 3 minutes
-            disp('No match for this profile in the turo dataset')
-            disp(filenamraw)
-            continue
+        if jj ~= kk & kk ~= ii
+            if jj ~= kk | c > 3/60/24 %lat/lon should be same index, time within 3 minutes
+                %             disp('No match for this profile in the turo dataset')
+                %             disp(filenamraw)
+                disp(cruid')
+                continue
+            end
         else
+%             disp(filenamed)
 
             if contains(turof(kk).name, 'test')
                 % need to use the index for the time match, not the lat/lon
@@ -146,6 +170,7 @@ for aa=1:length(stnnum)
                 end
             end
             % write out the correct woce_time
+            disp(['fixing: ' filenamed])
             ncwrite(filenamraw, 'woce_time', single(str2num(newwt)))
             ncwrite(filenamed, 'woce_time', single(str2num(newwt)))
             % and update the time variable
