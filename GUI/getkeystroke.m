@@ -710,7 +710,7 @@ end
         axes(handles.profile);
         qualf='QCA';
         addqualityflag(qualf,0,1);
-        qualf='CSA';
+        qualf='CSR';
         addqualityflag(qualf,0,0);
         %put into buddy mode
         plotbuddies
