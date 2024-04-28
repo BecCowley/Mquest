@@ -27,7 +27,7 @@
   semicolon     NON     %not used
   z             HBR     %hit bottom
   x             NGR     %no good - reject from cursor
-  c             CSA     %chop surface spikes
+  c             CSR     %chop surface spikes
   v             IPR     %insulation penetration - reject from cursor
   b             WBR     %wire break - reject from cursor
   n             NUA     %nub

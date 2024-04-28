@@ -36,7 +36,7 @@ update = datestr(now,'yyyymmdd');
 
 switch qualflag
     
-    case 'CSA'
+    case 'CSR'
 
         if(strmatch('XC',handles.keys.datatype(handles.currentprofile,:)))
             kk=find(pd.depth<=1.9);
