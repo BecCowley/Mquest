@@ -4,7 +4,7 @@
 %retrieveguidata
 
 if i == 1
-    clear recwritten
+    recwritten = 0;
 end
 if(strmatch('TP',profiledata.Act_Code(:,:)'))
     return
@@ -24,7 +24,7 @@ if (fid==-1)
     return
 end
 
-if exist('recwritten','var') == 0 %for the sort key in MA files
+if recwritten == 0 %for the sort key in MA files
     mkstart = '00000100'
     profiledata.Mky = mkstart;
     mky = profiledata.Mky(1:6);

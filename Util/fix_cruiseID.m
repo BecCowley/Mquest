@@ -33,17 +33,17 @@ end
 % note there is a correct 177N in April, 2022
 
 % fix first issue:
-ii = contains(crid, '176N') & ti < datenum(2022,3,1); 
-crid(ii) = {'176S      '};
+ii = matches(crid, 'IN2015_V02');% & ti < datenum(2022,3,1); 
+crid(ii) = {'in2015_v02'};
 
-% fix second issue:
-ij = contains(crid, '177N') & ti < datenum(2022,4,1); 
-crid(ij) = {'176N      '};
+% % fix second issue:
+% ij = contains(crid, '177N') & ti < datenum(2022,4,1); 
+% crid(ij) = {'176N      '};
 
 %%
 %write back to file:
-stns = [stnnum(ii); stnnum(ij)];
-crids = [crid(ii), crid(ij)];
+stns = stnnum(ii);%[stnnum(ii); stnnum(ij)];
+crids = crid(ii);%[crid(ii), crid(ij)];
 for aa=1:length(stns)
     for bb = 1:2
         raw= bb -1;
