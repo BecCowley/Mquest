@@ -92,6 +92,9 @@ handles.keys2=keysdata2;
 % Choose default command line output for exportdata
 handles.output = -1;
 
+% default xctd extraction
+handles.usexctd = 1;
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -332,12 +335,12 @@ selectedcallsign=callslist(callsselected);
 
 subsetkeys=strmatch(selectedcallsign,keysdata2.callsign);
 %subset for XBTS if no XCTD selected (note, removes CTDs too).
-try
+% try
 if handles.usexctd == 0
     sk = strmatch('XB',keysdata2.datatype);
     subsetkeys = unique([subsetkeys;sk]);
 end
-end
+% end
 if(~isempty(subsetkeys))
     %create data structure:
     %for i=1:length(subsetkeys)
