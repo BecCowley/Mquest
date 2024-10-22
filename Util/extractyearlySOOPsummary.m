@@ -5,7 +5,8 @@
 % clear
 
 % Enter year of report:
-yr=input('Enter the year for this SOOP metadata report: ');
+yr=input('Enter the database name year for this SOOP metadata report: ');
+year_extr = input('Extract all data (default) or specific year (eg, 2023): ');
 % Which agency:
 who=input('Which agency: b (Bureau) or c (CSIRO) ','s');
 
@@ -13,7 +14,7 @@ who=input('Which agency: b (Bureau) or c (CSIRO) ','s');
 if who == 'c' 
   agency='CSIRO';
 %  agency='AU';
-  dirn = '/home/cow074/ocean_obs/UOT-data/quest/';
+  dirn = '/oa-decadal-climate/work/observations/oceanobs_data/UOT-data/quest/';
   pref = {['mer/CSIROXBT' num2str(yr)],['antarctic/CSIROXBT' num2str(yr) 'ant']};
 %   pref = {['mer/CSIROXBT2019'],['antarctic/CSIROXBT' num2str(yr) 'ant']};
 %   pref = {['mer/CSIROXBT2019'],['antarctic/CSIROXBT' num2str(yr) 'ant'],['BOM/BOM' num2str(yr)]};
@@ -66,14 +67,18 @@ for aa = 1:length(pref)
   xlabel('Longitude'),ylabel('Latitude')
   %colorbar
   hold on
-    
-  iyr=find(keysdata.year==yr);
-        
+  
+  if isempty(year_extr)
+      iyr = 1:length(keysdata.year);
+  else
+      iyr=find(keysdata.year==year_extr);
+  end
+
 % output information for SOT reporting:
 % get the summary of how many good profiles along each section
 
  % Extract metadata to a txt file
-  [dat,alldat] = extractSOOPsummary(yr,[dirn pref{aa}],keysdata);
+  [dat,alldat] = extractSOOPsummary(iyr,[dirn pref{aa}],keysdata);
   lat = [lat;alldat.lat];
   lon = [lon;alldat.lon];
   calls = [calls;alldat.calls];

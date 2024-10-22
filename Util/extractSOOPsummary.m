@@ -1,4 +1,4 @@
-function [dat,alldat] = extractSOOPsummary(yr,pref,kd);
+function [dat,alldat] = extractSOOPsummary(iyr,pref,kd);
 %    function dat = extractSOOPsummary(yr,pref);
 % replaces the fortran code to extract yearly summary information for SOOP
 % reporting purposes. Will create the same text file as the original
@@ -14,18 +14,14 @@ function [dat,alldat] = extractSOOPsummary(yr,pref,kd);
 % load up the SOTID-CALLSIGN list (to be updated when we get a new ship or
 % when we code in the recording of the SOTID.
 fid = fopen('calls_sotid.csv');
-c = textscan(fid,'%s%s%s','delimiter',',','headerlines',1);
+sotid = textscan(fid,'%s%s%s','delimiter',',','headerlines',1);
 fclose(fid);
 
 %ship callsigns for each line, number of drops for each ship for this year
 ti = datenum(kd.year,kd.month,kd.day,...
     floor(kd.time/100),rem(kd.time/100,1)*100,repmat(0,length(kd.year),1));
-% include the next years' info because
-%the l'astrolabe sometimes goes into the next year.
-iyr=find(kd.year>=yr & kd.year < yr + 1);
 
 flds = fieldnames(kd);
-%subset
 
 for a = 1:length(flds)
     eval(['d = kd.' flds{a} ';'])
@@ -97,9 +93,9 @@ for a = 1:length(alldat.ti)
     %record the information:
     if ~isempty(kk)
         alldat.calls(a,:) = srfcparm(kk,:);
-        isotid = find(cellfun(@isempty,strfind(c{3},strtrim(srfcparm(kk,:))))==0);
+        isotid = find(cellfun(@isempty,strfind(sotid{3},strtrim(srfcparm(kk,:))))==0);
         if ~isempty(isotid)
-            alldat.sotid(a,1:length(c{1}{isotid})) = c{1}{isotid};
+            alldat.sotid(a,1:length(sotid{1}{isotid})) = sotid{1}{isotid};
         end
     end
     if ~isempty(mm)
@@ -248,8 +244,8 @@ for b = 1:length(ii)
     dat.ship = [dat.ship;uship];
 
     %subset by ship:
-    for c = 1:size(uline,1)
-        kk = iship(ib == c);
+    for sotid = 1:size(uline,1)
+        kk = iship(ib == sotid);
         cr = alldat.crid(kk,:);
         gd = alldat.good(kk);
         bd = alldat.bad(kk);
