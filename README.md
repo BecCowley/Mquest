@@ -7,15 +7,13 @@ SHORTCUT KEYS: see 'MQuESTmanual.doc' in Documents folder.
 
 1) Clone git repository with Mquest files: https://github.com/BecCowley/Mquest.git
 2) Set up the CONFIG.m file with correct paths for your system before loading Mquest.
-3) Install additional files from Bec: Here is a link to get all the files you need to get Mquest working. These files aren't on the github.https://cloudstor.aarnet.edu.au/plus/s/9DG8nyBR0bXeT5M
+3) Install additional files. Here is a link to get all the files you need to get Mquest working https://drive.google.com/drive/folders/1tmLg7BL_dsIYALVQIHmhJ53DOWjcD8tZ?usp=sharing
 Unzip the files from the link and put them in the following directories :
 UserSettings/calls.txt
 UserSettings/CONFIG.m
 UserSettings/ships.txt
 UserSettings/uniqueid.mat
-CARSatlas (unzip CARSatlas.zip to here)
-CARSatlas/levitusdata (directory)
-CARSatlas/temperature_cars2009a.nc
+CARSatlas/temperature_Argo_2006_Jan2019.nc
 Bathymetry/terrainbase.nc
 
 4) Set the Matlab paths to include the folder that contains your Mquest code.
