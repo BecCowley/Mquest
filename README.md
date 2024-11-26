@@ -7,14 +7,15 @@ SHORTCUT KEYS: see 'MQuESTmanual.doc' in Documents folder.
 
 1) Clone git repository with Mquest files: https://github.com/BecCowley/Mquest.git
 2) Set up the CONFIG.m file with correct paths for your system before loading Mquest.
-3) Install additional files. Here is a link to get all the files you need to get Mquest working https://drive.google.com/drive/folders/1tmLg7BL_dsIYALVQIHmhJ53DOWjcD8tZ?usp=sharing
+3) Install additional files. Here is a link to get all the files you need to get Mquest working: https://drive.google.com/drive/folders/1tmLg7BL_dsIYALVQIHmhJ53DOWjcD8tZ?usp=sharing
+
 Unzip the files from the link and put them in the following directories :
-UserSettings/calls.txt
-UserSettings/CONFIG.m
-UserSettings/ships.txt
-UserSettings/uniqueid.mat
-CARSatlas/temperature_Argo_2006_Jan2019.nc
-Bathymetry/terrainbase.nc
+•	UserSettings/calls.txt
+•	UserSettings/CONFIG.m
+•	UserSettings/ships.txt
+•	UserSettings/uniqueid.mat
+•	CARSatlas/temperature_Argo_2006_Jan2019.nc
+•	Bathymetry/terrainbase.nc
 
 4) Set the Matlab paths to include the folder that contains your Mquest code.
 
@@ -34,7 +35,7 @@ MATLAB command line will ask for ship callsign, then voyage number, then shipnam
 You can run Mquest without a buddy database. When you start it up, enter a database name for your data and that will appear in the 'buddy' window below. If you wanted to add buddy databases, you could by clicking in that window. But if you don't have any, don't add any.
 
 The CSIRO Cookbook will help with describing which flags to use. The main ones to use are:
-•	 WBR = wire break reject (w key or q w keys)
+•	WBR = wire break reject (w key or q w keys)
 •	WSR = wire stretch reject (I use the drop down menu, but I think there are some shortcut keys for this).
 •	LER = leakage reject (q k keys)
 •	IPR = insulation penetration reject (q v keys)
