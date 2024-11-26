@@ -1,6 +1,5 @@
 # Mquest
 Mquest source code for XBT profile QC
-Currently runs in Matlab 2015b.
 
 Documents folder contains the user manual (a little out of date, but still ok).
 
