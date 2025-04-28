@@ -5,7 +5,7 @@
 % clear
 
 % Enter year of report:
-yr=input('Enter the database name year for this SOOP metadata report: ');
+yr=input('Enter the database year for this SOOP metadata report (eg, 2024: ');
 year_extr = input('Extract all data (default) or specific year (eg, 2023): ');
 % Which agency:
 who=input('Which agency: b (Bureau) or c (CSIRO) ','s');
@@ -14,13 +14,13 @@ who=input('Which agency: b (Bureau) or c (CSIRO) ','s');
 if who == 'c' 
   agency='CSIRO';
 %  agency='AU';
-  dirn = '/oa-decadal-climate/work/observations/oceanobs_data/UOT-data/quest/';
+  dirn = '/datasets/work/soop-xbt/work/UOT-data/quest/';
   pref = {['mer/CSIROXBT' num2str(yr)],['antarctic/CSIROXBT' num2str(yr) 'ant']};
 %   pref = {['mer/CSIROXBT2019'],['antarctic/CSIROXBT' num2str(yr) 'ant']};
 %   pref = {['mer/CSIROXBT2019'],['antarctic/CSIROXBT' num2str(yr) 'ant'],['BOM/BOM' num2str(yr)]};
 %   pref = {['mer/GTSPPmer2017MQNC'],['antarctic/CSIROXBT2016ant']};
   v= [100 200.,-80,20];
-  agency_title = ['CSIRO SOOP High and Low Density sampling - ' num2str(yr)];
+  agency_title = ['CSIRO SOOP XBT High Density sampling - ' num2str(yr)];
 
 % Bureau set up
 else

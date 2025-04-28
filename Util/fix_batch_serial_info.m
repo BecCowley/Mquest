@@ -6,7 +6,6 @@ clear
 prefix=input('enter the database prefix:','s');
 stnnum = str2num(ncread([prefix '_keys.nc'],'stn_num')');
 
-%%
 %serial numbers and batch dates:
 serial = NaN*ones(length(stnnum),1); batch = serial;
 hh = serial; prt=serial; scale = serial; offset = serial; ti = serial;
@@ -61,7 +60,7 @@ for aa=1:length(stnnum)
     
 end
 
-% plot
+%% plot
 % ii = find(contains(crid,'LA2107A'));
 ii = 1:length(stnnum);
 figure(1);clf
@@ -69,9 +68,9 @@ plot(batch(ii),serial(ii),'ko')
 datetick('x','mm/yy')
 grid
 title(prefix)
-% figure(2);clf
-% plot(hh(ii))
-% title('Launch Height')
+figure(2);clf
+plot(hh(ii),'x')
+title('Launch Height')
 % plot probe type information
 figure(3);clf;hold on
 uu = unique(prt(ii));
@@ -147,6 +146,7 @@ for a = 1:length(ii)
 end
 %%
 %write back to file:
+ii = 1:length(stnnum);
 for aa=1:length(stnnum)
     for bb = 1:2
         raw= bb -1;
