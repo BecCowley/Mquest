@@ -33,8 +33,8 @@ if(~exist('clima'))
     [meant,std] = deal(NaN*ones(length(deps),length(lon),12));
     for jj = 1:12
         [aa,days,midd]=names_of_months(jj);
-        meant(:,:,jj)=quest_get_clim_casts('t',lon,lat,deps,midd,'Argo_2006_Jan2019',1,1);
-        std(:,:,jj)=quest_get_clim_casts('t',lon,lat,deps,midd,'Argo_2006_Jan2019',1,9);
+        meant(:,:,jj)=quest_get_clim_casts('t',lon,lat,deps,midd,'Argo_2006_Feb2025',1,1);
+        std(:,:,jj)=quest_get_clim_casts('t',lon,lat,deps,midd,'Argo_2006_Feb2025',1,9);
     end
     
     clima.mean=meant;

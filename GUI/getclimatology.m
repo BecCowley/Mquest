@@ -2,11 +2,11 @@
 %plot in the profile window.
 
 if(ispc)
-    clim_fname=[CLIMATOLOGY_PATH_PC 'temperature_Argo_2006_Jan2019.nc'];
-    clim_fname2=[CLIMATOLOGY_PATH_PC 'temperature_Argo_2006_Jan2019.nc'];
+    clim_fname=[CLIMATOLOGY_PATH_PC 'temperature_Argo_2006_Feb2025.nc'];
+    clim_fname2=[CLIMATOLOGY_PATH_PC 'temperature_Argo_2006_Feb2025.nc'];
 else
-    clim_fname=[CLIMATOLOGY_PATH_UNIX 'temperature_Argo_2006_Jan2019.nc'];
-    clim_fname2=[CLIMATOLOGY_PATH_UNIX 'temperature_Argo_2006_Jan2019.nc'];
+    clim_fname=[CLIMATOLOGY_PATH_UNIX 'temperature_Argo_2006_Feb2025.nc'];
+    clim_fname2=[CLIMATOLOGY_PATH_UNIX 'temperature_Argo_2006_Feb2025.nc'];
 end
 
 clim.temp=getnc(clim_fname,'mean');
