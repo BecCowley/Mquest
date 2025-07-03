@@ -39,13 +39,9 @@ wd=num2str(profiledata.woce_date);
 profiledata.year=wd(1:4);
 profiledata.month=wd(5:6);
 profiledata.day=wd(7:8);
-wt = profiledata.woce_time;
+wt = double(profiledata.woce_time);
 wt=floor(wt/100);
-wt2=sprintf('%4i',wt);
-jk=strfind(wt2,' ');
-if(~isempty(jk))
-    wt2(jk)='0';
-end
+wt2=sprintf('%04i',wt);
 profiledata.wt=[wt2(1:2) ':' wt2(3:4)];
 
 %get rid of extra dimensions to make writing to MA easier:
