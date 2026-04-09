@@ -83,33 +83,33 @@ grid on
 legend(num2str(uu),'location','best')
 title('Batch vs serial by probe type')
 % plot scale information
-figure(4);clf;hold on
-uu = unique(prt(ii));
-for a = 1:length(uu)
-    jj = find(prt(ii) == uu(a)); 
-    sc = scale(ii(jj));
-    tp = testprobe(ii(jj));
-    tim = ti(ii(jj));
-    plot(tim(~tp),sc(~tp),'.','MarkerSize',14)
-end
-datetick('x','mm/yy')
-grid
-legend(num2str(uu),'location','best')
-title('Scale vs deployment date by probe type')
-% plot offset information
-figure(5);clf;hold on
-uu = unique(prt(ii));
-for a = 1:length(uu)
-    jj = find(prt(ii) == uu(a)); 
-    of = offset(ii(jj));
-    tp = testprobe(ii(jj));
-    tim = ti(ii(jj));
-    plot(tim(~tp),of(~tp),'.','MarkerSize',14)
-end
-datetick('x','mm/yy')
-grid
-legend(num2str(uu),'location','best')
-title('Offset vs deployment date by probe type')
+% figure(4);clf;hold on
+% uu = unique(prt(ii));
+% for a = 1:length(uu)
+%     jj = find(prt(ii) == uu(a)); 
+%     sc = scale(ii(jj));
+%     tp = testprobe(ii(jj));
+%     tim = ti(ii(jj));
+%     plot(tim(~tp),sc(~tp),'.','MarkerSize',14)
+% end
+% datetick('x','mm/yy')
+% grid
+% legend(num2str(uu),'location','best')
+% title('Scale vs deployment date by probe type')
+% % plot offset information
+% figure(5);clf;hold on
+% uu = unique(prt(ii));
+% for a = 1:length(uu)
+%     jj = find(prt(ii) == uu(a)); 
+%     of = offset(ii(jj));
+%     tp = testprobe(ii(jj));
+%     tim = ti(ii(jj));
+%     plot(tim(~tp),of(~tp),'.','MarkerSize',14)
+% end
+% datetick('x','mm/yy')
+% grid
+% legend(num2str(uu),'location','best')
+% title('Offset vs deployment date by probe type')
 %% 20xx dates - which cruise?
 %adjust this to suit each fix
 
@@ -117,7 +117,7 @@ title('Offset vs deployment date by probe type')
 % ii = find(stnnum == 89013822);
 % stnnum(ii)
 % ii = 1:length(stnnum);
-ij = find(serial(ii) > 1360000);
+ij = find(serial(ii) > 1390000);
 for a = 1:length(ii)
     disp(stnnum(ii(a)))
     disp(serial(ii(a)))
@@ -167,12 +167,12 @@ for aa=1:length(stnnum)
             srfcparm(:,kk) = '          ';
             srfcparm(1:length(ser),kk)=ser;
         end
-%         kk=strmatch('HTL$',srfccodes');
-%         if(~isempty(kk))
-%             heig = num2str(hh(aa))';
-%             srfcparm(:,kk) = '          ';
-%             srfcparm(1:length(heig),kk)=heig;
-%         end
+        % kk=strmatch('HTL$',srfccodes');
+        % if(~isempty(kk))
+        %     heig = num2str(hh(aa))';
+        %     srfcparm(:,kk) = '          ';
+        %     srfcparm(1:length(heig),kk)=heig;
+        % end
         ncwrite(filenam,'SRFC_Code',srfccodes)
         ncwrite(filenam,'SRFC_Parm',srfcparm)
         % ncwrite(filenam,'Cruise_ID',crid{aa})
@@ -181,12 +181,40 @@ end
 
 %% just write back a cruise ID that has been updated
 % CARE!! CHECK BEFORE RUNNING.
-for aa = 1:length(ii)
-    for bb = 1:2
-        raw= bb -1;
-        filen=getfilename(num2str(stnnum(ii(aa))),raw);
-        filenam=[prefix '/' filen];
-        ncwrite(filenam,'Cruise_ID','MS3401    ')
-
-    end
-end
+% for aa = 1:length(ii)
+%     for bb = 1:2
+%         raw= bb -1;
+%         filen=getfilename(num2str(stnnum(ii(aa))),raw);
+%         filenam=[prefix '/' filen];
+%         ncwrite(filenam,'Cruise_ID','MS3401    ')
+% 
+%     end
+% end
+%% ASH EDIT %%
+% Fix cruise ID by profiles
+% for aa = 1:length(ii)
+%     for bb = 1:2
+%         raw = bb - 1;
+%         filen = getfilename(num2str(stnnum(ii(aa))), raw);
+%         filenam = [prefix '/' filen];
+% 
+%         % select cruise ID by index range
+%         idx = ii(aa);     
+%         if idx <= 70
+%             short = 'LA2601A';
+%         elseif idx <= 147
+%             short = 'LA2602A';
+%         else
+%             short = 'LA2603A';
+%         end
+% 
+%         % pad to original Cruise_ID char length and write
+%         orig = ncread(filenam, 'Cruise_ID');
+%         nchar = size(orig,1);
+%         newc = repmat(' ', nchar, 1);
+%         s = short';
+%         len = min(length(s), nchar);
+%         newc(1:len) = s(1:len);
+%         ncwrite(filenam, 'Cruise_ID', newc);
+%     end
+% end
